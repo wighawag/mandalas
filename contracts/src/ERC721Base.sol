@@ -221,7 +221,7 @@ abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
 
     /// @dev See ownerOf
     function _ownerOf(uint256 id) internal view returns (address owner) {
-        owner = address(_tokenOwners.get(id));
+        owner = address(_tokenOwners.getOrZero(id));
         require(owner != address(0), "NOT_EXIST");
     }
 
@@ -230,12 +230,13 @@ abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
     /// @return owner The owner of the token.
     /// @return operatorEnabled Whether or not operators are enabled for this token.
     function _ownerAndOperatorEnabledOf(uint256 id) internal view returns (address owner, bool operatorEnabled) {
-        uint256 data = _tokenOwners.get(id);
+        uint256 data = _tokenOwners.getOrZero(id);
         owner = address(data);
         operatorEnabled = (data | OPERATOR_FLAG) == 1;
     }
 
     function _mint(uint256 id, address to) internal {
+        require(to != address(0), "NOT_TO_ZEROADDRESS");
         uint256 data = _tokenOwners.getOrZero(id);
         require(data == 0, "ALREADY_MINTED");
         _holderTokens[to].add(id);
@@ -244,7 +245,8 @@ abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
     }
 
     function burn(uint256 id) internal {
-        uint256 data = _tokenOwners.get(id);
+        uint256 data = _tokenOwners.getOrZero(id);
+        require(data != 0, "NOT_EXIST");
         require(data & BURN_FLAG == 0, "ALREADY BURN");
         address owner = address(data);
         require(msg.sender == owner, "NOT_OWNER");

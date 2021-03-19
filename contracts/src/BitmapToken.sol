@@ -6,10 +6,13 @@ pragma experimental ABIEncoderV2;
 
 import "./ERC721Base.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol";
+import "@openzeppelin/contracts/cryptography/ECDSA.sol";
 // import "hardhat/console.sol";
 
 contract BitmapToken is ERC721Base, IERC721Metadata {
     using EnumerableSet for EnumerableSet.UintSet;
+    using EnumerableMap for EnumerableMap.UintToUintMap;
+    using ECDSA for bytes32;
 
     /// @notice A descriptive name for a collection of NFTs in this contract
     function name() external pure override returns (string memory) {
@@ -22,6 +25,8 @@ contract BitmapToken is ERC721Base, IERC721Metadata {
     }
 
     function tokenURI(uint256 id) public view virtual override returns (string memory) {
+        address owner = _ownerOf(id);
+        require(owner != address(0), "NOT_EXISTS");
         return _tokenURI(id);
     }
 
@@ -36,9 +41,15 @@ contract BitmapToken is ERC721Base, IERC721Metadata {
         ERC721Base.supportsInterface(id) || id == 0x5b5e139f;
     }
 
-     struct TokenData {
+    struct TokenData {
         uint256 id;
         string tokenURI;
+    }
+
+    struct TokenDataMintedOrNot {
+        uint256 id;
+        string tokenURI;
+        bool minted;
     }
 
     function getTokenDataOfOwner(
@@ -58,17 +69,24 @@ contract BitmapToken is ERC721Base, IERC721Metadata {
         }
     }
 
+    function getTokenDataForIds(uint256[] memory ids) external view returns (TokenDataMintedOrNot[] memory tokens) {
+        tokens = new TokenDataMintedOrNot[](ids.length);
+        for (uint256 i = 0; i < ids.length; i++) {
+            uint256 id = ids[i];
+            uint256 data = _tokenOwners.getOrZero(id);
+            tokens[i] = TokenDataMintedOrNot(id, _tokenURI(id), data != 0);
+        }
+    }
 
-
-    function mint(uint256 id) external {
-        _mint(id, msg.sender);
+    function mint(address to, bytes memory signature) external {
+        // TODO payment
+        bytes32 hashedData = keccak256(abi.encodePacked("Bitmap", to));
+        address signer = hashedData.toEthSignedMessageHash().recover(signature);
+        _mint(uint256(signer), to);
     }
 
 
     function _tokenURI(uint256 id) internal view returns (string memory) {
-        address owner = _ownerOf(id);
-        require(owner != address(0), "NOT_EXISTS");
-
         bytes memory base64Bytes = new bytes((8 * 8) * 4);
 
         bytes32 random = keccak256(abi.encodePacked(id));
