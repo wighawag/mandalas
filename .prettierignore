@@ -1,0 +1,10 @@
+web/build
+web/public/pwa
+web/public/pwa
+contracts/deployments
+contracts/artifacts
+contracts/cache
+contracts/coverage
+node_modules
+common-lib/lib
+package.json

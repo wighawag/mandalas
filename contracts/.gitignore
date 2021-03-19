@@ -1,0 +1,14 @@
+coverage*
+typechain/
+
+cache/
+artifacts/
+
+node_modules/
+.env
+contractsInfo.json
+deployments/hardhat/
+deployments/localhost/
+
+.vscode/*
+!.vscode/settings.json.default
