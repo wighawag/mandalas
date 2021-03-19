@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import "@openzeppelin/contracts/utils/EnumerableMap.sol";
+import "./EnumerableMap.sol";
 
 abstract contract ERC721Base is IERC721 {
     using Address for address;
@@ -191,17 +191,17 @@ abstract contract ERC721Base is IERC721 {
     /// @param operator The address of the operator.
     /// @param from The from address, may be different from msg.sender.
     /// @param to The adddress we want to transfer to.
-    /// @param tokenId The id of the token we would like to transfer.
-    /// @param _data Any additional data to send with the transfer.
+    /// @param id The id of the token we would like to transfer.
+    /// @param data Any additional data to send with the transfer.
     /// @return Whether the expected value of 0x150b7a02 is returned.
     function _checkOnERC721Received(
         address operator,
         address from,
         address to,
         uint256 id,
-        bytes memory _data
+        bytes memory data
     ) internal returns (bool) {
-        bytes4 retval = IERC721Receiver(to).onERC721Received(operator, from, id, _data);
+        bytes4 retval = IERC721Receiver(to).onERC721Received(operator, from, id, data);
         return (retval == ERC721_RECEIVED);
     }
 
@@ -222,10 +222,10 @@ abstract contract ERC721Base is IERC721 {
     }
 
     function _mint(uint256 id, address to) internal {
-        uint256 data = _tokenOwners.get(id);
+        uint256 data = _tokenOwners.getOrZero(id);
         require(data == 0, "ALREADY_MINTED");
         _holderTokens[to].add(id);
-        _tokenOwners.set(id, to);
+        _tokenOwners.set(id, uint256(to));
         emit Transfer(address(0), to, id);
     }
 
@@ -234,8 +234,8 @@ abstract contract ERC721Base is IERC721 {
         require(data & BURN_FLAG == 0, "ALREADY BURN");
         address owner = address(data);
         require(msg.sender == owner, "NOT_OWNER");
-        _holderTokens[owner].remove(tokenId);
-        _tokenOwners.remove(tokenId);
+        _holderTokens[owner].remove(id);
+        _tokenOwners.remove(id);
         _tokenOwners.set(id, BURN_FLAG);
         emit Transfer(msg.sender, address(0), id);
     }

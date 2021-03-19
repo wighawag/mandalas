@@ -167,6 +167,14 @@ library EnumerableMap {
         return map._entries[keyIndex - 1]._value; // All indexes are 1-based
     }
 
+    function _getOrZero(Map storage map, bytes32 key) private view returns (bytes32) {
+        uint256 keyIndex = map._indexes[key];
+        if (keyIndex == 0) {
+            return 0x0000000000000000000000000000000000000000000000000000000000000000;
+        }
+        return map._entries[keyIndex - 1]._value; // All indexes are 1-based
+    }
+
     /**
      * @dev Same as {_get}, with a custom error message when `key` is not in the map.
      *
@@ -254,6 +262,11 @@ library EnumerableMap {
     function get(UintToUintMap storage map, uint256 key) internal view returns (uint256) {
         return uint256(_get(map._inner, bytes32(key)));
     }
+
+    function getOrZero(UintToUintMap storage map, uint256 key) internal view returns (uint256) {
+        return uint256(_getOrZero(map._inner, bytes32(key)));
+    }
+
 
     /**
      * @dev Same as {get}, with a custom error message when `key` is not in the map.
