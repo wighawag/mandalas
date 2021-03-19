@@ -1,29 +1,14 @@
-import {getUnnamedAccounts, ethers} from 'hardhat';
+import {getUnnamedAccounts, deployments} from 'hardhat';
 
-const messages = [
-  'Hello',
-  '你好',
-  'سلام',
-  'здравствуйте',
-  'Habari',
-  'Bonjour',
-  'नमस्ते',
-];
-
-function waitFor<T>(p: Promise<{wait: () => Promise<T>}>): Promise<T> {
-  return p.then((tx) => tx.wait());
-}
+const {execute} = deployments;
 
 async function main() {
   const others = await getUnnamedAccounts();
-  for (let i = 0; i < messages.length; i++) {
-    const sender = others[i];
-    if (sender) {
-      const greetingsRegistryContract = await ethers.getContract(
-        'GreetingsRegistry',
-        sender
-      );
-      await waitFor(greetingsRegistryContract.setMessage(messages[i]));
+  let n = 1;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      await execute('BitmapToken', {from: others[i]}, 'mint', n)
+      n++;
     }
   }
 }

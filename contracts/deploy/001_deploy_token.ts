@@ -10,6 +10,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy('BitmapToken', {
     from: deployer,
     log: true,
+    proxy: !hre.network.live
   });
 };
 export default func;

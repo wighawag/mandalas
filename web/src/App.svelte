@@ -21,7 +21,7 @@
 <Router {routes} globalQueryStrings={['debug', 'log', 'trace', '_d_eruda']}>
   <Notifications />
   <NavBar
-    links={[{name: 'index', title: 'Home'}, {name: 'demo', title: 'Demo'}]} />
+    links={[{name: 'index', title: 'Home'}]} />
   <CurrentPage>
     <Loading />
     Loading...

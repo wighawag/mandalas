@@ -20,8 +20,8 @@ abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
     uint256 internal constant OPERATOR_FLAG = (2**255);
     uint256 internal constant BURN_FLAG = (2**254);
 
-    mapping (address => EnumerableSet.UintSet) private _holderTokens;
-    EnumerableMap.UintToUintMap private _tokenOwners;
+    mapping (address => EnumerableSet.UintSet) internal _holderTokens;
+    EnumerableMap.UintToUintMap internal _tokenOwners;
     mapping(address => mapping(address => bool)) internal _operatorsForAll;
     mapping(uint256 => address) internal _operators;
 
