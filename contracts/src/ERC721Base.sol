@@ -4,10 +4,12 @@ pragma solidity 0.7.1;
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
+import "@openzeppelin/contracts/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "./EnumerableMap.sol";
 
-abstract contract ERC721Base is IERC721 {
+abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
     using Address for address;
     using EnumerableSet for EnumerableSet.UintSet;
     using EnumerableMap for EnumerableMap.UintToUintMap;
@@ -91,6 +93,19 @@ abstract contract ERC721Base is IERC721 {
         require(owner != address(0), "NONEXISTANT_TOKEN");
     }
 
+    function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
+        return _holderTokens[owner].at(index);
+    }
+
+    function totalSupply() public view virtual override returns (uint256) {
+        return _tokenOwners.length();
+    }
+
+    function tokenByIndex(uint256 index) public view virtual override returns (uint256) {
+        (uint256 tokenId, ) = _tokenOwners.at(index);
+        return tokenId;
+    }
+
     /// @notice Get the approved operator for a specific token.
     /// @param id The id of the token.
     /// @return The address of the operator.
@@ -142,12 +157,11 @@ abstract contract ERC721Base is IERC721 {
     /// @notice Check if the contract supports an interface.
     /// 0x01ffc9a7 is ERC165.
     /// 0x80ac58cd is ERC721
-    /// 0x5b5e139f is for ERC721 metadata
     /// 0x780e9d63 is for ERC721 enumerable
     /// @param id The id of the interface.
     /// @return Whether the interface is supported.
     function supportsInterface(bytes4 id) public pure virtual override returns (bool) {
-        return id == 0x01ffc9a7 || id == 0x80ac58cd || id == 0x5b5e139f || id == 0x780e9d63;
+        return id == 0x01ffc9a7 || id == 0x80ac58cd || id == 0x780e9d63;
     }
 
     function _transferFrom(
