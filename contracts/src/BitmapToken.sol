@@ -98,9 +98,9 @@ contract BitmapToken is ERC721Base, IERC721Metadata {
                     idStr,
                     '","description":"bitmap token generated from ',
                     idStr,
-                    '","image":"data:image/bmp;base64,Qk02wAAAAAAAADYAAAAoAAAACAAAAAgAAAABABgAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAA', //bmp_header, then 8bit per color 8x8
+                    '","image":"data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' shape-rendering=\'crispEdges\' width=\'512\' height=\'512\'><g transform=\'scale(64)\'><image width=\'8\' height=\'8\' style=\'image-rendering: pixelated;\' href=\'data:image/bmp;base64,Qk02wAAAAAAAADYAAAAoAAAACAAAAAgAAAABABgAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAA', //bmp_header, then 8bit per color 8x8
                     base64Bytes,
-                    '"}'
+                    '\'/></g></svg>"}'
                 )
             );
     }
