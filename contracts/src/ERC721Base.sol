@@ -4,9 +4,13 @@ pragma solidity 0.7.1;
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/utils/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/EnumerableMap.sol";
 
 abstract contract ERC721Base is IERC721 {
     using Address for address;
+    using EnumerableSet for EnumerableSet.UintSet;
+    using EnumerableMap for EnumerableMap.UintToUintMap;
 
     bytes4 internal constant ERC721_RECEIVED = 0x150b7a02;
     bytes4 internal constant ERC165ID = 0x01ffc9a7;
@@ -14,8 +18,8 @@ abstract contract ERC721Base is IERC721 {
     uint256 internal constant OPERATOR_FLAG = (2**255);
     uint256 internal constant BURN_FLAG = (2**254);
 
-    mapping(address => uint256) internal _numNFTs;
-    mapping(uint256 => uint256) internal _owners;
+    mapping (address => EnumerableSet.UintSet) private _holderTokens;
+    EnumerableMap.UintToUintMap private _tokenOwners;
     mapping(address => mapping(address => bool)) internal _operatorsForAll;
     mapping(uint256 => address) internal _operators;
 
@@ -76,7 +80,7 @@ abstract contract ERC721Base is IERC721 {
     /// @return balance The number of tokens owned by the address.
     function balanceOf(address owner) external view override returns (uint256 balance) {
         require(owner != address(0), "ZERO_ADDRESS_OWNER");
-        balance = _numNFTs[owner];
+        balance = _holderTokens[owner].length();
     }
 
     /// @notice Get the owner of a token.
@@ -151,9 +155,9 @@ abstract contract ERC721Base is IERC721 {
         address to,
         uint256 id
     ) internal {
-        _numNFTs[from] --;
-        _numNFTs[to] ++;
-        _owners[id] = uint256(to); // TODO should we check if from == to for operator clearing
+        _holderTokens[from].remove(id);
+        _holderTokens[to].add(id);
+        _tokenOwners.set(id, uint256(to));
         emit Transfer(from, to, id);
     }
 
@@ -164,9 +168,9 @@ abstract contract ERC721Base is IERC721 {
         uint256 id
     ) internal {
         if (operator == address(0)) {
-            _owners[id] = uint256(owner);
+            _tokenOwners.set(id, uint256(owner));
         } else {
-            _owners[id] = OPERATOR_FLAG | uint256(owner);
+            _tokenOwners.set(id, OPERATOR_FLAG | uint256(owner));
             _operators[id] = operator;
         }
         emit Approval(owner, operator, id);
@@ -194,16 +198,17 @@ abstract contract ERC721Base is IERC721 {
         address operator,
         address from,
         address to,
-        uint256 tokenId,
+        uint256 id,
         bytes memory _data
     ) internal returns (bool) {
-        bytes4 retval = IERC721Receiver(to).onERC721Received(operator, from, tokenId, _data);
+        bytes4 retval = IERC721Receiver(to).onERC721Received(operator, from, id, _data);
         return (retval == ERC721_RECEIVED);
     }
 
     /// @dev See ownerOf
     function _ownerOf(uint256 id) internal view returns (address owner) {
-        owner = address(_owners[id]);
+        owner = address(_tokenOwners.get(id));
+        require(owner != address(0), "NOT_EXIST");
     }
 
     /// @dev Get the owner and operatorEnabled status of a token.
@@ -211,25 +216,27 @@ abstract contract ERC721Base is IERC721 {
     /// @return owner The owner of the token.
     /// @return operatorEnabled Whether or not operators are enabled for this token.
     function _ownerAndOperatorEnabledOf(uint256 id) internal view returns (address owner, bool operatorEnabled) {
-        uint256 data = _owners[id];
+        uint256 data = _tokenOwners.get(id);
         owner = address(data);
         operatorEnabled = (data | OPERATOR_FLAG) == 1;
     }
 
     function _mint(uint256 id, address to) internal {
-        require(_owners[id] == 0, "ALREADY_MINTED");
-        _numNFTs[to] ++;
-        _owners[id] = uint256(to);
+        uint256 data = _tokenOwners.get(id);
+        require(data == 0, "ALREADY_MINTED");
+        _holderTokens[to].add(id);
+        _tokenOwners.set(id, to);
         emit Transfer(address(0), to, id);
     }
 
     function burn(uint256 id) internal {
-        uint256 data = _owners[id];
+        uint256 data = _tokenOwners.get(id);
         require(data & BURN_FLAG == 0, "ALREADY BURN");
         address owner = address(data);
         require(msg.sender == owner, "NOT_OWNER");
-        _numNFTs[msg.sender] --;
-        _owners[id] = BURN_FLAG;
+        _holderTokens[owner].remove(tokenId);
+        _tokenOwners.remove(tokenId);
+        _tokenOwners.set(id, BURN_FLAG);
         emit Transfer(msg.sender, address(0), id);
     }
 }
