@@ -29,7 +29,13 @@ type NFTs = {
   error?: unknown;
   tokens: NFT[];
   startIndex: number;
+  currentPrice?: BigNumber;
+  supply?: BigNumber;
 };
+
+type Token = {tokenURI: string; id: string; minted: boolean};
+
+type MintData = {currentPrice: BigNumber, supply: BigNumber, tokens: Token[]}
 
 export class RandomNFTStore extends BaseStore<NFTs> {
   private timer: NodeJS.Timeout | undefined;
@@ -37,7 +43,7 @@ export class RandomNFTStore extends BaseStore<NFTs> {
   private random = '';
   private accounts: Wallet[] = [];
   private cache: {
-    [cacheId: string]: {tokenURI: string; id: string; minted: boolean}[];
+    [cacheId: string]: Token[];
   } = {};
   constructor() {
     super({
@@ -45,6 +51,7 @@ export class RandomNFTStore extends BaseStore<NFTs> {
       error: undefined,
       tokens: [],
       startIndex: 0,
+      currentPrice: BigNumber.from(0)
     });
   }
 
@@ -133,25 +140,25 @@ export class RandomNFTStore extends BaseStore<NFTs> {
   }
 
   async query(): Promise<
-    null | {tokenURI: string; id: string; minted: boolean}[]
+    null | MintData
   > {
     if (this.accounts.length === 0) {
       return null;
     }
     const ids = this.accounts.map((v) => v.address);
-    const cacheId = ids.join(',');
-    const tokensFromCache = this.cache[cacheId];
-    if (tokensFromCache) {
-      return tokensFromCache;
-    }
+    // const cacheId = ids.join(',');
+    // const tokensFromCache = this.cache[cacheId];
+    // if (tokensFromCache) {
+    //   return tokensFromCache;
+    // }
     const contracts = chain.contracts || fallback.contracts;
     if (contracts) {
       console.log(`getTokenDataForIds: ${performance.now()}`);
-      const tokens = await contracts.BitmapToken.getTokenDataForIds(ids);
-      this.cache[cacheId] = tokens;
+      const mintData = await contracts.BitmapToken.getMintData(ids);
+      // this.cache[cacheId] = tokens;
       console.log(`done: ${performance.now()}`);
       // TODO support batching
-      return tokens;
+      return mintData;
     } else if (fallback.state === 'Ready') {
       throw new Error('no contracts to fetch with');
     } else {
@@ -161,15 +168,17 @@ export class RandomNFTStore extends BaseStore<NFTs> {
 
   private async _fetch(start: number) {
     const result = await this.query();
+    this.setPartial({currentPrice: result?.currentPrice, supply: result?.supply});
     if (start !== this.$store.startIndex) {
       return;
     }
+
     if (!result) {
       this.setPartial({tokens: [], state: 'Loading'});
     } else {
       if (this.$store.tokens.length === 0) {
         const tmp: NFT[] = [];
-        for (const token of result) {
+        for (const token of result.tokens) {
           tmp.push({
             id: token.id,
             tokenURI: token.tokenURI,
@@ -181,7 +190,7 @@ export class RandomNFTStore extends BaseStore<NFTs> {
         }
         this.setPartial({tokens: tmp, state: 'Ready'});
       }
-      const transformed = await this._transform(result);
+      const transformed = await this._transform(result.tokens);
       if (start !== this.$store.startIndex) {
         return;
       }
@@ -190,7 +199,7 @@ export class RandomNFTStore extends BaseStore<NFTs> {
   }
 
   async _transform(
-    tokens: {tokenURI: string; id: string; minted: boolean}[]
+    tokens: Token[]
   ): Promise<NFT[]> {
     // TODO cache
     const newResult: NFT[] = [];

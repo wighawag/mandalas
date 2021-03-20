@@ -56,6 +56,8 @@ importers:
       npm-run-all: ^4.1.5
       typescript: ^3.8.3
   contracts:
+    dependencies:
+      '@ethersproject/units': 5.0.11
     devDependencies:
       '@ethersproject/abi': 5.0.12
       '@ethersproject/bignumber': 5.0.13
@@ -75,12 +77,12 @@ importers:
       dotenv: 8.2.0
       ethers: 5.0.26
       fs-extra: 9.1.0
+      generative-art-common: 'link:../common-lib'
       hardhat: 2.0.11
       hardhat-deploy: 0.7.0-beta.44_hardhat@2.0.11
       hardhat-deploy-ethers: 0.3.0-beta.7_ethers@5.0.26+hardhat@2.0.11
       hardhat-gas-reporter: 1.0.4_hardhat@2.0.11
       hardhat-typechain: 0.3.5_8815b6a9336ce1da66c99228afdbeae1
-      generative-art-common: 'link:../common-lib'
       mocha: 8.2.1
       solidity-coverage: 0.7.15
       ts-generator: 0.1.1
@@ -94,6 +96,7 @@ importers:
       '@ethersproject/contracts': ^5.0.9
       '@ethersproject/providers': ^5.0.14
       '@ethersproject/solidity': ^5.0.2
+      '@ethersproject/units': ^5.0.11
       '@ethersproject/wallet': ^5.0.2
       '@openzeppelin/contracts': ^3.2.1-solc-0.7
       '@typechain/ethers-v5': ^6.0.0
@@ -106,12 +109,12 @@ importers:
       dotenv: ^8.2.0
       ethers: ^5.0.17
       fs-extra: ^9.0.1
+      generative-art-common: 'workspace:*'
       hardhat: ^2.0.10
       hardhat-deploy: ^0.7.0-beta.44
       hardhat-deploy-ethers: ^0.3.0-beta.7
       hardhat-gas-reporter: ^1.0.1
       hardhat-typechain: ^0.3.5
-      generative-art-common: 'workspace:*'
       mocha: ^8.1.1
       solidity-coverage: ^0.7.15
       ts-generator: ^0.1.1
@@ -209,9 +212,9 @@ importers:
       eslint: ^7.18.0
       eslint-config-prettier: ^7.2.0
       eslint-plugin-svelte3: ^3.0.0
+      generative-art-common: 'workspace:*'
       ipfs-deploy: ^8.0.1
       ipfs-gateway-emulator: ^4.2.1-ipfs.1
-      generative-art-common: 'workspace:*'
       named-logs: 0.0.13
       named-logs-console: 0.0.14
       npm-run-all: ^4.1.5
@@ -446,16 +449,36 @@ packages:
       bn.js: 4.12.0
     resolution:
       integrity: sha512-Q4TjMq9Gg3Xzj0aeJWqJgI3tdEiPiET7Y5OtNtjTAODZ2kp4y9jMNg97zVcvPedFvGROdpGDyCI77JDFodUzOw==
+  /@ethersproject/bignumber/5.0.15:
+    dependencies:
+      '@ethersproject/bytes': 5.0.11
+      '@ethersproject/logger': 5.0.10
+      bn.js: 4.12.0
+    dev: false
+    resolution:
+      integrity: sha512-MTADqnyacvdRwtKh7o9ujwNDSM1SDJjYDMYAzjIgjoi9rh6TY4suMbhCa3i2vh3SUXiXSICyTI8ui+NPdrZ9Lw==
   /@ethersproject/bytes/5.0.10:
     dependencies:
       '@ethersproject/logger': 5.0.9
     resolution:
       integrity: sha512-vpu0v1LZ1j1s9kERQIMnVU69MyHEzUff7nqK9XuCU4vx+AM8n9lU2gj7jtJIvGSt9HzatK/6I6bWusI5nyuaTA==
+  /@ethersproject/bytes/5.0.11:
+    dependencies:
+      '@ethersproject/logger': 5.0.10
+    dev: false
+    resolution:
+      integrity: sha512-D51plLYY5qF05AsoVQwIZVLqlBkaTPVHVP/1WmmBIWyHB0cRW0C9kh0kx5Exo51rB63Hk8PfHxc7SmpoaQFEyg==
   /@ethersproject/bytes/5.0.9:
     dependencies:
       '@ethersproject/logger': 5.0.8
     resolution:
       integrity: sha512-k+17ZViDtAugC0s7HM6rdsTWEdIYII4RPCDkPEuxKc6i40Bs+m6tjRAtCECX06wKZnrEoR9pjOJRXHJ/VLoOcA==
+  /@ethersproject/constants/5.0.10:
+    dependencies:
+      '@ethersproject/bignumber': 5.0.15
+    dev: false
+    resolution:
+      integrity: sha512-OSo8jxkHLDXieCy8bgOFR7lMfgPxEzKvSDdP+WAWHCDM8+orwch0B6wzkTmiQFgryAtIctrBt5glAdJikZ3hGw==
   /@ethersproject/constants/5.0.8:
     dependencies:
       '@ethersproject/bignumber': 5.0.14
@@ -548,6 +571,10 @@ packages:
       js-sha3: 0.5.7
     resolution:
       integrity: sha512-zoGbwXcWWs9MX4NOAZ7N0hhgIRl4Q/IO/u9c/RHRY4WqDy3Ywm0OLamEV53QDwhjwn3YiiVwU1Ve5j7yJ0a/KQ==
+  /@ethersproject/logger/5.0.10:
+    dev: false
+    resolution:
+      integrity: sha512-0y2T2NqykDrbPM3Zw9RSbPkDOxwChAL8detXaom76CfYoGxsOnRP/zTX8OUAV+x9LdwzgbWvWmeXrc0M7SuDZw==
   /@ethersproject/logger/5.0.8:
     resolution:
       integrity: sha512-SkJCTaVTnaZ3/ieLF5pVftxGEFX56pTH+f2Slrpv7cU0TNpUZNib84QQdukd++sWUp/S7j5t5NW+WegbXd4U/A==
@@ -693,6 +720,14 @@ packages:
       '@ethersproject/signing-key': 5.0.10
     resolution:
       integrity: sha512-0Fu1yhdFBkrbMjenEr+39tmDxuHmaw0pe9Jb18XuKoItj7Z3p7+UzdHLr2S/okvHDHYPbZE5gtANDdQ3ZL1nBA==
+  /@ethersproject/units/5.0.11:
+    dependencies:
+      '@ethersproject/bignumber': 5.0.15
+      '@ethersproject/constants': 5.0.10
+      '@ethersproject/logger': 5.0.10
+    dev: false
+    resolution:
+      integrity: sha512-nOSPmcCWyB/dwoBRhhTtPGCsTbiXqmc7Q0Adwvafc432AC7hy3Fj3IFZtnSXsbtJ/GdHCIUIoA8gtvxSsFuBJg==
   /@ethersproject/units/5.0.9:
     dependencies:
       '@ethersproject/bignumber': 5.0.14

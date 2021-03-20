@@ -244,7 +244,7 @@ abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
         emit Transfer(address(0), to, id);
     }
 
-    function burn(uint256 id) internal {
+    function _burn(uint256 id) internal {
         uint256 data = _tokenOwners.getOrZero(id);
         require(data != 0, "NOT_EXIST");
         require(data & BURN_FLAG == 0, "ALREADY BURN");

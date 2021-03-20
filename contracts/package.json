@@ -22,12 +22,12 @@
     "dotenv": "^8.2.0",
     "ethers": "^5.0.17",
     "fs-extra": "^9.0.1",
+    "generative-art-common": "workspace:*",
     "hardhat": "^2.0.10",
     "hardhat-deploy": "^0.7.0-beta.44",
     "hardhat-deploy-ethers": "^0.3.0-beta.7",
     "hardhat-gas-reporter": "^1.0.1",
     "hardhat-typechain": "^0.3.5",
-    "generative-art-common": "workspace:*",
     "mocha": "^8.1.1",
     "solidity-coverage": "^0.7.15",
     "ts-generator": "^0.1.1",
@@ -64,5 +64,8 @@
     "mainnet:export": "hardhat --network mainnet export",
     "mainnet:run": "cross-env HARDHAT_NETWORK=mainnet ts-node --files",
     "hardhat": "hardhat"
+  },
+  "dependencies": {
+    "@ethersproject/units": "^5.0.11"
   }
 }

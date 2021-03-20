@@ -1,5 +1,6 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
+import {parseEther} from '@ethersproject/units';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, getNamedAccounts} = hre;
@@ -10,7 +11,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy('BitmapToken', {
     from: deployer,
     log: true,
-    proxy: !hre.network.live
+    args:[deployer, parseEther("0.01"), 500],
+    proxy: !hre.network.live ? 'postUpgrade': false
   });
 };
 export default func;

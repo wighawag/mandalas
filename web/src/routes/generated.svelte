@@ -6,6 +6,7 @@
   import {randomnnfts} from '../stores/randomNfts';
   import {wallet, flow} from '../stores/wallet';
   import {onMount} from 'svelte';
+import { BigNumber } from '@ethersproject/bignumber';
 
   let nfts = randomnnfts;
   onMount(() => {
@@ -24,14 +25,24 @@
         ['Bitmap', wallet.address]
       );
       const signature = await account.signMessage(arrayify(hashedData));
-      await contracts.BitmapToken.mint(wallet.address, signature);
+      const buffer = BigNumber.from("1000000000000000000"); // TODO
+      if (!$randomnnfts.currentPrice) {
+        throw new Error(`no currentPrice available`);
+      }
+      await contracts.BitmapToken.mint(wallet.address, signature, {value: $randomnnfts.currentPrice.add(buffer) });
     });
   }
 </script>
 
 <WalletAccess>
   <div
+    class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
+    <p>Current Price: {$randomnnfts.currentPrice ? $randomnnfts.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
+    <p>Current Supply: {$randomnnfts.supply ? $randomnnfts.supply.toNumber() : 'loading'}</p>
+  </div>
+  <div
     class="w-full h-full mx-auto flex items-center justify-center text-black dark:text-white ">
+
     <form class="mt-5 w-full max-w-sm">
       <div class="flex items-center">
         <NavButton
@@ -63,13 +74,13 @@
       <div>Loading Bitmaps...</div>
     {:else}
       <ul
-        class="space-y-12 sm:grid sm:grid-cols-3 sm:gap-x-6 sm:gap-y-12 sm:space-y-0 lg:grid-cols-4 lg:gap-x-8">
+        class="grid-cols-2 grid sm:grid-cols-4 sm:gap-x-6 sm:gap-y-12 sm:space-y-0 lg:grid-cols-6 lg:gap-x-8">
         {#each $nfts.tokens as nft, index}
           <li>
             <div
               id={nft.id}
-              class="space-y-4 p-8 cursor-pointer"
-              on:click={() => mint(index)}>
+              class=" p-8 cursor-pointer"
+              on:click={() => {if (nft.image) {mint(index)}} }>
               <div class="aspect-w-3 aspect-h-2">
                 {#if nft.error}
                   Error:
@@ -84,8 +95,9 @@
                   <p class="">{nft.name}</p>
                 {/if}
               </div>
+              {#if nft.image}
               <div>
-                <div class="-mt-px flex">
+                <div class="mt-2 flex">
                   <div class="w-0 flex-1 flex">
                     <button
                       class="relative w-0 flex-1 inline-flex items-center
@@ -109,7 +121,7 @@
                   </div>
                 </div>
               </div>
-
+              {/if}
               <!-- <div class="space-y-2">
                   <div class="text-lg leading-6 font-medium space-y-1">
                     <h3>Lindsay Walton</h3>
@@ -123,7 +135,7 @@
                 </div> -->
             </div>
           </li>
-        {:else}You do not have any Bitmap{/each}
+        {:else}Error: No Bitmap could be generated{/each}
       </ul>
     {/if}
   </section>

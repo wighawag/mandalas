@@ -7,12 +7,44 @@ pragma experimental ABIEncoderV2;
 import "./ERC721Base.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol";
 import "@openzeppelin/contracts/cryptography/ECDSA.sol";
+import "hardhat-deploy/solc_0.7/proxy/Proxied.sol";
 // import "hardhat/console.sol";
 
-contract BitmapToken is ERC721Base, IERC721Metadata {
+contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     using EnumerableSet for EnumerableSet.UintSet;
     using EnumerableMap for EnumerableMap.UintToUintMap;
     using ECDSA for bytes32;
+
+    event Minted(uint256 indexed id, uint256 indexed pricePaid);
+    event Burned(uint256 indexed id, uint256 indexed priceReceived);
+    event CreatorshipTransferred(address indexed previousCreator, address indexed newCreator);
+
+    uint256 public immutable initialPrice;
+    uint256 public immutable creatorCutPer10000th;
+    address payable public creator;
+
+    constructor(address payable _creator, uint256 _initialPrice, uint256 _creatorCutPer10000th) {
+        initialPrice = _initialPrice;
+        creatorCutPer10000th = _creatorCutPer10000th;
+        postUpgrade(_creator, _initialPrice, _creatorCutPer10000th);
+    }
+
+    // solhint-disable-next-line no-unused-vars
+    function postUpgrade(address payable _creator, uint256 _initialPrice, uint256 _creatorCutPer10000th) public proxied {
+        // immutables are set in the constructor:
+        // initialPrice = _initialPrice;
+        // creatorCutPer10000th = _creatorCutPer10000th;
+        creator = _creator;
+        emit CreatorshipTransferred(address(0), creator);
+    }
+
+
+    function transferCreatorship(address payable newCreatorAddress) external {
+        address oldCreator = creator;
+        require(oldCreator == msg.sender, "NOT_AUTHORIZED");
+        creator = newCreatorAddress;
+        emit CreatorshipTransferred(oldCreator, newCreatorAddress);
+    }
 
     /// @notice A descriptive name for a collection of NFTs in this contract
     function name() external pure override returns (string memory) {
@@ -52,6 +84,12 @@ contract BitmapToken is ERC721Base, IERC721Metadata {
         bool minted;
     }
 
+    struct MintData {
+        uint256 currentPrice;
+        uint256 supply;
+        TokenDataMintedOrNot[] tokens;
+    }
+
     function getTokenDataOfOwner(
         address owner,
         uint256 start,
@@ -69,7 +107,69 @@ contract BitmapToken is ERC721Base, IERC721Metadata {
         }
     }
 
-    function getTokenDataForIds(uint256[] memory ids) external view returns (TokenDataMintedOrNot[] memory tokens) {
+    function getMintData(uint256[] calldata ids) external view returns (MintData memory data) {
+        data.supply = totalSupply();
+        data.currentPrice = _curve(data.supply);
+        data.tokens = _getTokenDataForIds(ids);
+    }
+
+    function getTokenDataForIds(uint256[] calldata ids) external view returns (TokenDataMintedOrNot[] memory tokens) {
+        return _getTokenDataForIds(ids);
+    }
+
+    function mint(address to, bytes memory signature) external payable returns (uint256) {
+        uint256 supply = totalSupply();
+        uint256 mintPrice = _curve(supply);
+        require(msg.value >= mintPrice, "NOT_ENOUGH_ETH");
+
+
+        // -------------------------- MINTING ---------------------------------------------------------
+        bytes32 hashedData = keccak256(abi.encodePacked("Bitmap", to));
+        address signer = hashedData.toEthSignedMessageHash().recover(signature);
+        _mint(uint256(signer), to);
+        // -------------------------- MINTING ---------------------------------------------------------
+
+        uint256 forCreator = mintPrice - _forReserve(mintPrice);
+
+        // responsibility of the creator to ensure it can receive the fund
+        bool success = true;
+        if (forCreator > 0) {
+            // solhint-disable-next-line check-send-result
+            success = creator.send(forCreator);
+        }
+
+        if(!success || msg.value > mintPrice) {
+            msg.sender.transfer(msg.value - mintPrice + (!success ? forCreator : 0));
+        }
+
+        emit Minted(uint256(signer), mintPrice);
+        return uint256(signer);
+    }
+
+
+    function burn(uint256 id) external {
+        uint256 supply = totalSupply();
+        uint256 burnPrice = _forReserve(_curve(supply));
+
+        _burn(id);
+
+        msg.sender.transfer(burnPrice);
+        emit Burned(id, burnPrice);
+    }
+
+    function currentPrice() external view returns (uint256) {
+        return _curve(totalSupply());
+    }
+
+    function _curve(uint256 supply) internal view returns (uint256) {
+        return initialPrice + supply * 0.001 ether;
+    }
+
+    function _forReserve(uint256 mintPrice) internal view returns (uint256) {
+        return mintPrice * creatorCutPer10000th / 10000;
+    }
+
+    function _getTokenDataForIds(uint256[] memory ids) internal view returns (TokenDataMintedOrNot[] memory tokens) {
         tokens = new TokenDataMintedOrNot[](ids.length);
         for (uint256 i = 0; i < ids.length; i++) {
             uint256 id = ids[i];
@@ -78,15 +178,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata {
         }
     }
 
-    function mint(address to, bytes memory signature) external {
-        // TODO payment
-        bytes32 hashedData = keccak256(abi.encodePacked("Bitmap", to));
-        address signer = hashedData.toEthSignedMessageHash().recover(signature);
-        _mint(uint256(signer), to);
-    }
-
-
-    function _tokenURI(uint256 id) internal view returns (string memory) {
+    function _tokenURI(uint256 id) internal pure returns (string memory) {
         bytes memory base64Bytes = new bytes((8 * 8) * 4);
 
         bytes32 random = keccak256(abi.encodePacked(id));
