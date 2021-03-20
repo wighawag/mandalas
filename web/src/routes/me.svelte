@@ -18,8 +18,8 @@
 <WalletAccess>
   <div
     class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
-    <p class="m-2 font-black text-yellow-400">Current Price: {$curve.currentPrice ? $curve.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
-    <p class="m-2 font-black text-yellow-400">Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
+    <p class="m-2 font-black text-xs sm:text-base  text-yellow-400">Current Price: {$curve.currentPrice ? $curve.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
+    <p class="m-2 font-black text-xs sm:text-base  text-yellow-400">Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
   </div>
 
   {#if $nfts.state === 'Ready'}
