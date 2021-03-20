@@ -21,7 +21,7 @@
 <Router {routes} globalQueryStrings={['debug', 'log', 'trace', '_d_eruda']}>
   <Notifications />
   <NavBar
-    links={[{name: 'index', title: 'Home'}, {name: 'generated', title: 'Mint Them'}]} />
+    links={[{name: 'index', title: 'Bitmaps!'}, {name: 'mybitmaps', title: 'My Bitmaps'}]} />
   <CurrentPage>
     <Loading />
     Loading...
