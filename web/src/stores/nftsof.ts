@@ -72,7 +72,9 @@ class NFTOfStore extends BaseStore<NFTs> {
     if (owner) {
       const result = await this.query(owner);
       if (!result) {
-        this.setPartial({tokens: [], state: 'Loading'});
+        if (this.$store.state !== 'Ready') {
+          this.setPartial({tokens: [], state: 'Loading'});
+        }
       } else {
         const transformed = await this._transform(result);
         // console.log({transformed});
@@ -146,7 +148,10 @@ class NFTOfStore extends BaseStore<NFTs> {
 
   start(): NFTOfStore | void {
     console.log('start ' + this.currentOwner);
-    this.setPartial({state: 'Loading'});
+    if (this.$store.state !== 'Ready') {
+      this.setPartial({state: 'Loading'});
+    }
+
     this._fetch();
     this.timer = setInterval(() => this._fetch(), 5000); // TODO polling interval config
     return this;
