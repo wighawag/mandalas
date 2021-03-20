@@ -12,7 +12,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     from: deployer,
     log: true,
     args:[deployer, parseEther("0.01"), 500],
-    proxy: !hre.network.live ? 'postUpgrade': false
+    proxy: !hre.network.live ? 'postUpgrade': false,
+    autoMine: true
   });
 };
 export default func;

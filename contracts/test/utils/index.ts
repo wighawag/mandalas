@@ -1,4 +1,4 @@
-import {Contract} from '@ethersproject/contracts';
+import {Contract, ContractTransaction, ContractReceipt} from '@ethersproject/contracts';
 import {ethers} from 'hardhat';
 
 export async function setupUsers<T extends {[contractName: string]: Contract}>(
@@ -22,4 +22,8 @@ export async function setupUser<T extends {[contractName: string]: Contract}>(
     user[key] = contracts[key].connect(await ethers.getSigner(address));
   }
   return user as {address: string} & T;
+}
+
+export function waitFor(t: Promise<ContractTransaction>): Promise<ContractReceipt> {
+  return t.then((tx) => tx.wait());
 }

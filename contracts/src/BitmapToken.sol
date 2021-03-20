@@ -15,6 +15,17 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     using EnumerableMap for EnumerableMap.UintToUintMap;
     using ECDSA for bytes32;
 
+    // Template : contains all data to be used: reduce memory usage and is easier to work with
+    // solhint-disable-next-line quotes
+    bytes internal constant TEMPLATE = 'data:text/plain,{"name":"Bitmap 0x0000000000000000000000000000000000000000","description":"A Bitmap","image":"data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' shape-rendering=\'crispEdges\' width=\'512\' height=\'512\'><g transform=\'scale(64)\'><image width=\'8\' height=\'8\' style=\'image-rendering: pixelated;\' href=\'data:image/gif;base64,R0lGODdhEAAQAMQAAAAAAB0rU34lUwCHUatSNl9XT8LDx//x6P8ATf+jAP/sJwDkNimt/4N2nP93qP/MqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkKAAAALAAAAAAQABAAAAdBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgQA7\'/></g></svg>"}';
+    uint256 internal constant IMAGE_DATA_POS = 512;
+    uint256 internal constant ADDRESS_NAME_POS = 73;
+
+    uint256 internal constant WIDTH = 16;
+    uint256 internal constant HEIGHT = 16;
+    bytes32 constant internal xs = 0x7673456734567234567234567123456701234567000000000000000000000000;
+    bytes32 constant internal ys = 0x0112222233333444444555555666666677777777000000000000000000000000;
+
     event Minted(uint256 indexed id, uint256 indexed pricePaid);
     event Burned(uint256 indexed id, uint256 indexed priceReceived);
     event CreatorshipTransferred(address indexed previousCreator, address indexed newCreator);
@@ -179,84 +190,72 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     }
 
     function _tokenURI(uint256 id) internal pure returns (string memory) {
-        bytes memory base64Bytes = new bytes((8 * 8) * 4);
+        bytes memory metadata = TEMPLATE;
+        writeUintAsHex(metadata, ADDRESS_NAME_POS, id);
 
-        bytes32 random = keccak256(abi.encodePacked(id));
-
-        for (uint256 y = 0; y < 8; y++) {
-            uint24 p0 = uint24(((uint256(random) >> (255- y*4 + 0)) % 2) == 1 ? 0xFFFFFF : 0);
-            uint24 p1 = uint24(((uint256(random) >> (255- y*4 + 1)) % 2) == 1 ? 0xFFFFFF : 0);
-            uint24 p2 = uint24(((uint256(random) >> (255- y*4 + 2)) % 2) == 1 ? 0xFFFFFF : 0);
-            uint24 p3 = uint24(((uint256(random) >> (255- y*4 + 3)) % 2) == 1 ? 0xFFFFFF : 0);
-
-            uint256 i = (7-y) * 8; //reverse y
-            setColor(base64Bytes, i + 0, p0);
-            setColor(base64Bytes, i + 1, p1);
-            setColor(base64Bytes, i + 2, p2);
-            setColor(base64Bytes, i + 3, p3);
-            setColor(base64Bytes, i + 4, p3);
-            setColor(base64Bytes, i + 5, p2);
-            setColor(base64Bytes, i + 6, p1);
-            setColor(base64Bytes, i + 7, p0);
+        for (uint256 i = 0; i < 40; i++) {
+            uint8 value = uint8((id >> (40-i)*4) % 16);
+            if (value == 0) {
+                value = 16; // use black as oposed to transparent
+            }
+            // value = 7;
+            // uint256 x = i % 8;
+            // uint256 y = i / 8;
+            uint256 x = extract(xs, i);
+            uint256 y = extract(ys, i);
+            setCharacter(metadata, IMAGE_DATA_POS, y*WIDTH + x + (y /4) * 2 + 1, value);
+            setCharacter(metadata, IMAGE_DATA_POS, y*WIDTH + (WIDTH -x -1) + (y /4) * 2 + 1, value); // x mirror
+            setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT-y-1)*WIDTH + x + ((HEIGHT-y-1) /4) * 2 + 1, value); // y mirror
+            setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT-y-1)*WIDTH + (WIDTH-x-1) + ((HEIGHT-y-1) /4) * 2 + 1, value); // x,y mirror
         }
 
-        string memory idStr = uint2str(id);
-        return
-            string(
-                abi.encodePacked(
-                    'data:text/plain,{"name":"bitmap token',
-                    idStr,
-                    '","description":"bitmap token generated from ',
-                    idStr,
-                    '","image":"data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' shape-rendering=\'crispEdges\' width=\'512\' height=\'512\'><g transform=\'scale(64)\'><image width=\'8\' height=\'8\' style=\'image-rendering: pixelated;\' href=\'data:image/bmp;base64,Qk02wAAAAAAAADYAAAAoAAAACAAAAAgAAAABABgAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAA', //bmp_header, then 8bit per color 8x8
-                    base64Bytes,
-                    '\'/></g></svg>"}'
-                )
-            );
+        return string(metadata);
+    }
+
+
+
+    function setCharacter(bytes memory metadata, uint256 base, uint256 pos, uint8 value) internal pure {
+        uint256 base64Slot = base + (pos * 8) / 6;
+        uint8 bit = uint8((pos * 8) % 6);
+        uint8 existingValue = base64ToUint8(metadata[base64Slot]);
+        if (bit == 0) {
+            metadata[base64Slot] = uint8ToBase64(value >> 2);
+            uint8 extraValue = base64ToUint8(metadata[base64Slot + 1]);
+            metadata[base64Slot + 1] = uint8ToBase64(((value % 4) << 4) | (0x0F & extraValue));
+        } else if (bit == 2) {
+            metadata[base64Slot] = uint8ToBase64((value >> 4) | (0x30 & existingValue));
+            uint8 extraValue = base64ToUint8(metadata[base64Slot + 1]);
+            metadata[base64Slot + 1] = uint8ToBase64(((value % 16) << 2) | (0x03 & extraValue));
+        } else { // bit == 4)
+            // metadata[base64Slot] = uint8ToBase64((value >> 6) | (0x3C & existingValue));
+            metadata[base64Slot + 1] = uint8ToBase64(value % 64);
+        }
+    }
+
+    function extract(bytes32 arr, uint256 i) internal pure returns (uint256) {
+        return (uint256(arr) >> (256 - (i+1) * 4)) % 16;
     }
 
     bytes32 constant internal base64Alphabet_1 = 0x4142434445464748494A4B4C4D4E4F505152535455565758595A616263646566;
     bytes32 constant internal base64Alphabet_2 = 0x6768696A6B6C6D6E6F707172737475767778797A303132333435363738392B2F;
 
-    // bytes constant internal bmp_header =
-        // "0x424D36C000000000000036000000280000000800000008000000010018000000000000C0000000000000000000000000000000000000"; // then 8bit per color 8x8
-
-
-    function setColor(
-        bytes memory base64Bytes,
-        uint256 i,
-        uint24 c
-    ) internal pure {
-        base64Bytes[i * 4 + 0] = uint8ToBase64(c / 2**18);
-        base64Bytes[i * 4 + 1] = uint8ToBase64((c / 2**12) % 64);
-        base64Bytes[i * 4 + 2] = uint8ToBase64((c / 2**6) % 64);
-        base64Bytes[i * 4 + 3] = uint8ToBase64(c % 64);
-    }
-
-    function uint2str(uint256 num)
-        private
-        pure
-        returns (string memory _uintAsString)
-    {
-        if (num == 0) {
-            return "0";
+    function base64ToUint8(bytes1 s) internal pure returns (uint8 v) {
+        if (uint8(s) == 0x2B) {
+            return 62;
         }
-
-        uint256 j = num;
-        uint256 len;
-        while (j != 0) {
-            len++;
-            j /= 10;
+        if (uint8(s) == 0x2F) {
+            return 63;
         }
-
-        bytes memory bstr = new bytes(len);
-        uint256 k = len - 1;
-        while (num != 0) {
-            bstr[k--] = bytes1(uint8(48 + (num % 10)));
-            num /= 10;
+        if (uint8(s) >= 0x30 && uint8(s) <= 0x39) {
+            return uint8(s) - 0x30 + 52;
         }
-
-        return string(bstr);
+        if (uint8(s) >= 0x41 && uint8(s) <= 0x5A) {
+            return uint8(s) - 0x41;
+        }
+        if (uint8(s) >= 0x5A && uint8(s) <= 0x7A) {
+            return uint8(s) - 0x5A + 26;
+        }
+        return 0;
     }
 
     function uint8ToBase64(uint24 v) internal pure returns (bytes1 s) {
@@ -264,6 +263,15 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
             return base64Alphabet_2[v - 32];
         }
         return base64Alphabet_1[v];
+    }
+
+    bytes constant internal hexAlphabet = "0123456789abcdef";
+
+    function writeUintAsHex(bytes memory data, uint256 endPos, uint256 num) internal pure {
+        while (num != 0) {
+            data[endPos--] = bytes1(hexAlphabet[num % 16]);
+            num /= 16;
+        }
     }
 
 }
