@@ -5,6 +5,7 @@ import {setupUsers, waitFor} from './utils';
 import {Wallet} from '@ethersproject/wallet';
 import {keccak256} from '@ethersproject/solidity';
 import {arrayify} from '@ethersproject/bytes';
+import {generateTokenURI} from 'generative-art-common';
 // import {BigNumber} from '@ethersproject/bignumber';
 
 const setup = deployments.createFixture(async () => {
@@ -65,6 +66,8 @@ describe('BitmapToken', function () {
     await users[0].BitmapToken.mint(users[0].address, signature, {value: currentPrice });
     const uri = await BitmapToken.callStatic.tokenURI(tokenId);
     console.log({uri});
+
+    expect(uri).to.eq(generateTokenURI(tokenId))
   });
 
 });
