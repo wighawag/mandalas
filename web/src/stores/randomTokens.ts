@@ -22,12 +22,12 @@ type NFTs = {
   startIndex: number;
 };
 
-type Token = {tokenURI: string; id: string; minted: boolean};
-
-type MintData = {currentPrice: BigNumber, supply: BigNumber};
-
+type Transaction = {
+  hash: string;
+  nonce: number;
+}
 type LocalStorageData = {
-  claimTXs: {[id: string]: string};
+  claimTXs: {[id: string]: Transaction};
   random: string,
   start: number;
 }
@@ -36,7 +36,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
   private timer: NodeJS.Timeout | undefined;
   private counter = 0; // keep count of subscription
   private random = '';
-  private claimTXs: {[id: string]: string} = {}
+  private claimTXs: {[id: string]: Transaction} = {}
   constructor() {
     super({
       state: 'Ready',
@@ -44,6 +44,26 @@ export class RandomTokenStore extends BaseStore<NFTs> {
       tokens: [],
       startIndex: 0
     });
+  }
+
+  record(id: string, hash: string, nonce: number) : void {
+    this.claimTXs[id] = {hash,nonce};
+    try {
+      localStorage.setItem('_bitmaps_generated', JSON.stringify({
+        random: this.random,
+        start: this.$store.startIndex,
+        claimTXs: this.claimTXs
+      }));
+    } catch(e) {
+      console.error(e);
+    }
+    for(const token of this.$store.tokens) {
+      if (token.id === id) {
+        token.minted = true;
+        break;
+      }
+    }
+    this.setPartial({tokens: this.$store.tokens})
   }
 
   loadMore(num: number): void {

@@ -24,7 +24,7 @@
   {#if $nfts.state === 'Ready'}
     {#if $nfts.tokens.length > 0}
       <div class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
-        Here is your Mandalas. You can burn them to get 95% of the current price. Each time a mandala is burnt, the price decrease. Note that once burnt that Mandala cannot be re-created.
+        Here are your Mandalas. You can burn them to get 95% of the current price. Each time a mandala is burnt, the price decrease. Note that once burnt that Mandala cannot be re-created.
       </div>
     {:else}
       <div class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
