@@ -44,7 +44,7 @@
   </div>
   <div class="w-full h-full text-xs sm:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
     <p class="px-4 pt-4">There are millions of millions of Mandalas, all unique. Pick the one you like :)</p>
-    <p class="px-4 pb-4">Like <a class="underline" href="https://neolastics.com/" target="_blank">neolastics</a> their price run on a bounding curve. More details <Link name="about" class="underline">here</Link>.</p>
+    <p class="px-4 pb-1">Like <a class="underline" href="https://neolastics.com/" target="_blank">neolastics</a> their price run on a bounding curve. More details <Link name="about" class="underline">here</Link>.</p>
   </div>
   <div
     class="w-full h-full mx-auto flex items-center justify-center text-black dark:text-white ">

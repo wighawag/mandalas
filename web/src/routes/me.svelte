@@ -4,6 +4,7 @@
   import {nftsof} from '../stores/nftsof';
   import {curve} from '../stores/curve';
   import {wallet, flow, chain} from '../stores/wallet';
+  import Link from '../lib/routing/curi/Link.svelte';
 
   $: nfts = nftsof($wallet.address);
 
@@ -29,6 +30,7 @@
     {:else}
       <div class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
         <p class="p-4">You do not have any Mandala yet.</p>
+        <p>get  your  first one <Link name="index" class="underline">here </Link></p>
       </div>
     {/if}
   {/if}
@@ -66,7 +68,7 @@
                   {nft.error}
                 {:else if nft.image}
                   <img
-                    style="image-rendering: pixelated;"
+                  style={`image-rendering: pixelated; ${ $nfts.burning[nft.id] ? 'filter: grayscale(100%);' : ''}`}
                     class="object-contain h-full w-full"
                     alt={nft.name}
                     src={nft.image} />
@@ -75,7 +77,7 @@
                 {/if}
               </div>
             {#if nft.image}
-              <div>
+              <div class={ $nfts.burning[nft.id] ? 'hidden' : ''}>
                 <div class="mt-2 flex">
                   <div class="w-0 flex-1 flex">
                     <button

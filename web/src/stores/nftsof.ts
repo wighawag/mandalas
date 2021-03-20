@@ -1,5 +1,33 @@
-import {chain, fallback} from './wallet';
+import {chain, fallback, transactions} from './wallet';
 import {BaseStore} from '../lib/utils/stores';
+
+// TODO export in web3w
+type ParsedEvent = {args: Record<string, unknown>; name: string; signature: string};
+type TransactionStatus = 'pending' | 'cancelled' | 'success' | 'failure' | 'mined';
+type TransactionRecord = {
+  hash: string;
+  from: string;
+  submissionBlockTime: number;
+  acknowledged: boolean;
+  status: TransactionStatus;
+  nonce: number;
+  confirmations: number;
+  finalized: boolean;
+  lastAcknowledgment?: TransactionStatus;
+  to?: string;
+  gasLimit?: string;
+  gasPrice?: string;
+  data?: string;
+  value?: string;
+  contractName?: string;
+  method?: string;
+  args?: unknown[];
+  metadata?: unknown;
+  lastCheck?: number;
+  blockHash?: string;
+  blockNumber?: number;
+  events?: ParsedEvent[];
+};
 
 function fixURI(uri?: string): string {
   if (!uri) {
@@ -24,17 +52,20 @@ type NFTs = {
   state: 'Idle' | 'Loading' | 'Ready';
   error?: unknown;
   tokens: NFT[];
+  burning: {[id: string]: boolean};
 };
 
 class NFTOfStore extends BaseStore<NFTs> {
   private timer: NodeJS.Timeout | undefined;
   private counter = 0;
   private currentOwner?: string;
+  private unsubscribeFromTransactions: (() => void) | undefined;
   constructor(owner?: string) {
     super({
       state: 'Idle',
       error: undefined,
       tokens: [],
+      burning: {}
     });
     this.currentOwner = owner?.toLowerCase();
   }
@@ -146,18 +177,53 @@ class NFTOfStore extends BaseStore<NFTs> {
     };
   }
 
+  onTransactions(txs: TransactionRecord[]): void {
+    for (const tx of txs) {
+      if (!tx.finalized && tx.args) {
+        // based on args : so need to ensure args are available
+        if (tx.status != 'cancelled' && tx.status !== 'failure') {
+          if (tx.args.length === 1) {
+            this.$store.burning[tx.args[0] as string] = true;
+          }
+        }
+          // const foundIndex = this.$.findIndex(
+          //   (v) => v.id.toLowerCase() === tx.from.toLowerCase()
+          // );
+          // if (foundIndex >= 0) {
+          //   newData[foundIndex].message = tx.args[0] as string;
+          //   newData[foundIndex].pending = tx.confirmations < 1;
+          //   newData[foundIndex].timestamp = Math.floor(
+          //     Date.now() / 1000
+          //   ).toString();
+          // } else {
+          //   newData.unshift({
+          //     id: tx.from.toLowerCase(),
+          //     message: tx.args[0] as string,
+          //     timestamp: Math.floor(Date.now() / 1000).toString(),
+          //     pending: tx.confirmations < 1,
+          //   });
+          // }
+      }
+    }
+    this.setPartial({burning: this.$store.burning});
+  }
+
   start(): NFTOfStore | void {
     console.log('start ' + this.currentOwner);
     if (this.$store.state !== 'Ready') {
       this.setPartial({state: 'Loading'});
     }
 
+    this.unsubscribeFromTransactions = transactions.subscribe((txs) => this.onTransactions(txs))
     this._fetch();
     this.timer = setInterval(() => this._fetch(), 5000); // TODO polling interval config
     return this;
   }
 
   stop() {
+    if (this.unsubscribeFromTransactions) {
+      this.unsubscribeFromTransactions();
+    }
     console.log('stop ' + this.currentOwner);
     if (this.timer) {
       clearInterval(this.timer);
