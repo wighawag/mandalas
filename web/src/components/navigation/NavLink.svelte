@@ -14,25 +14,32 @@
   $: route = router.route(name);
   $: active =
     $response && activeInteraction(route, $response, {params, partial});
+
+  const base: string = window.basepath || '/';
 </script>
 
 {#if active}
-  <li class="-mb-px mr-1">
+  <li class="">
+    <!-- <div class="w-full h-1 mt-1" style={`background: url(${base}images/multicolor_line_x8.png);`}></div> -->
+    <div class="w-full h-1 mb-1"></div>
     <Link
-      class="bg-white dark:bg-black inline-block border-l border-t border-r rounded-t py-2 px-4 border-pink-600
-        text-pink-600 font-semibold"
+      class="text-xs sm:text-base inline-block py-2 px-4 mr-3 font-semibold border-b-2 bg-white dark:bg-black dark:text-white text-black"
       {name}
       {params}>
       <slot />
     </Link>
+    <div class="w-full h-1 mb-1"></div>
+    <!-- <div class="w-full h-1 mb-1" style={`background: url(${base}images/multicolor_line_x8.png);`}></div> -->
   </li>
 {:else}
-  <li class="-mb-px mr-1">
+  <li>
+    <div class="w-full h-1 mb-1"></div>
     <Link
-      class="bg-white dark:bg-black inline-block py-2 px-4 border-pink-600 text-pink-600 font-semibold"
+      class="text-xs sm:text-base inline-block py-2 px-4 mr-3 font-semibold bg-white dark:bg-black dark:text-white text-black"
       {name}
       {params}>
       <slot />
     </Link>
+    <div class="w-full h-1 mb-1"></div>
   </li>
 {/if}

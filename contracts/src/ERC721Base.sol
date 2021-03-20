@@ -4,15 +4,14 @@ pragma solidity 0.7.1;
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
+// import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol"; // only partially implemented for efficiency and simplicity
 import "@openzeppelin/contracts/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "./EnumerableMap.sol";
 
-abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
+abstract contract ERC721Base is IERC165, IERC721 {
     using Address for address;
     using EnumerableSet for EnumerableSet.UintSet;
-    using EnumerableMap for EnumerableMap.UintToUintMap;
 
     bytes4 internal constant ERC721_RECEIVED = 0x150b7a02;
     bytes4 internal constant ERC165ID = 0x01ffc9a7;
@@ -20,8 +19,9 @@ abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
     uint256 internal constant OPERATOR_FLAG = (2**255);
     uint256 internal constant BURN_FLAG = (2**254);
 
+    uint256 internal _supply;
+    mapping (uint256 => uint256) internal _owners;
     mapping (address => EnumerableSet.UintSet) internal _holderTokens;
-    EnumerableMap.UintToUintMap internal _tokenOwners;
     mapping(address => mapping(address => bool)) internal _operatorsForAll;
     mapping(uint256 => address) internal _operators;
 
@@ -93,17 +93,12 @@ abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
         require(owner != address(0), "NONEXISTANT_TOKEN");
     }
 
-    function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
+    function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256) {
         return _holderTokens[owner].at(index);
     }
 
-    function totalSupply() public view virtual override returns (uint256) {
-        return _tokenOwners.length();
-    }
-
-    function tokenByIndex(uint256 index) public view virtual override returns (uint256) {
-        (uint256 tokenId, ) = _tokenOwners.at(index);
-        return tokenId;
+    function totalSupply() external view returns (uint256) {
+        return _supply;
     }
 
     /// @notice Get the approved operator for a specific token.
@@ -171,7 +166,7 @@ abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
     ) internal {
         _holderTokens[from].remove(id);
         _holderTokens[to].add(id);
-        _tokenOwners.set(id, uint256(to));
+        _owners[id] = uint256(to);
         emit Transfer(from, to, id);
     }
 
@@ -182,9 +177,9 @@ abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
         uint256 id
     ) internal {
         if (operator == address(0)) {
-            _tokenOwners.set(id, uint256(owner));
+            _owners[id] =  uint256(owner);
         } else {
-            _tokenOwners.set(id, OPERATOR_FLAG | uint256(owner));
+            _owners[id] = OPERATOR_FLAG | uint256(owner);
             _operators[id] = operator;
         }
         emit Approval(owner, operator, id);
@@ -221,7 +216,7 @@ abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
 
     /// @dev See ownerOf
     function _ownerOf(uint256 id) internal view returns (address owner) {
-        owner = address(_tokenOwners.getOrZero(id));
+        owner = address(_owners[id]);
         require(owner != address(0), "NOT_EXIST");
     }
 
@@ -230,29 +225,30 @@ abstract contract ERC721Base is IERC165, IERC721, IERC721Enumerable {
     /// @return owner The owner of the token.
     /// @return operatorEnabled Whether or not operators are enabled for this token.
     function _ownerAndOperatorEnabledOf(uint256 id) internal view returns (address owner, bool operatorEnabled) {
-        uint256 data = _tokenOwners.getOrZero(id);
+        uint256 data = _owners[id];
         owner = address(data);
         operatorEnabled = (data | OPERATOR_FLAG) == 1;
     }
 
     function _mint(uint256 id, address to) internal {
         require(to != address(0), "NOT_TO_ZEROADDRESS");
-        uint256 data = _tokenOwners.getOrZero(id);
+        uint256 data = _owners[id];
         require(data == 0, "ALREADY_MINTED");
         _holderTokens[to].add(id);
-        _tokenOwners.set(id, uint256(to));
+        _owners[id] = uint256(to);
+        _supply ++;
         emit Transfer(address(0), to, id);
     }
 
     function _burn(uint256 id) internal {
-        uint256 data = _tokenOwners.getOrZero(id);
+        uint256 data = _owners[id];
         require(data != 0, "NOT_EXIST");
-        require(data & BURN_FLAG == 0, "ALREADY BURN");
+        require(data & BURN_FLAG == 0, "ALREADY BURNT");
         address owner = address(data);
         require(msg.sender == owner, "NOT_OWNER");
         _holderTokens[owner].remove(id);
-        _tokenOwners.remove(id);
-        _tokenOwners.set(id, BURN_FLAG);
+        _owners[id] = BURN_FLAG;
+        _supply --;
         emit Transfer(msg.sender, address(0), id);
     }
 }

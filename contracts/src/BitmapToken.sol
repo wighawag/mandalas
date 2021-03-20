@@ -132,7 +132,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     }
 
     function getMintData(uint256[] calldata ids) external view returns (MintData memory data) {
-        data.supply = totalSupply();
+        data.supply = _supply;
         data.currentPrice = _curve(data.supply);
         data.tokens = _getTokenDataForIds(ids);
     }
@@ -142,8 +142,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     }
 
     function mint(address to, bytes memory signature) external payable returns (uint256) {
-        uint256 supply = totalSupply();
-        uint256 mintPrice = _curve(supply);
+        uint256 mintPrice = _curve(_supply);
         require(msg.value >= mintPrice, "NOT_ENOUGH_ETH");
 
 
@@ -172,8 +171,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
 
 
     function burn(uint256 id) external {
-        uint256 supply = totalSupply();
-        uint256 burnPrice = _forReserve(_curve(supply));
+        uint256 burnPrice = _forReserve(_curve(_supply - 1));
 
         _burn(id);
 
@@ -182,7 +180,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     }
 
     function currentPrice() external view returns (uint256) {
-        return _curve(totalSupply());
+        return _curve(_supply);
     }
 
     function _curve(uint256 supply) internal view returns (uint256) {
@@ -197,7 +195,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
         tokens = new TokenDataMintedOrNot[](ids.length);
         for (uint256 i = 0; i < ids.length; i++) {
             uint256 id = ids[i];
-            uint256 data = _tokenOwners.getOrZero(id);
+            uint256 data = _owners[id];
             tokens[i] = TokenDataMintedOrNot(id, _tokenURI(id), data != 0);
         }
     }

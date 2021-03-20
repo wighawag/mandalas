@@ -16,10 +16,22 @@
 
 <WalletAccess>
   <div
-    class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
-    <p>Current Price: {$curve.currentPrice ? $curve.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
-    <p>Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
+    class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
+    <p class="m-2 font-black text-yellow-400">Current Price: {$curve.currentPrice ? $curve.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
+    <p class="m-2 font-black text-yellow-400">Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
   </div>
+
+  {#if $nfts.state === 'Ready'}
+    {#if $nfts.tokens.length > 0}
+      <div class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
+        Here is your Mandalas. You can burn them to get 95% of the current price. Each time a mandala is burnt, the price decrease. Note that once burnt that Mandala cannot be re-created.
+      </div>
+    {:else}
+      <div class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
+        You do not have any Mandala yet.
+      </div>
+    {/if}
+  {/if}
   <section
     class="py-8 px-10 md:w-3/4 w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
     {#if $wallet.state !== 'Ready'}
@@ -91,7 +103,7 @@
               {/if}
             </div>
           </li>
-        {:else}You do not have any Tokens{/each}
+        {/each}
       </ul>
     {/if}
   </section>

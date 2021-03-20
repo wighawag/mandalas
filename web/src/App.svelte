@@ -13,6 +13,7 @@
   onMount(() => {
     document.body.classList.add('dark:bg-black');
     document.body.classList.add('bg-white');
+    document.documentElement.classList.add('dark');
   });
 </script>
 
@@ -21,7 +22,7 @@
 <Router {routes} globalQueryStrings={['debug', 'log', 'trace', '_d_eruda']}>
   <Notifications />
   <NavBar
-    links={[{name: 'index', title: 'Bitmaps!'}, {name: 'mybitmaps', title: 'My Bitmaps'}]} />
+    links={[{name: 'index', title: 'MANDALAS'}, {name: 'me', title: 'My Mandalas'}, {name: 'about', title: 'About'}]} />
   <CurrentPage>
     <Loading />
     Loading...

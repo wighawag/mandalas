@@ -7,6 +7,7 @@
   import {wallet, flow} from '../stores/wallet';
   import {BigNumber} from '@ethersproject/bignumber';
   import {Wallet} from '@ethersproject/wallet';
+  import Link from '../lib/routing/curi/Link.svelte';
 
   let nfts = randomTokens;
   nfts.generate(32);
@@ -36,9 +37,13 @@
 
 <WalletAccess>
   <div
-    class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
-    <p>Current Price: {$curve.currentPrice ? $curve.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
-    <p>Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
+    class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
+    <p class="m-2 text-xs sm:text-base font-black text-yellow-400">Current Price: {$curve.currentPrice ? $curve.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
+    <p class="m-2 text-xs sm:text-base font-black text-yellow-400">Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
+  </div>
+  <div class="w-full h-full text-xs sm:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
+    <p class="px-4 pt-4">There are millions of millions of Mandalas, all unique. Pick the one you like :)</p>
+    <p class="px-4 pb-4">Like neolastics their price run on a bounding curve. More details <Link name="about" class="underline">here</Link>.</p>
   </div>
   <div
     class="w-full h-full mx-auto flex items-center justify-center text-black dark:text-white ">
@@ -116,7 +121,7 @@
                           stroke-width="2"
                           d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
                       </svg>
-                      <span class="ml-3">Mint It</span>
+                      <span class="text-xs sm:text-base ml-3">Mint It</span>
                     </button>
                   </div>
                 </div>
