@@ -17,14 +17,15 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
 
     // Template : contains all data to be used: reduce memory usage and is easier to work with
     // solhint-disable-next-line quotes
-    bytes internal constant TEMPLATE = 'data:text/plain,{"name":"Bitmap 0x0000000000000000000000000000000000000000","description":"A Bitmap","image":"data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' shape-rendering=\'crispEdges\' width=\'512\' height=\'512\'><g transform=\'scale(64)\'><image width=\'8\' height=\'8\' style=\'image-rendering: pixelated;\' href=\'data:image/gif;base64,R0lGODdhEAAQAMQAAAAAAB0rU34lUwCHUatSNl9XT8LDx//x6P8ATf+jAP/sJwDkNimt/4N2nP93qP/MqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkKAAAALAAAAAAQABAAAAdBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgQA7\'/></g></svg>"}';
+    bytes internal constant TEMPLATE = 'data:text/plain,{"name":"Bitmap 0x0000000000000000000000000000000000000000","description":"A Bitmap","image":"data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' shape-rendering=\'crispEdges\' width=\'512\' height=\'512\'><g transform=\'scale(64)\'><image width=\'8\' height=\'8\' style=\'image-rendering: pixelated;\' href=\'data:image/gif;base64,R0lGODdhDwAPAMQAAAAAAPb+Y/7EJfN3NNARQUUKLG0bMsR1SujKqW7wQwe/dQBcmQeEqjDR0UgXo4A0vrlq2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkKAAAALAAAAAAPAA8AAAdMgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgQA7\'/></g></svg>"}';
     uint256 internal constant IMAGE_DATA_POS = 512;
     uint256 internal constant ADDRESS_NAME_POS = 73;
 
-    uint256 internal constant WIDTH = 16;
-    uint256 internal constant HEIGHT = 16;
-    bytes32 constant internal xs = 0x7673456734567234567234567123456701234567000000000000000000000000;
-    bytes32 constant internal ys = 0x0112222233333444444555555666666677777777000000000000000000000000;
+    uint256 internal constant WIDTH = 15;
+    uint256 internal constant HEIGHT = 15;
+    uint256 internal constant ROW_PER_BLOCK = 5;
+    bytes32 constant internal xs = 0x6756756745673456712345670123456701234567000000000000000000000000;
+    bytes32 constant internal ys = 0x0011122233334444455555556666666677777777000000000000000000000000;
 
     event Minted(uint256 indexed id, uint256 indexed pricePaid);
     event Burned(uint256 indexed id, uint256 indexed priceReceived);
@@ -190,7 +191,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     }
 
     function _tokenURI(uint256 id) internal pure returns (string memory) {
-        bytes memory metadata = TEMPLATE;
+       bytes memory metadata = TEMPLATE;
         writeUintAsHex(metadata, ADDRESS_NAME_POS, id);
 
         for (uint256 i = 0; i < 40; i++) {
@@ -198,17 +199,20 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
             if (value == 0) {
                 value = 16; // use black as oposed to transparent
             }
-            // value = 7;
-            // uint256 x = i % 8;
-            // uint256 y = i / 8;
             uint256 x = extract(xs, i);
             uint256 y = extract(ys, i);
-            setCharacter(metadata, IMAGE_DATA_POS, y*WIDTH + x + (y /4) * 2 + 1, value);
-            setCharacter(metadata, IMAGE_DATA_POS, y*WIDTH + (WIDTH -x -1) + (y /4) * 2 + 1, value); // x mirror
-            setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT-y-1)*WIDTH + x + ((HEIGHT-y-1) /4) * 2 + 1, value); // y mirror
-            setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT-y-1)*WIDTH + (WIDTH-x-1) + ((HEIGHT-y-1) /4) * 2 + 1, value); // x,y mirror
-        }
+            setCharacter(metadata, IMAGE_DATA_POS, y*WIDTH + x + (y /ROW_PER_BLOCK) * 2 + 1, value);
+            if (x != WIDTH / 2) {
+                setCharacter(metadata, IMAGE_DATA_POS, y*WIDTH + (WIDTH -x -1) + (y /ROW_PER_BLOCK) * 2 + 1, value); // x mirror
+            }
+            if (y != HEIGHT / 2) {
+                setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT-y-1)*WIDTH + x + ((HEIGHT-y-1) /ROW_PER_BLOCK) * 2 + 1, value); // y mirror
+            }
 
+            if (x != WIDTH / 2 && y != HEIGHT / 2) {
+                setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT-y-1)*WIDTH + (WIDTH-x-1) + ((HEIGHT-y-1) /ROW_PER_BLOCK) * 2 + 1, value); // x,y mirror
+            }
+        }
         return string(metadata);
     }
 
