@@ -186,7 +186,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     }
 
     function _curve(uint256 supply) internal view returns (uint256) {
-        return initialPrice + supply * 0.001 ether;
+        return initialPrice + supply * 0.001 ether; // TODO configure ?
     }
 
     function _forReserve(uint256 mintPrice) internal view returns (uint256) {

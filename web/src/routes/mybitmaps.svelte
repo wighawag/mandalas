@@ -2,6 +2,7 @@
   import WalletAccess from '../templates/WalletAccess.svelte';
   import NavButton from '../components/navigation/NavButton.svelte';
   import {nftsof} from '../stores/nftsof';
+  import {curve} from '../stores/curve';
   import {wallet, flow, chain} from '../stores/wallet';
 
   $: nfts = nftsof($wallet.address);
@@ -14,11 +15,11 @@
 </script>
 
 <WalletAccess>
-  <!-- <div
+  <div
     class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
-    <p>Current Price: {$nfts.currentPrice ? $nfts.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
-    <p>Current Supply: {$nfts.supply ? $nfts.supply.toNumber() : 'loading'}</p>
-  </div> -->
+    <p>Current Price: {$curve.currentPrice ? $curve.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
+    <p>Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
+  </div>
   <section
     class="py-8 px-10 md:w-3/4 w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
     {#if $wallet.state !== 'Ready'}

@@ -2,23 +2,17 @@
   import {keccak256} from '@ethersproject/solidity';
   import {arrayify} from '@ethersproject/bytes';
   import WalletAccess from '../templates/WalletAccess.svelte';
-  import NavButton from '../components/navigation/NavButton.svelte';
-  import {randomnnfts} from '../stores/randomNfts';
+  import {randomTokens} from '../stores/randomTokens';
+  import {curve} from '../stores/curve';
   import {wallet, flow} from '../stores/wallet';
-  import {onMount} from 'svelte';
-import { BigNumber } from '@ethersproject/bignumber';
+  import {BigNumber} from '@ethersproject/bignumber';
+  import {Wallet} from '@ethersproject/wallet';
 
-  let nfts = randomnnfts;
-  onMount(() => {
-    setTimeout(() => {
-      nfts.generate();
-    }, 200);
-  });
+  let nfts = randomTokens;
+  nfts.generate(32);
 
-
-  function mint(index: number) {
-    const account = nfts.accountAt(index);
-
+  function mint(nft: {id: string, privateKey: string}) {
+    const account = new Wallet(nft.privateKey);
     flow.execute(async (contracts) => {
       const hashedData = keccak256(
         ['string', 'address'],
@@ -26,40 +20,46 @@ import { BigNumber } from '@ethersproject/bignumber';
       );
       const signature = await account.signMessage(arrayify(hashedData));
       const buffer = BigNumber.from("1000000000000000000"); // TODO
-      if (!$randomnnfts.currentPrice) {
+      if (!$curve.currentPrice) {
         throw new Error(`no currentPrice available`);
       }
-      await contracts.BitmapToken.mint(wallet.address, signature, {value: $randomnnfts.currentPrice.add(buffer) });
+      await contracts.BitmapToken.mint(wallet.address, signature, {value: $curve.currentPrice.add(buffer) });
     });
   }
+
+  window.onscroll = function() {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - window.innerHeight / 3) {
+        nfts.loadMore(32);
+    }
+};
 </script>
 
 <WalletAccess>
   <div
     class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
-    <p>Current Price: {$randomnnfts.currentPrice ? $randomnnfts.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
-    <p>Current Supply: {$randomnnfts.supply ? $randomnnfts.supply.toNumber() : 'loading'}</p>
+    <p>Current Price: {$curve.currentPrice ? $curve.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
+    <p>Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
   </div>
   <div
     class="w-full h-full mx-auto flex items-center justify-center text-black dark:text-white ">
 
-    <form class="mt-5 w-full max-w-sm">
+    <!-- <form class="mt-5 w-full max-w-sm">
       <div class="flex items-center">
         <NavButton
           label="Previous"
           class="mr-4"
-          disabled={$randomnnfts.startIndex === 0}
-          on:click={() => randomnnfts.newPage(-12)}>
+          disabled={$nfts.startIndex === 0}
+          on:click={() => nfts.newPage(-12)}>
           Previous
         </NavButton>
         <NavButton
           label="More"
           class="ml-4"
-          on:click={() => randomnnfts.newPage(12)}>
+          on:click={() => nfts.newPage(12)}>
           More...
         </NavButton>
       </div>
-    </form>
+    </form> -->
   </div>
 
   <section
@@ -79,8 +79,8 @@ import { BigNumber } from '@ethersproject/bignumber';
           <li>
             <div
               id={nft.id}
-              class=" p-8 cursor-pointer"
-              on:click={() => {if (nft.image) {mint(index)}} }>
+              class={`p-8 ${$curve.currentPrice ? "cursor-pointer" : '' }`}
+              on:click={() => {if ($curve.currentPrice) {mint(nft)}} }>
               <div class="aspect-w-3 aspect-h-2">
                 {#if nft.error}
                   Error:
@@ -139,27 +139,4 @@ import { BigNumber } from '@ethersproject/bignumber';
       </ul>
     {/if}
   </section>
-
-  {#if $nfts && $nfts.tokens && $nfts.tokens.length}
-    <div
-      class="w-full h-full mx-auto flex items-center justify-center text-black dark:text-white ">
-      <form class="m-5 w-full max-w-sm">
-        <div class="flex items-center">
-          <NavButton
-            label="Previous"
-            class="mr-4"
-            disabled={$randomnnfts.startIndex === 0}
-            on:click={() => randomnnfts.newPage(-12)}>
-            Previous
-          </NavButton>
-          <NavButton
-            label="More"
-            class="ml-4"
-            on:click={() => randomnnfts.newPage(12)}>
-            More...
-          </NavButton>
-        </div>
-      </form>
-    </div>
-  {/if}
 </WalletAccess>

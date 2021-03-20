@@ -8,11 +8,18 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const {deployer} = await getNamedAccounts();
 
+  const initialPrice = parseEther("0.01");
+  const creatorCutPer10000th = 500;
+
   await deploy('BitmapToken', {
     from: deployer,
     log: true,
-    args:[deployer, parseEther("0.01"), 500],
+    args:[deployer, initialPrice, creatorCutPer10000th],
     proxy: !hre.network.live ? 'postUpgrade': false,
+    linkedData: {
+      initialPrice: initialPrice.toString(),
+      creatorCutPer10000th
+    },
     autoMine: true
   });
 };
