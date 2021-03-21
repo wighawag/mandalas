@@ -1,4 +1,4 @@
-import {generateTokenURI} from 'generative-art-common';
+import {generateTokenURI} from 'mandalas-common';
 import {BigNumber} from '@ethersproject/bignumber';
 import {Wallet} from '@ethersproject/wallet';
 import {hexlify, hexZeroPad} from '@ethersproject/bytes';

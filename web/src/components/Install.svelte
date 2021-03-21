@@ -75,11 +75,11 @@
             <img
               class="h-10 w-10 rounded-full"
               src={`${base}maskable_icon_512x512.png`}
-              alt="Generative Art" />
+              alt="Mandalas" />
           </div>
           <div class="ml-3 w-0 flex-1">
             <p class="text-sm font-medium dark:text-gray-100 text-black">
-              Do you want to install Generative Art on your home screen?
+              Do you want to install Mandalas on your home screen?
             </p>
             <!-- <p class="mt-1 text-sm text-gray-500">
             Install it for later

@@ -2,7 +2,7 @@ node_modules/
 .newsh.json
 .env*
 !.env*.default
-generative-art.code-workspace
+mandalas.code-workspace
 .vscode/*
 !.vscode/settings.json.default
 .yalc

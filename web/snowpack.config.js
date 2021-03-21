@@ -6,13 +6,13 @@ const mount = {
   public: {url: '/', static: true},
   src: {url: '/dist'},
 };
-mount[resolve(__dirname, '../common-lib')] = '/dist/generative-art-common';
+mount[resolve(__dirname, '../common-lib')] = '/dist/mandalas-common';
 
 /** @type {import("snowpack").SnowpackUserConfig } */
 module.exports = {
   mount,
   alias: {
-    'generative-art-common': '../common-lib/src',
+    'mandalas-common': '../common-lib/src',
   },
   plugins: [
     '@snowpack/plugin-svelte',

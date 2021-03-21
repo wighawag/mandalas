@@ -5,7 +5,7 @@ import {setupUsers, waitFor} from './utils';
 import {Wallet} from '@ethersproject/wallet';
 import {keccak256} from '@ethersproject/solidity';
 import {arrayify} from '@ethersproject/bytes';
-import {generateTokenURI} from 'generative-art-common';
+import {generateTokenURI} from 'mandalas-common';
 import { BigNumber } from 'ethers';
 // import {BigNumber} from '@ethersproject/bignumber';
 

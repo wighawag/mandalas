@@ -1,6 +1,6 @@
 {
-  "name": "generative-art-contracts",
-  "description": "Smart contracts for Generative Art",
+  "name": "mandalas-contracts",
+  "description": "Smart contracts for Mandalas",
   "version": "0.0.1",
   "private": true,
   "devDependencies": {
@@ -25,7 +25,7 @@
     "ethereum-contracts-test-suite": "^0.1.0",
     "ethers": "^5.0.17",
     "fs-extra": "^9.0.1",
-    "generative-art-common": "workspace:*",
+    "mandalas-common": "workspace:*",
     "hardhat": "^2.0.10",
     "hardhat-deploy": "^0.7.0-beta.44",
     "hardhat-deploy-ethers": "^0.3.0-beta.7",

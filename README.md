@@ -1,13 +1,13 @@
 <!--- -------------------------------------------- -->
 
-# Generative Art
+# Mandalas
 
 This is a template to build a decentralised applicaiton using ethereum, hardhat and svelte
 
 to make an app out of it, execute the following
 
 ```
-npx degit wighawag/generative-art <your-app-folder>
+npx degit wighawag/mandalas <your-app-folder>
 ```
 
 There also more template available in branches:
@@ -15,13 +15,13 @@ There also more template available in branches:
 ## Lite version (without subgraph, no dependency on any backend):
 
 ```
-npx degit wighawag/generative-art#lite <your-app-folder>
+npx degit wighawag/mandalas#lite <your-app-folder>
 ```
 
 ## NFT version (it includes eip-721-subgraph and a basic "my nfts" page):
 
 ```
-npx degit wighawag/generative-art#erc721 <your-app-folder>
+npx degit wighawag/mandalas#erc721 <your-app-folder>
 ```
 
 ---

@@ -16,7 +16,7 @@ function writeIfNotExists(p, content) {
 }
 
 [
-  'generative-art.code-workspace',
+  'mandalas.code-workspace',
   '.env',
   '.env.production',
   '.env.staging',
