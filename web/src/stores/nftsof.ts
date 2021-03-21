@@ -75,8 +75,8 @@ class NFTOfStore extends BaseStore<NFTs> {
   ): Promise<null | {tokenURI: string; id: string;}[]> {
     const contracts = chain.contracts || fallback.contracts;
     if (contracts) {
-      const numTokens = await contracts.BitmapToken.balanceOf(address);
-      const tokens = await contracts.BitmapToken.getTokenDataOfOwner(
+      const numTokens = await contracts.MandalaToken.balanceOf(address);
+      const tokens = await contracts.MandalaToken.getTokenDataOfOwner(
         address,
         0,
         numTokens

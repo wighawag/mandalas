@@ -14,9 +14,9 @@
   import Modal from '../components/Modal.svelte';
   import {computeBuffer} from '../utils';
 
-  const initialPrice = BigNumber.from(contractsInfo.contracts.BitmapToken.linkedData.initialPrice);
-  const creatorCutPer10000th = contractsInfo.contracts.BitmapToken.linkedData.creatorCutPer10000th;
-  const coefficient = BigNumber.from(contractsInfo.contracts.BitmapToken.linkedData.linearCoefficient);
+  const initialPrice = BigNumber.from(contractsInfo.contracts.MandalaToken.linkedData.initialPrice);
+  const creatorCutPer10000th = contractsInfo.contracts.MandalaToken.linkedData.creatorCutPer10000th;
+  const coefficient = BigNumber.from(contractsInfo.contracts.MandalaToken.linkedData.linearCoefficient);
 
   function format(bn : BigNumber, numDecimals: number): number {
     const precision = Math.pow(10, numDecimals);
@@ -60,13 +60,13 @@
   <section
     class="py-8 px-4 w-full h-full mx-auto flex items-center justify-center text-black dark:text-white ">
     {#if !$nfts}
-      <div>Generating Bitmaps...</div>
+      <div>Generating Mandalas...</div>
     {:else if $nfts.state === 'Idle'}
-      <div>Bitmaps not loaded</div>
+      <div>Mandalas not loaded</div>
     {:else if $nfts.error}
       <div>Error: {$nfts.error}</div>
     {:else if $nfts.tokens.length === 0 && $nfts.state === 'Loading'}
-      <div>Loading Bitmaps...</div>
+      <div>Loading Mandalas...</div>
     {:else}
       <ul
         class="grid-cols-2 grid sm:grid-cols-4 sm:gap-x-6 sm:gap-y-12 sm:space-y-0 lg:grid-cols-6 lg:gap-x-8">
@@ -120,7 +120,7 @@
               {/if}
             </div>
           </li>
-        {:else}Error: No Bitmap could be generated{/each}
+        {:else}Error: No Mandala could be generated{/each}
       </ul>
     {/if}
   </section>

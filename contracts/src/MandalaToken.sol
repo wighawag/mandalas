@@ -9,26 +9,14 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol";
 import "@openzeppelin/contracts/cryptography/ECDSA.sol";
 import "hardhat-deploy/solc_0.7/proxy/Proxied.sol";
 
-contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
+contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
     using EnumerableSet for EnumerableSet.UintSet;
     using ECDSA for bytes32;
 
-    // Template : contains all data to be used: reduce memory usage and is easier to work with
     // solhint-disable-next-line quotes
-    // bytes internal constant TEMPLATE = 'data:text/plain,{"name":"Bitmap 0x0000000000000000000000000000000000000000","description":"A Bitmap","image":"data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' shape-rendering=\'crispEdges\' width=\'512\' height=\'512\'><g transform=\'scale(64)\'><image width=\'8\' height=\'8\' style=\'image-rendering: pixelated;\' href=\'data:image/gif;base64,R0lGODdhEwATAMQAAAAAAPb+Y/7EJfN3NNARQUUKLG0bMsR1SujKqW7wQwe/dQBcmQeEqjDR0UgXo4A0vrlq2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkKAAAALAAAAAATABMAAAdNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA6gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGBADs=\'/></g></svg>"}';
-    // uint256 internal constant IMAGE_DATA_POS = 512;
-    // uint256 internal constant ADDRESS_NAME_POS = 73;
-
-    // uint256 internal constant WIDTH = 19;
-    // uint256 internal constant HEIGHT = 19;
-    // uint256 internal constant ROW_PER_BLOCK = 4;
-    // bytes32 constant internal xs = 0x9348923467893456789456789567896789789899000000000000000000000000;
-    // bytes32 constant internal ys = 0x0111122222223333333444444555556666777889000000000000000000000000;
-
-    // solhint-disable-next-line quotes
-    bytes internal constant TEMPLATE = 'data:text/plain,{"name":"Bitmap 0x0000000000000000000000000000000000000000","description":"A Bitmap","image":"data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' shape-rendering=\'crispEdges\' width=\'512\' height=\'512\'><g transform=\'scale(64)\'><image width=\'8\' height=\'8\' style=\'image-rendering: pixelated;\' href=\'data:image/gif;base64,R0lGODdhEQARAMQAAAAAAPb+Y/7EJfN3NNARQUUKLG0bMsR1SujKqW7wQwe/dQBcmQeEqjDR0UgXo4A0vrlq2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkKAAAALAAAAAARABEAAAdFgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEoAAAAAAAAAAAAAAAAAAAAAAAAGBADs=\'/></g></svg>"}';
-    uint256 internal constant IMAGE_DATA_POS = 512;
-    uint256 internal constant ADDRESS_NAME_POS = 73;
+    bytes internal constant TEMPLATE = 'data:text/plain,{"name":"Mandala 0x0000000000000000000000000000000000000000","description":"A Unique Mandala","image":"data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' shape-rendering=\'crispEdges\' width=\'512\' height=\'512\'><g transform=\'scale(64)\'><image width=\'8\' height=\'8\' style=\'image-rendering: pixelated;\' href=\'data:image/gif;base64,R0lGODdhEQARAMQAAAAAAPb+Y/7EJfN3NNARQUUKLG0bMsR1SujKqW7wQwe/dQBcmQeEqjDR0UgXo4A0vrlq2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkKAAAALAAAAAARABEAAAdFgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEoAAAAAAAAAAAAAAAAAAAAAAAAGBADs=\'/></g></svg>"}';
+    uint256 internal constant IMAGE_DATA_POS = 521;
+    uint256 internal constant ADDRESS_NAME_POS = 74;
 
     uint256 internal constant WIDTH = 17;
     uint256 internal constant HEIGHT = 17;
@@ -74,12 +62,12 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
 
     /// @notice A descriptive name for a collection of NFTs in this contract
     function name() external pure override returns (string memory) {
-        return "Bitmap Art Token";
+        return "Mandala Tokens";
     }
 
     /// @notice An abbreviated name for NFTs in this contract
     function symbol() external pure override returns (string memory) {
-        return "BITMAP";
+        return "MANDALA";
     }
 
     function tokenURI(uint256 id) public view virtual override returns (string memory) {
@@ -121,37 +109,13 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
         }
     }
 
-
-    // struct TokenDataMintedOrNot {
-    //     uint256 id;
-    //     string tokenURI;
-    //     bool minted;
-    // }
-
-    // struct MintData {
-    //     uint256 currentPrice;
-    //     uint256 supply;
-    //     TokenDataMintedOrNot[] tokens;
-    // }
-
-
-    // function getMintData(uint256[] calldata ids) external view returns (MintData memory data) {
-    //     data.supply = _supply;
-    //     data.currentPrice = _curve(data.supply);
-    //     data.tokens = _getTokenDataForIds(ids);
-    // }
-
-    // function getTokenDataForIds(uint256[] calldata ids) external view returns (TokenDataMintedOrNot[] memory tokens) {
-    //     return _getTokenDataForIds(ids);
-    // }
-
     function mint(address to, bytes memory signature) external payable returns (uint256) {
         uint256 mintPrice = _curve(_supply);
         require(msg.value >= mintPrice, "NOT_ENOUGH_ETH");
 
 
         // -------------------------- MINTING ---------------------------------------------------------
-        bytes32 hashedData = keccak256(abi.encodePacked("Bitmap", to));
+        bytes32 hashedData = keccak256(abi.encodePacked("Mandala", to));
         address signer = hashedData.toEthSignedMessageHash().recover(signature);
         _mint(uint256(signer), to);
         // -------------------------- MINTING ---------------------------------------------------------
@@ -195,14 +159,6 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
         return mintPrice * (10000-creatorCutPer10000th) / 10000;
     }
 
-    // function _getTokenDataForIds(uint256[] memory ids) internal view returns (TokenDataMintedOrNot[] memory tokens) {
-    //     tokens = new TokenDataMintedOrNot[](ids.length);
-    //     for (uint256 i = 0; i < ids.length; i++) {
-    //         uint256 id = ids[i];
-    //         uint256 data = _owners[id];
-    //         tokens[i] = TokenDataMintedOrNot(id, _tokenURI(id), data != 0);
-    //     }
-    // }
 
     // solhint-disable-next-line code-complexity
     function _tokenURI(uint256 id) internal pure returns (string memory) {

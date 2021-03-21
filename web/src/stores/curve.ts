@@ -24,7 +24,7 @@ export class CurveStore extends BaseStore<Curve> {
     null | BigNumber
   > {const contracts = chain.contracts || fallback.contracts;
     if (contracts) {
-      return await contracts.BitmapToken.totalSupply();
+      return await contracts.MandalaToken.totalSupply();
     } else if (fallback.state === 'Ready') {
       throw new Error('no contracts to fetch with');
     } else {
@@ -37,7 +37,7 @@ export class CurveStore extends BaseStore<Curve> {
     if (!supply) {
       this.setPartial({state: 'Loading'});
     } else {
-      this.setPartial({currentPrice: supply.mul(contractsInfo.contracts.BitmapToken.linkedData.linearCoefficient).add(contractsInfo.contracts.BitmapToken.linkedData.initialPrice), supply, state: 'Ready'});
+      this.setPartial({currentPrice: supply.mul(contractsInfo.contracts.MandalaToken.linkedData.linearCoefficient).add(contractsInfo.contracts.MandalaToken.linkedData.initialPrice), supply, state: 'Ready'});
     }
   }
 

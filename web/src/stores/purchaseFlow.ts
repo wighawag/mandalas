@@ -8,9 +8,9 @@ import {keccak256} from '@ethersproject/solidity';
 import {arrayify} from '@ethersproject/bytes';
 import {computeBuffer} from '../utils';
 
-const initialPrice = BigNumber.from(contractsInfo.contracts.BitmapToken.linkedData.initialPrice);
-const creatorCutPer10000th = contractsInfo.contracts.BitmapToken.linkedData.creatorCutPer10000th;
-const coefficient = BigNumber.from(contractsInfo.contracts.BitmapToken.linkedData.linearCoefficient);
+const initialPrice = BigNumber.from(contractsInfo.contracts.MandalaToken.linkedData.initialPrice);
+const creatorCutPer10000th = contractsInfo.contracts.MandalaToken.linkedData.creatorCutPer10000th;
+const coefficient = BigNumber.from(contractsInfo.contracts.MandalaToken.linkedData.linearCoefficient);
 
 type Data = {id: string, privateKey: string, currentPrice: BigNumber, supply: BigNumber};
 export type PurchaseFlow = {
@@ -47,7 +47,7 @@ class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
     this.setPartial({step: 'CONNECTING'});
     flow.execute(async (contracts) => {
       this.setPartial({step: 'LOADING_CURRENT_PRICE'});
-      const supply = await contracts.BitmapToken.totalSupply();
+      const supply = await contracts.MandalaToken.totalSupply();
       const currentPrice = supply.mul(coefficient).add(initialPrice);
       this.setPartial({data: {id: nft.id, privateKey: nft.privateKey, currentPrice, supply}, step: 'CONFIRM'});
     });
@@ -66,12 +66,12 @@ class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
       }
       const hashedData = keccak256(
         ['string', 'address'],
-        ['Bitmap', wallet.address]
+        ['Mandala', wallet.address]
       );
       const signature = await account.signMessage(arrayify(hashedData));
       const buffer = computeBuffer(purchaseFlow.data.supply, purchaseFlow.data.currentPrice)
 
-      const tx = await contracts.BitmapToken.mint(wallet.address, signature, {value: purchaseFlow.data.currentPrice.add(buffer) });
+      const tx = await contracts.MandalaToken.mint(wallet.address, signature, {value: purchaseFlow.data.currentPrice.add(buffer) });
       randomTokens.record(purchaseFlow.data.id, tx.hash, tx.nonce);
       this.setPartial({step: 'SUCCESS'});
     });

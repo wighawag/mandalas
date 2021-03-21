@@ -49,7 +49,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
   record(id: string, hash: string, nonce: number) : void {
     this.claimTXs[id] = {hash,nonce};
     try {
-      localStorage.setItem('_bitmaps_generated', JSON.stringify({
+      localStorage.setItem('_mandalas_generated', JSON.stringify({
         random: this.random,
         start: this.$store.startIndex,
         claimTXs: this.claimTXs
@@ -97,7 +97,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
   generate(num: number): void {
     let data: LocalStorageData | undefined;
     try {
-      const fromStorage = localStorage.getItem('_bitmaps_generated');
+      const fromStorage = localStorage.getItem('_mandalas_generated');
       if (fromStorage) {
         try {
           data = JSON.parse(fromStorage);
@@ -118,7 +118,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
         claimTXs: {}
       };
       try {
-        localStorage.setItem('_bitmaps_generated', JSON.stringify(data));
+        localStorage.setItem('_mandalas_generated', JSON.stringify(data));
       } catch (e) {
         console.error(e);
       }

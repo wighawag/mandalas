@@ -12,7 +12,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const creatorCutPer10000th = 500;
   const linearCoefficient = parseEther("0.0005")
 
-  await deploy('BitmapToken', {
+  await deploy('MandalaToken', {
     from: deployer,
     log: true,
     args:[deployer, initialPrice, creatorCutPer10000th, linearCoefficient],
@@ -26,4 +26,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 export default func;
-func.tags = ['BitmapToken'];
+func.tags = ['MandalaToken'];

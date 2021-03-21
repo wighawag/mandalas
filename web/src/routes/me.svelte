@@ -10,7 +10,7 @@
 
   function burn({id}: {id: string}) {
     flow.execute(async (contracts) => {
-      await contracts.BitmapToken.burn(id);
+      await contracts.MandalaToken.burn(id);
     });
   }
 </script>

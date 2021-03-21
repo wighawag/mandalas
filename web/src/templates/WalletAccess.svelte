@@ -59,6 +59,17 @@
     wallet.disconnect();
     e.stopImmediatePropagation();
   }
+
+  function formatError(message: string): string{
+    const messageInside = message.indexOf('"message":');
+    if (messageInside >= 0) {
+      const subMessage = message.substr(messageInside + 11);
+      const nextQuote = message.indexOf('"');
+      return subMessage.substr(0,nextQuote);
+    } else {
+      return message;
+    }
+  }
 </script>
 
 <slot />
@@ -151,7 +162,7 @@
       {#if executionError.code === 4001}
         You rejected the request
       {:else if executionError.message}
-        {executionError.message}
+        {formatError(executionError.message)}
       {:else}Error: {executionError}{/if}
       <NavButton label="Retry" on:click={() => flow.retry()}>Retry</NavButton>
     {/if}
