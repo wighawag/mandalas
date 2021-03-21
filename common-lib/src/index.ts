@@ -145,6 +145,7 @@ export function generateTokenURI(id: string, template: Template): string {
         metadata = setCharacter(metadata, template.bitmap_data_pos, (template.height-y-1)*template.width + (template.width-x-1) + Math.floor((template.height-y-1) /template.row_per_block) * 2 + 1, value); // x,y mirror
       }
   }
-  return metadata;
+  // fix for firefox :(
+  return metadata.replace('image-rendering: pixelated;', 'image-rendering: pixelated; image-rendering: crisp-edges;');
 }
 
