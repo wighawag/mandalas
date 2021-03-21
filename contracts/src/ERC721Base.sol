@@ -227,7 +227,7 @@ abstract contract ERC721Base is IERC165, IERC721 {
     function _ownerAndOperatorEnabledOf(uint256 id) internal view returns (address owner, bool operatorEnabled) {
         uint256 data = _owners[id];
         owner = address(data);
-        operatorEnabled = (data | OPERATOR_FLAG) == 1;
+        operatorEnabled = (data & OPERATOR_FLAG) == OPERATOR_FLAG;
     }
 
     function _mint(uint256 id, address to) internal {

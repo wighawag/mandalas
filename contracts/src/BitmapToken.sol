@@ -94,7 +94,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     /// @param id The id of the interface.
     /// @return Whether the interface is supported.
     function supportsInterface(bytes4 id) public pure virtual override(ERC721Base, IERC165) returns (bool) {
-        ERC721Base.supportsInterface(id) || id == 0x5b5e139f;
+        return ERC721Base.supportsInterface(id) || id == 0x5b5e139f;
     }
 
     struct TokenData {
