@@ -5,7 +5,7 @@ import {setupUsers, waitFor} from './utils';
 import {Wallet} from '@ethersproject/wallet';
 import {keccak256} from '@ethersproject/solidity';
 import {arrayify} from '@ethersproject/bytes';
-import {generateTokenURI, template17} from 'mandalas-common';
+import {generateTokenURI, template19_bis} from 'mandalas-common';
 import { BigNumber } from 'ethers';
 // import {BigNumber} from '@ethersproject/bignumber';
 
@@ -70,7 +70,7 @@ describe('MandalaToken Specific', function () {
     const uri = await MandalaToken.callStatic.tokenURI(tokenId);
     console.log({uri});
 
-    expect(uri).to.eq(generateTokenURI(tokenId, template17))
+    expect(uri).to.eq(generateTokenURI(tokenId, template19_bis))
   });
 
 
