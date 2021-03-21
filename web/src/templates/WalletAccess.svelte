@@ -49,38 +49,44 @@
         name: v,
       };
     });
+
+  function connect(e: Event) {
+    flow.connect();
+    e.stopImmediatePropagation();
+  }
+
+  function disconnect(e: Event) {
+    wallet.disconnect();
+    e.stopImmediatePropagation();
+  }
 </script>
 
 <slot />
 
-{#if $chain.state === 'Idle' && !$chain.connecting && $fallback.state === 'Idle' && !$fallback.connecting}
-  <div
-    class="w-full flex items-center justify-center fixed top-0 pointer-events-none"
-    style="z-index: 5;">
+{#if $chain.state === 'Idle' && !$chain.connecting && $fallback.error}
+  <div class="w-full flex items-center justify-center fixed bottom-0" style="z-index: 5;">
     <p
-      class="w-64 text-center rounded-bl-xl rounded-br-xl text-gray-200 bg-pink-600 p-1">
-      Please Connect.
+      class="w-64 text-center rounded-tl-xl rounded-tr-xl text-gray-200 bg-pink-600 p-1">
+      Network Issues, Please <button class="underline" on:click={connect}>Connect</button>.
     </p>
   </div>
-{:else if $chain.state === 'Idle' && !$chain.connecting && $fallback.error}
-  <div
-    class="w-full flex items-center justify-center fixed top-0 pointer-events-none"
-    style="z-index: 5;">
+{:else if $chain.state === 'Idle' && !$chain.connecting && $fallback.state === 'Idle' && !$fallback.connecting}
+  <div class="w-full flex items-center justify-center fixed bottom-0" style="z-index: 5;">
     <p
-      class="w-64 text-center rounded-bl-xl rounded-br-xl text-gray-200 bg-pink-600 p-1">
-      Network Issues, Please Connect.
+      class="w-64 text-center rounded-tl-xl rounded-tr-xl text-gray-200 bg-pink-600 p-1">
+      Please <button class="underline" on:click={connect}>Connect</button>.
     </p>
   </div>
 {:else if $chain.notSupported}
-  <!-- <div
-    class="w-full flex items-center justify-center fixed top-0 pointer-events-none"
+  <div
+    class="w-full flex items-center justify-center fixed bottom-0"
     style="z-index: 5;">
     <p
-      class="w-64 text-center rounded-bl-xl rounded-br-xl text-gray-200 bg-pink-600 p-1">
+      class="w-64 text-center rounded-tl-xl rounded-tr-xl text-gray-200 bg-pink-600 p-1">
       Wrong network, use
-      {chainName}
+      {chainName} or <button class="underline" on:click={disconnect}>Disconnect</button>
     </p>
-  </div> -->
+  </div>
 {/if}
 
 {#if $flow.inProgress}

@@ -27,7 +27,7 @@ const walletStores = WalletStores({
       infuraId: 'bc0bdd4eaac640278cdebc3aa91fabe4',
     }),
   ],
-  fallbackNode: nodeUrl, // TODO use query string to specify it // TODO settings
+  fallbackNode: nodeUrl,
 });
 
 export const {

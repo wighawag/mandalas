@@ -10,6 +10,8 @@
   import Link from '../lib/routing/curi/Link.svelte';
   import contractsInfo from '../contracts.json';
   import {parseEther} from '@ethersproject/units';
+  import purchaseFlow from '../stores/purchaseFlow';
+  import Modal from '../components/Modal.svelte';
 
   const initialPrice = BigNumber.from(contractsInfo.contracts.BitmapToken.linkedData.initialPrice);
   const creatorCutPer10000th = contractsInfo.contracts.BitmapToken.linkedData.creatorCutPer10000th;
@@ -34,21 +36,7 @@
   nfts.generate(32);
 
   function mint(nft: {id: string, privateKey: string}) {
-    const account = new Wallet(nft.privateKey);
-    flow.execute(async (contracts) => {
-      const hashedData = keccak256(
-        ['string', 'address'],
-        ['Bitmap', wallet.address]
-      );
-      const signature = await account.signMessage(arrayify(hashedData));
-      if (!$curve.currentPrice || !$curve.supply) {
-        throw new Error(`no currentPrice available`);
-      }
-      const buffer = computeBuffer($curve.supply, $curve.currentPrice)
-
-      const tx = await contracts.BitmapToken.mint(wallet.address, signature, {value: $curve.currentPrice.add(buffer) });
-      nfts.record(nft.id, tx.hash, tx.nonce);
-    });
+    purchaseFlow.mint(nft);
   }
 
   window.onscroll = function() {
@@ -61,17 +49,17 @@
 <WalletAccess>
   <div
     class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
-    <p class="m-2 text-xs sm:text-base font-black text-yellow-400">Current Price: {$curve.currentPrice ? format($curve.currentPrice, 4) + ' ETH' : 'loading'}</p>
-    <p class="m-2 text-xs sm:text-base font-black text-yellow-400">Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
+    <p class="m-2 text-xs md:text-base font-black text-yellow-400">Current Price: {$curve.currentPrice ? format($curve.currentPrice, 4) + ' ETH' : 'loading'}</p>
+    <p class="m-2 text-xs md:text-base font-black text-yellow-400">Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
   </div>
   <div
     class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
-    <p class="m-2 text-xs sm:text-base font-black text-yellow-400">+ Refunded Buffer: {($curve.supply && $curve.currentPrice) ? format(computeBuffer($curve.supply, $curve.currentPrice),4) + ' ETH' : 'loading'}</p>
-    <button class="m-2 text-xs sm:text-base font-black text-yellow-400 border border-yellow-500 p-1" on:click={() => nfts.reset()}>randomize</button>
+    <p class="m-2 text-xs md:text-base font-black text-yellow-400">+ Refunded Buffer: {($curve.supply && $curve.currentPrice) ? format(computeBuffer($curve.supply, $curve.currentPrice),4) + ' ETH' : 'loading'}</p>
+    <button class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1" on:click={() => nfts.reset()}>randomize</button>
   </div>
-  <div class="w-full h-full text-xs text-center sm:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
+  <div class="w-full h-full text-xs text-center md:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
     <p class="px-4 pt-4">There are millions of millions of Mandalas, all unique. Pick the one you like :)</p>
-    <p class="px-4 pb-1">Like <a class="underline" href="https://neolastics.com/" target="_blank">neolastics</a> their price run on a bounding curve. More details <Link name="about" class="underline">here</Link>.</p>
+    <p class="px-4 pb-1">Their price run on a bounding curve. So as more people collect them, the more they get expensive. And you can burn them to get most of the price back. More details <Link name="about" class="underline">here</Link>.</p>
   </div>
   <div
     class="w-full h-full mx-auto flex items-center justify-center text-black dark:text-white ">
@@ -94,8 +82,8 @@
           <li>
             <div
               id={nft.id}
-              class={`p-8 ${$curve.currentPrice ? "cursor-pointer" : '' }`}
-              on:click={() => {if ($curve.currentPrice) {mint(nft)}} }>
+              class="p-8 cursor-pointer"
+              on:click={() => mint(nft) }>
               <div class="aspect-w-3 aspect-h-2">
                 {#if nft.error}
                   Error:
@@ -119,7 +107,6 @@
                         justify-center pb-4 text-sm text-gray-700 dark:text-gray-300 font-medium
                         border border-transparent rounded-br-lg
                         hover:text-gray-500">
-                      {#if $curve.currentPrice}
                         <svg
                           class="w-6 h-6"
                           xmlns="http://www.w3.org/2000/svg"
@@ -132,12 +119,7 @@
                             stroke-width="2"
                             d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
                         </svg>
-                        <span class="text-xs sm:text-base ml-3">Mint It</span>
-                      {:else}
-                        <svg class="w-6 h-6 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      {/if}
+                        <span class="text-xs md:text-base ml-3">Mint It</span>
 
                     </button>
                   </div>
@@ -151,3 +133,32 @@
     {/if}
   </section>
 </WalletAccess>
+
+
+{#if $purchaseFlow.step !== 'IDLE' && $purchaseFlow.step !== 'SUCCESS'}
+
+  {#if $purchaseFlow.step !== 'CONFIRM'}
+    <!-- Taken care by WalletAccess -->
+  {:else}
+    <Modal on:close={() => purchaseFlow.cancel()}>
+        {#if !$purchaseFlow.data}
+        Error
+        {:else}
+        <div class="text-center">
+          <h2>
+            Mint for {format($purchaseFlow.data.currentPrice, 4)} ETH
+          </h2>
+          <p class="text-gray-300 mt-2 text-sm">
+            We added a buffer of {format(computeBuffer($purchaseFlow.data.supply, $purchaseFlow.data.currentPrice), 4)} ETH to cover the case someone else  is minting at the same time. You'll be refunded if that does not happen.
+          </p>
+          <button
+            class="mt-5 p-1 border border-yellow-500"
+            label="Mint"
+            on:click={() => purchaseFlow.confirm()}>
+            Confirm
+          </button>
+        </div>
+        {/if}
+    </Modal>
+  {/if}
+{/if}
