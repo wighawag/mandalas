@@ -1,4 +1,4 @@
-import {generateTokenURI, template17, template19} from 'mandalas-common';
+import {generateTokenURI, template19_bis, template19} from 'mandalas-common';
 import {BigNumber} from '@ethersproject/bignumber';
 import {Wallet} from '@ethersproject/wallet';
 import {hexlify, hexZeroPad} from '@ethersproject/bytes';
@@ -47,9 +47,10 @@ export class RandomTokenStore extends BaseStore<NFTs> {
     });
 
     // TODO remove
+    // let currentTemplate = template19
     // window.addEventListener('click', () => {
-    //   if (currentTemplate == template19) {
-    //     currentTemplate = template17;
+    //   if (currentTemplate === template19) {
+    //     currentTemplate = template19_bis;
     //   } else {
     //     currentTemplate = template19;
     //   }
