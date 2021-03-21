@@ -67,7 +67,7 @@
   <div
     class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
     <p class="m-2 text-xs sm:text-base font-black text-yellow-400">+ Refunded Buffer: {($curve.supply && $curve.currentPrice) ? format(computeBuffer($curve.supply, $curve.currentPrice),4) + ' ETH' : 'loading'}</p>
-    <p class="m-2 text-xs sm:text-base font-black text-yellow-400"></p>
+    <button class="m-2 text-xs sm:text-base font-black text-yellow-400 border border-yellow-500 p-1" on:click={() => nfts.reset()}>randomize</button>
   </div>
   <div class="w-full h-full text-xs sm:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
     <p class="px-4 pt-4">There are millions of millions of Mandalas, all unique. Pick the one you like :)</p>
@@ -75,24 +75,6 @@
   </div>
   <div
     class="w-full h-full mx-auto flex items-center justify-center text-black dark:text-white ">
-
-    <!-- <form class="mt-5 w-full max-w-sm">
-      <div class="flex items-center">
-        <NavButton
-          label="Previous"
-          class="mr-4"
-          disabled={$nfts.startIndex === 0}
-          on:click={() => nfts.newPage(-12)}>
-          Previous
-        </NavButton>
-        <NavButton
-          label="More"
-          class="ml-4"
-          on:click={() => nfts.newPage(12)}>
-          More...
-        </NavButton>
-      </div>
-    </form> -->
   </div>
 
   <section

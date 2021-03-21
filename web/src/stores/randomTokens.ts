@@ -89,6 +89,11 @@ export class RandomTokenStore extends BaseStore<NFTs> {
     this.setPartial({tokens: this.$store.tokens.concat(tokens)});
   }
 
+  reset(): void {
+    localStorage.clear();
+    location.reload();
+  }
+
   generate(num: number): void {
     let data: LocalStorageData | undefined;
     try {
