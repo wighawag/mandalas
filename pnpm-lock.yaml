@@ -75,6 +75,7 @@ importers:
       chai-ethers: 0.0.1
       cross-env: 7.0.3
       dotenv: 8.2.0
+      ethereum-contracts-test-suite: 0.1.0
       ethers: 5.0.26
       fs-extra: 9.1.0
       generative-art-common: 'link:../common-lib'
@@ -107,6 +108,7 @@ importers:
       chai-ethers: ^0.0.1
       cross-env: ^7.0.2
       dotenv: ^8.2.0
+      ethereum-contracts-test-suite: ^0.1.0
       ethers: ^5.0.17
       fs-extra: ^9.0.1
       generative-art-common: 'workspace:*'
@@ -5004,6 +5006,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-GiK/RQkAkcVaEdxKVkPcG07PQ5vD7v2MFSHgZmBJSfMzNRHimntdBithsHAT89tAXnIpzVDWt8iaCD1DvkaxGg==
+  /ethereum-contracts-test-suite/0.1.0:
+    dev: true
+    resolution:
+      integrity: sha512-oggoifytuDMEGWmaTFmKLrUMDyGqv6ieNzUbmz6Oha5+vmhT4/qGMwJXbJlFlPOKF+4HGjO48zqehZ3QjHLYsQ==
   /ethereum-cryptography/0.1.3:
     dependencies:
       '@types/pbkdf2': 3.1.0

@@ -59,7 +59,7 @@ describe('BitmapToken', function () {
     expect(owner).to.equal(users[1].address);
   });
 
-  it('uri ', async function () {
+  it('js uri match', async function () {
     const {users, BitmapToken} = await setup();
     const currentPrice = await BitmapToken.currentPrice();
     const {tokenId, signature} = await randomMintSignature(users[0].address);

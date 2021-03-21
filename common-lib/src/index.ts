@@ -85,7 +85,7 @@ export function generateTokenURI(id: string): string {
 
       if (x != y) {
         metadata = setCharacter(metadata, IMAGE_DATA_POS, x*WIDTH + y + Math.floor(x /ROW_PER_BLOCK) * 2 + 1, value);
-          if (y != Math.floor(WIDTH / 2)) {
+          if (y != Math.floor(HEIGHT / 2)) {
             metadata = setCharacter(metadata, IMAGE_DATA_POS, x*WIDTH + (WIDTH -y -1) + Math.floor(x /ROW_PER_BLOCK) * 2 + 1, value); // x mirror
           }
 

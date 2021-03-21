@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 // import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol"; // only partially implemented for efficiency and simplicity
 import "@openzeppelin/contracts/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import "./EnumerableMap.sol";
 
 abstract contract ERC721Base is IERC165, IERC721 {
     using Address for address;

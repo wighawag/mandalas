@@ -8,11 +8,9 @@ import "./ERC721Base.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol";
 import "@openzeppelin/contracts/cryptography/ECDSA.sol";
 import "hardhat-deploy/solc_0.7/proxy/Proxied.sol";
-// import "hardhat/console.sol";
 
 contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     using EnumerableSet for EnumerableSet.UintSet;
-    using EnumerableMap for EnumerableMap.UintToUintMap;
     using ECDSA for bytes32;
 
     // Template : contains all data to be used: reduce memory usage and is easier to work with
@@ -200,6 +198,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
         }
     }
 
+    // solhint-disable-next-line code-complexity
     function _tokenURI(uint256 id) internal pure returns (string memory) {
         bytes memory metadata = TEMPLATE;
         writeUintAsHex(metadata, ADDRESS_NAME_POS, id);
@@ -215,7 +214,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
 
             if (x != y) {
                 setCharacter(metadata, IMAGE_DATA_POS, x*WIDTH + y + (x /ROW_PER_BLOCK) * 2 + 1, value);
-                if (y != WIDTH / 2) {
+                if (y != HEIGHT / 2) {
                     setCharacter(metadata, IMAGE_DATA_POS, x*WIDTH + (WIDTH -y -1) + (x /ROW_PER_BLOCK) * 2 + 1, value); // x mirror
                 }
 

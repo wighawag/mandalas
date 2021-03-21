@@ -5,3 +5,5 @@ node_modules/
 generative-art.code-workspace
 .vscode/*
 !.vscode/settings.json.default
+.yalc
+yalc.lock
