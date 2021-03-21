@@ -96,49 +96,49 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
         return ERC721Base.supportsInterface(id) || id == 0x5b5e139f;
     }
 
-    struct TokenData {
-        uint256 id;
-        string tokenURI;
-    }
+    // struct TokenData {
+    //     uint256 id;
+    //     string tokenURI;
+    // }
 
-    struct TokenDataMintedOrNot {
-        uint256 id;
-        string tokenURI;
-        bool minted;
-    }
+    // struct TokenDataMintedOrNot {
+    //     uint256 id;
+    //     string tokenURI;
+    //     bool minted;
+    // }
 
-    struct MintData {
-        uint256 currentPrice;
-        uint256 supply;
-        TokenDataMintedOrNot[] tokens;
-    }
+    // struct MintData {
+    //     uint256 currentPrice;
+    //     uint256 supply;
+    //     TokenDataMintedOrNot[] tokens;
+    // }
 
-    function getTokenDataOfOwner(
-        address owner,
-        uint256 start,
-        uint256 num
-    ) external view returns (TokenData[] memory tokens) {
-        EnumerableSet.UintSet storage allTokens = _holderTokens[owner];
-        uint256 balance = allTokens.length();
-        require(balance >= start + num, "TOO_MANY_TOKEN_REQUESTED");
-        tokens = new TokenData[](num);
-        uint256 i = 0;
-        while (i < num) {
-            uint256 id = allTokens.at(start + i);
-            tokens[i] = TokenData(id, _tokenURI(id));
-            i++;
-        }
-    }
+    // function getTokenDataOfOwner(
+    //     address owner,
+    //     uint256 start,
+    //     uint256 num
+    // ) external view returns (TokenData[] memory tokens) {
+    //     EnumerableSet.UintSet storage allTokens = _holderTokens[owner];
+    //     uint256 balance = allTokens.length();
+    //     require(balance >= start + num, "TOO_MANY_TOKEN_REQUESTED");
+    //     tokens = new TokenData[](num);
+    //     uint256 i = 0;
+    //     while (i < num) {
+    //         uint256 id = allTokens.at(start + i);
+    //         tokens[i] = TokenData(id, _tokenURI(id));
+    //         i++;
+    //     }
+    // }
 
-    function getMintData(uint256[] calldata ids) external view returns (MintData memory data) {
-        data.supply = _supply;
-        data.currentPrice = _curve(data.supply);
-        data.tokens = _getTokenDataForIds(ids);
-    }
+    // function getMintData(uint256[] calldata ids) external view returns (MintData memory data) {
+    //     data.supply = _supply;
+    //     data.currentPrice = _curve(data.supply);
+    //     data.tokens = _getTokenDataForIds(ids);
+    // }
 
-    function getTokenDataForIds(uint256[] calldata ids) external view returns (TokenDataMintedOrNot[] memory tokens) {
-        return _getTokenDataForIds(ids);
-    }
+    // function getTokenDataForIds(uint256[] calldata ids) external view returns (TokenDataMintedOrNot[] memory tokens) {
+    //     return _getTokenDataForIds(ids);
+    // }
 
     function mint(address to, bytes memory signature) external payable returns (uint256) {
         uint256 mintPrice = _curve(_supply);
@@ -190,14 +190,14 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
         return mintPrice * (10000-creatorCutPer10000th) / 10000;
     }
 
-    function _getTokenDataForIds(uint256[] memory ids) internal view returns (TokenDataMintedOrNot[] memory tokens) {
-        tokens = new TokenDataMintedOrNot[](ids.length);
-        for (uint256 i = 0; i < ids.length; i++) {
-            uint256 id = ids[i];
-            uint256 data = _owners[id];
-            tokens[i] = TokenDataMintedOrNot(id, _tokenURI(id), data != 0);
-        }
-    }
+    // function _getTokenDataForIds(uint256[] memory ids) internal view returns (TokenDataMintedOrNot[] memory tokens) {
+    //     tokens = new TokenDataMintedOrNot[](ids.length);
+    //     for (uint256 i = 0; i < ids.length; i++) {
+    //         uint256 id = ids[i];
+    //         uint256 data = _owners[id];
+    //         tokens[i] = TokenDataMintedOrNot(id, _tokenURI(id), data != 0);
+    //     }
+    // }
 
     // solhint-disable-next-line code-complexity
     function _tokenURI(uint256 id) internal pure returns (string memory) {
@@ -256,7 +256,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
             uint8 extraValue = base64ToUint8(metadata[base64Slot + 1]);
             metadata[base64Slot + 1] = uint8ToBase64(((value % 16) << 2) | (0x03 & extraValue));
         } else { // bit == 4)
-            // metadata[base64Slot] = uint8ToBase64((value >> 6) | (0x3C & existingValue));
+            // metadata[base64Slot] = uint8ToBase64((value >> 6) | (0x3C & existingValue)); // skip as value are never as big
             metadata[base64Slot + 1] = uint8ToBase64(value % 64);
         }
     }
