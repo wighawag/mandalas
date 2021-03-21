@@ -96,10 +96,28 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
         return ERC721Base.supportsInterface(id) || id == 0x5b5e139f;
     }
 
-    // struct TokenData {
-    //     uint256 id;
-    //     string tokenURI;
-    // }
+    struct TokenData {
+        uint256 id;
+        string tokenURI;
+    }
+
+    function getTokenDataOfOwner(
+        address owner,
+        uint256 start,
+        uint256 num
+    ) external view returns (TokenData[] memory tokens) {
+        EnumerableSet.UintSet storage allTokens = _holderTokens[owner];
+        uint256 balance = allTokens.length();
+        require(balance >= start + num, "TOO_MANY_TOKEN_REQUESTED");
+        tokens = new TokenData[](num);
+        uint256 i = 0;
+        while (i < num) {
+            uint256 id = allTokens.at(start + i);
+            tokens[i] = TokenData(id, _tokenURI(id));
+            i++;
+        }
+    }
+
 
     // struct TokenDataMintedOrNot {
     //     uint256 id;
@@ -113,22 +131,6 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     //     TokenDataMintedOrNot[] tokens;
     // }
 
-    // function getTokenDataOfOwner(
-    //     address owner,
-    //     uint256 start,
-    //     uint256 num
-    // ) external view returns (TokenData[] memory tokens) {
-    //     EnumerableSet.UintSet storage allTokens = _holderTokens[owner];
-    //     uint256 balance = allTokens.length();
-    //     require(balance >= start + num, "TOO_MANY_TOKEN_REQUESTED");
-    //     tokens = new TokenData[](num);
-    //     uint256 i = 0;
-    //     while (i < num) {
-    //         uint256 id = allTokens.at(start + i);
-    //         tokens[i] = TokenData(id, _tokenURI(id));
-    //         i++;
-    //     }
-    // }
 
     // function getMintData(uint256[] calldata ids) external view returns (MintData memory data) {
     //     data.supply = _supply;
