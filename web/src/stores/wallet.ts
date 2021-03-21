@@ -31,7 +31,7 @@ const walletStores = WalletStores({
 });
 
 export const {
-  walalet,
+  wallet,
   transactions,
   builtin,
   chain,
