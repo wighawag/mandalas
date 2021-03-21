@@ -6,15 +6,13 @@ import {randomTokens} from './randomTokens';
 import contractsInfo from '../contracts.json';
 import {keccak256} from '@ethersproject/solidity';
 import {arrayify} from '@ethersproject/bytes';
-import {parseEther} from '@ethersproject/units';
-
 const initialPrice = BigNumber.from(contractsInfo.contracts.BitmapToken.linkedData.initialPrice);
 const creatorCutPer10000th = contractsInfo.contracts.BitmapToken.linkedData.creatorCutPer10000th;
-const coeeficient = parseEther("0.001");
+const coefficient = BigNumber.from(contractsInfo.contracts.BitmapToken.linkedData.linearCoefficient);
 
 
 function computeBuffer(supply: BigNumber, currentPrice: BigNumber): BigNumber {
-  const computed = initialPrice.add(supply.add(3).mul(coeeficient)).sub(currentPrice)
+  const computed = initialPrice.add(supply.add(3).mul(coefficient)).sub(currentPrice)
   const min = BigNumber.from("6000000000000000");
   if (computed.gt(min)) {
     return computed;
@@ -58,7 +56,7 @@ class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
     flow.execute(async (contracts) => {
       this.setPartial({step: 'LOADING_CURRENT_PRICE'});
       const supply = await contracts.BitmapToken.totalSupply();
-      const currentPrice = supply.mul(parseEther("0.001")).add(initialPrice);
+      const currentPrice = supply.mul(coefficient).add(initialPrice);
       this.setPartial({data: {id: nft.id, privateKey: nft.privateKey, currentPrice, supply}, step: 'CONFIRM'});
     });
 

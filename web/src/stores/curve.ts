@@ -37,7 +37,7 @@ export class CurveStore extends BaseStore<Curve> {
     if (!supply) {
       this.setPartial({state: 'Loading'});
     } else {
-      this.setPartial({currentPrice: supply.mul(parseEther("0.001")).add(contractsInfo.contracts.BitmapToken.linkedData.initialPrice), supply, state: 'Ready'});
+      this.setPartial({currentPrice: supply.mul(contractsInfo.contracts.BitmapToken.linkedData.linearCoefficient).add(contractsInfo.contracts.BitmapToken.linkedData.initialPrice), supply, state: 'Ready'});
     }
   }
 

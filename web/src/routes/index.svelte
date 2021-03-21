@@ -15,7 +15,7 @@
 
   const initialPrice = BigNumber.from(contractsInfo.contracts.BitmapToken.linkedData.initialPrice);
   const creatorCutPer10000th = contractsInfo.contracts.BitmapToken.linkedData.creatorCutPer10000th;
-  const coeeficient = parseEther("0.001");
+  const coefficient = BigNumber.from(contractsInfo.contracts.BitmapToken.linkedData.linearCoefficient);
 
   function format(bn : BigNumber, numDecimals: number): number {
     const precision = Math.pow(10, numDecimals);
@@ -24,7 +24,7 @@
   }
 
   function computeBuffer(supply: BigNumber, currentPrice: BigNumber): BigNumber {
-    const computed = initialPrice.add(supply.add(3).mul(coeeficient)).sub(currentPrice)
+    const computed = initialPrice.add(supply.add(3).mul(coefficient)).sub(currentPrice)
     const min = BigNumber.from("6000000000000000");
     if (computed.gt(min)) {
       return computed;
@@ -54,8 +54,8 @@
   </div>
   <div
     class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
-    <p class="m-2 text-xs md:text-base font-black text-yellow-400">+ Refunded Buffer: {($curve.supply && $curve.currentPrice) ? format(computeBuffer($curve.supply, $curve.currentPrice),4) + ' ETH' : 'loading'}</p>
-    <button class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1" on:click={() => nfts.reset()}>randomize</button>
+    <!-- <p class="m-2 text-xs md:text-base font-black text-yellow-400">+ Refunded Buffer: {($curve.supply && $curve.currentPrice) ? format(computeBuffer($curve.supply, $curve.currentPrice),4) + ' ETH' : 'loading'}</p> -->
+    <button class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1" on:click={() => nfts.reset()}>reset batch</button>
   </div>
   <div class="w-full h-full text-xs text-center md:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
     <p class="px-4 pt-4">There are millions of millions of Mandalas, all unique. Pick the one you like :)</p>

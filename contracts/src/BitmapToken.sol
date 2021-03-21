@@ -41,22 +41,25 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     event Burned(uint256 indexed id, uint256 indexed priceReceived);
     event CreatorshipTransferred(address indexed previousCreator, address indexed newCreator);
 
+    uint256 public immutable linearCoefficient;
     uint256 public immutable initialPrice;
     uint256 public immutable creatorCutPer10000th;
     address payable public creator;
 
-    constructor(address payable _creator, uint256 _initialPrice, uint256 _creatorCutPer10000th) {
+    constructor(address payable _creator, uint256 _initialPrice, uint256 _creatorCutPer10000th, uint256 _linearCoefficient) {
         require(_creatorCutPer10000th < 2000, "CREATOR_CUT_ROO_HIGHT");
         initialPrice = _initialPrice;
         creatorCutPer10000th = _creatorCutPer10000th;
-        postUpgrade(_creator, _initialPrice, _creatorCutPer10000th);
+        linearCoefficient = _linearCoefficient;
+        postUpgrade(_creator, _initialPrice, _creatorCutPer10000th, _linearCoefficient);
     }
 
     // solhint-disable-next-line no-unused-vars
-    function postUpgrade(address payable _creator, uint256 _initialPrice, uint256 _creatorCutPer10000th) public proxied {
+    function postUpgrade(address payable _creator, uint256 _initialPrice, uint256 _creatorCutPer10000th, uint256 _linearCoefficient) public proxied {
         // immutables are set in the constructor:
         // initialPrice = _initialPrice;
         // creatorCutPer10000th = _creatorCutPer10000th;
+        // linearCoefficient = _linearCoefficient;
         creator = _creator;
         emit CreatorshipTransferred(address(0), creator);
     }
@@ -185,7 +188,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     }
 
     function _curve(uint256 supply) internal view returns (uint256) {
-        return initialPrice + supply * 0.001 ether; // TODO configure ?
+        return initialPrice + supply * linearCoefficient;
     }
 
     function _forReserve(uint256 mintPrice) internal view returns (uint256) {

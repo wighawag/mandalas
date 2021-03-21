@@ -7,7 +7,6 @@ import {keccak256} from '@ethersproject/solidity';
 import {arrayify} from '@ethersproject/bytes';
 import {generateTokenURI} from 'generative-art-common';
 import { BigNumber } from 'ethers';
-import { parseEther } from '@ethersproject/units';
 // import {BigNumber} from '@ethersproject/bignumber';
 
 const setup = deployments.createFixture(async () => {
@@ -20,7 +19,7 @@ const setup = deployments.createFixture(async () => {
   return {
     ...contracts,
     users,
-    linkedData: deployment.linkedData as {initialPrice: string, creatorCutPer10000th: number}
+    linkedData: deployment.linkedData as {initialPrice: string, creatorCutPer10000th: number, linearCoefficient: string}
   };
 });
 
@@ -108,7 +107,7 @@ describe('BitmapToken Specific', function () {
     const gasPrice = await ethers.provider.getGasPrice();
     const supply = await BitmapToken.totalSupply();
     // const newCurrentPrice = await BitmapToken.currentPrice();
-    const burnPrice = BigNumber.from(linkedData.initialPrice).add(supply.sub(1).mul(parseEther("0.001"))).mul(10000 - linkedData.creatorCutPer10000th).div(10000);
+    const burnPrice = BigNumber.from(linkedData.initialPrice).add(supply.sub(1).mul(linkedData.linearCoefficient)).mul(10000 - linkedData.creatorCutPer10000th).div(10000);
     const receipt = await waitFor(users[1].BitmapToken.burn(tokenId, {gasPrice}));
     const txCost = gasPrice.mul(receipt.gasUsed);
     const balanceAfter = await ethers.provider.getBalance(users[1].address);
