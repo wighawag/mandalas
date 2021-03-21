@@ -91,7 +91,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
     for (let i =0; i < num; i++) {
       const wallet = new Wallet(BigNumber.from(this.random).add(from + i).toHexString());
       const id = wallet.address;
-      const tokenURI = generateTokenURI(id, template19);
+      const tokenURI = generateTokenURI(id, template19_bis);
       const jsonStart = tokenURI.indexOf(",") + 1;
       const jsonStr = tokenURI.slice(jsonStart);
       const json = JSON.parse(jsonStr);
@@ -151,7 +151,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
     for (let i = data.start; i < data.start + num; i++) {
       const wallet = new Wallet(hexZeroPad(BigNumber.from(data.random).add(i).toHexString(), 40));
       const id = wallet.address;
-      const tokenURI = generateTokenURI(id, template19);
+      const tokenURI = generateTokenURI(id, template19_bis);
       const jsonStart = tokenURI.indexOf(",") + 1;
       const jsonStr = tokenURI.slice(jsonStart);
       const json = JSON.parse(jsonStr);
