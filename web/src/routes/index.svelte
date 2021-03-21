@@ -74,16 +74,17 @@
           <li>
             <div
               id={nft.id}
-              class="p-8 cursor-pointer"
-              on:click={() => mint(nft) }>
+              class="p-8"
+              >
               <div class="aspect-w-3 aspect-h-2">
                 {#if nft.error}
                   Error:
                   {nft.error}
                 {:else if nft.image}
                   <img
+                    on:click={() => mint(nft) }
                     style={`image-rendering: pixelated; ${ nft.minted ? 'filter: grayscale(100%);' : ''}`}
-                    class="object-contain h-full w-full"
+                    class={`object-contain h-full w-full ${nft.minted ? '' : 'cursor-pointer'}`}
                     alt={nft.name}
                     src={nft.image} />
                 {:else}
@@ -94,7 +95,7 @@
               <div class={nft.minted ? 'hidden' : ''}>
                 <div class="mt-2 flex">
                   <div class="w-0 flex-1 flex">
-                    <button
+                    <button on:click={() => mint(nft) }
                       class="relative w-0 flex-1 inline-flex items-center
                         justify-center pb-4 text-sm text-gray-700 dark:text-gray-300 font-medium
                         border border-transparent rounded-br-lg

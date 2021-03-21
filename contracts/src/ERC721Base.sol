@@ -242,7 +242,7 @@ abstract contract ERC721Base is IERC165, IERC721 {
     function _burn(uint256 id) internal {
         uint256 data = _owners[id];
         require(data != 0, "NOT_EXIST");
-        require(data & BURN_FLAG == 0, "ALREADY BURNT");
+        require(data & BURN_FLAG == 0, "ALREADY_BURNT");
         address owner = address(data);
         require(msg.sender == owner, "NOT_OWNER");
         _holderTokens[owner].remove(id);

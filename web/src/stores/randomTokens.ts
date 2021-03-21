@@ -1,8 +1,9 @@
-import {generateTokenURI} from 'mandalas-common';
+import {generateTokenURI, template17, template19} from 'mandalas-common';
 import {BigNumber} from '@ethersproject/bignumber';
 import {Wallet} from '@ethersproject/wallet';
 import {hexlify, hexZeroPad} from '@ethersproject/bytes';
 import {BaseStore} from '../lib/utils/stores';
+
 
 type NFT = {
   id: string;
@@ -44,6 +45,23 @@ export class RandomTokenStore extends BaseStore<NFTs> {
       tokens: [],
       startIndex: 0
     });
+
+    // TODO remove
+    // window.addEventListener('click', () => {
+    //   if (currentTemplate == template19) {
+    //     currentTemplate = template17;
+    //   } else {
+    //     currentTemplate = template19;
+    //   }
+    //   for (const token of this.$store.tokens) {
+    //     const tokenURI = generateTokenURI(token.id, currentTemplate);
+    //     const jsonStart = tokenURI.indexOf(",") + 1;
+    //     const jsonStr = tokenURI.slice(jsonStart);
+    //     const json = JSON.parse(jsonStr);
+    //     token.image = json.image || json.image_url;
+    //   }
+    //   this.setPartial({tokens: this.$store.tokens});
+    // })
   }
 
   record(id: string, hash: string, nonce: number) : void {
@@ -72,7 +90,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
     for (let i =0; i < num; i++) {
       const wallet = new Wallet(BigNumber.from(this.random).add(from + i).toHexString());
       const id = wallet.address;
-      const tokenURI = generateTokenURI(id);
+      const tokenURI = generateTokenURI(id, template19);
       const jsonStart = tokenURI.indexOf(",") + 1;
       const jsonStr = tokenURI.slice(jsonStart);
       const json = JSON.parse(jsonStr);
@@ -132,7 +150,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
     for (let i = data.start; i < data.start + num; i++) {
       const wallet = new Wallet(hexZeroPad(BigNumber.from(data.random).add(i).toHexString(), 40));
       const id = wallet.address;
-      const tokenURI = generateTokenURI(id);
+      const tokenURI = generateTokenURI(id, template19);
       const jsonStart = tokenURI.indexOf(",") + 1;
       const jsonStr = tokenURI.slice(jsonStart);
       const json = JSON.parse(jsonStr);

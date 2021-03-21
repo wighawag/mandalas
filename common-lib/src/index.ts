@@ -59,54 +59,78 @@ function setCharacter(metadata: string, base: number, pos: number, value: number
   return metadata;
 }
 
-const TEMPLATE = 'data:text/plain,{"name":"Mandala 0x0000000000000000000000000000000000000000","description":"A Unique Mandala","image":"data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' shape-rendering=\'crispEdges\' width=\'512\' height=\'512\'><g transform=\'scale(64)\'><image width=\'8\' height=\'8\' style=\'image-rendering: pixelated;\' href=\'data:image/gif;base64,R0lGODdhEQARAMQAAAAAAPb+Y/7EJfN3NNARQUUKLG0bMsR1SujKqW7wQwe/dQBcmQeEqjDR0UgXo4A0vrlq2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkKAAAALAAAAAARABEAAAdFgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEoAAAAAAAAAAAAAAAAAAAAAAAAGBADs=\'/></g></svg>"}';
-const IMAGE_DATA_POS = 521;
-const ADDRESS_NAME_POS = 74;
-const WIDTH = 17;
-const HEIGHT = 17;
-const ROW_PER_BLOCK = 4;
-const xs = [2,3,5,7,8,1,2,3,5,6,7,8,2,3,4,5,6,7,8,3,4,5,6,7,8,4,5,6,7,8,5,6,7,8,6,7,8,7,8,8];
-const ys = [0,0,0,0,0,1,1,1,1,1,1,1,2,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4,5,5,5,5,6,6,6,7,7,8];
+type Template = {
+  data: string;
+  bitmap_data_pos: number;
+  address_data_pos: number;
+  width: number;
+  height: number;
+  row_per_block: number;
+  xs: number[],
+  ys: number[]
+}
 
-export function generateTokenURI(id: string): string {
-  let metadata = TEMPLATE;
+export const template19: Template = {
+  data: 'data:text/plain,{"name":"Mandala 0x0000000000000000000000000000000000000000","description":"A Unique Mandala","image":"data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' shape-rendering=\'crispEdges\' width=\'512\' height=\'512\'><g transform=\'scale(64)\'><image width=\'8\' height=\'8\' style=\'image-rendering: pixelated;\' href=\'data:image/gif;base64,R0lGODdhEwATAMQAAAAAAPb+Y/7EJfN3NNARQUUKLG0bMsR1SujKqW7wQwe/dQBcmQeEqjDR0UgXo4A0vrlq2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkKAAAALAAAAAATABMAAAdNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA6gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGBADs=\'/></g></svg>"}',
+  bitmap_data_pos: 521,
+  address_data_pos: 74,
+  width: 19,
+  height: 19,
+  row_per_block: 4,
+  xs: [9,3,4,8,9,2,3,4,6,7,8,9,3,4,5,6,7,8,9,4,5,6,7,8,9,5,6,7,8,9,6,7,8,9,7,8,9,8,9,9],
+  ys: [0,1,1,1,1,2,2,2,2,2,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,6,6,6,6,7,7,7,8,8,9]
+}
+
+export const template17: Template = {
+  data: 'data:text/plain,{"name":"Mandala 0x0000000000000000000000000000000000000000","description":"A Unique Mandala","image":"data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' shape-rendering=\'crispEdges\' width=\'512\' height=\'512\'><g transform=\'scale(64)\'><image width=\'8\' height=\'8\' style=\'image-rendering: pixelated;\' href=\'data:image/gif;base64,R0lGODdhEQARAMQAAAAAAPb+Y/7EJfN3NNARQUUKLG0bMsR1SujKqW7wQwe/dQBcmQeEqjDR0UgXo4A0vrlq2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkKAAAALAAAAAARABEAAAdFgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEoAAAAAAAAAAAAAAAAAAAAAAAAGBADs=\'/></g></svg>"}',
+  bitmap_data_pos: 521,
+  address_data_pos: 74,
+  width: 17,
+  height: 17,
+  row_per_block: 4,
+  xs: [2,3,5,7,8,1,2,3,5,6,7,8,2,3,4,5,6,7,8,3,4,5,6,7,8,4,5,6,7,8,5,6,7,8,6,7,8,7,8,8],
+  ys: [0,0,0,0,0,1,1,1,1,1,1,1,2,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4,5,5,5,5,6,6,6,7,7,8]
+}
+
+export function generateTokenURI(id: string, template: Template): string {
+  let metadata = template.data;
   const bn = BigNumber.from(id);
 
-  metadata = writeUintAsHex(metadata, ADDRESS_NAME_POS, bn);
+  metadata = writeUintAsHex(metadata, template.address_data_pos, bn);
 
   for (let i = 0; i < 40; i++) {
-      let value = bn.shr((40-i)*4).mod(16).toNumber();
+      let value = bn.shr((40-(i+1))*4).mod(16).toNumber();
       if (value == 0) {
           value = 16; // use black as oposed to transparent
       }
-      const x = xs[i];
-      const y = ys[i];
-      metadata = setCharacter(metadata, IMAGE_DATA_POS, y*WIDTH + x + Math.floor(y /ROW_PER_BLOCK) * 2 + 1, value);
+      const x = template.xs[i];
+      const y = template.ys[i];
+      metadata = setCharacter(metadata, template.bitmap_data_pos, y*template.width + x + Math.floor(y /template.row_per_block) * 2 + 1, value);
 
       if (x != y) {
-        metadata = setCharacter(metadata, IMAGE_DATA_POS, x*WIDTH + y + Math.floor(x /ROW_PER_BLOCK) * 2 + 1, value);
-          if (y != Math.floor(HEIGHT / 2)) {
-            metadata = setCharacter(metadata, IMAGE_DATA_POS, x*WIDTH + (WIDTH -y -1) + Math.floor(x /ROW_PER_BLOCK) * 2 + 1, value); // x mirror
+        metadata = setCharacter(metadata, template.bitmap_data_pos, x*template.width + y + Math.floor(x /template.row_per_block) * 2 + 1, value);
+          if (y != Math.floor(template.height / 2)) {
+            metadata = setCharacter(metadata, template.bitmap_data_pos, x*template.width + (template.width -y -1) + Math.floor(x /template.row_per_block) * 2 + 1, value); // x mirror
           }
 
-          if (x != Math.floor(WIDTH / 2)) {
-            metadata = setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT-x-1)*WIDTH + y + Math.floor((HEIGHT-x-1) /ROW_PER_BLOCK) * 2 + 1, value); // y mirror
+          if (x != Math.floor(template.width / 2)) {
+            metadata = setCharacter(metadata, template.bitmap_data_pos, (template.height-x-1)*template.width + y + Math.floor((template.height-x-1) /template.row_per_block) * 2 + 1, value); // y mirror
           }
 
-          if (x != Math.floor(WIDTH / 2) && y != Math.floor(HEIGHT / 2)) {
-            metadata = setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT-x-1)*WIDTH + (WIDTH-y-1) + Math.floor((HEIGHT-x-1) /ROW_PER_BLOCK) * 2 + 1, value); // x,y mirror
+          if (x != Math.floor(template.width / 2) && y != Math.floor(template.height / 2)) {
+            metadata = setCharacter(metadata, template.bitmap_data_pos, (template.height-x-1)*template.width + (template.width-y-1) + Math.floor((template.height-x-1) /template.row_per_block) * 2 + 1, value); // x,y mirror
           }
       }
 
-      if (x != Math.floor(WIDTH / 2)) {
-        metadata = setCharacter(metadata, IMAGE_DATA_POS, y*WIDTH + (WIDTH -x -1) + Math.floor(y /ROW_PER_BLOCK) * 2 + 1, value); // x mirror
+      if (x != Math.floor(template.width / 2)) {
+        metadata = setCharacter(metadata, template.bitmap_data_pos, y*template.width + (template.width -x -1) + Math.floor(y /template.row_per_block) * 2 + 1, value); // x mirror
       }
-      if (y != Math.floor(HEIGHT / 2)) {
-        metadata = setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT-y-1)*WIDTH + x + Math.floor((HEIGHT-y-1) /ROW_PER_BLOCK) * 2 + 1, value); // y mirror
+      if (y != Math.floor(template.height / 2)) {
+        metadata = setCharacter(metadata, template.bitmap_data_pos, (template.height-y-1)*template.width + x + Math.floor((template.height-y-1) /template.row_per_block) * 2 + 1, value); // y mirror
       }
 
-      if (x != Math.floor(WIDTH / 2) && y != Math.floor(HEIGHT / 2)) {
-        metadata = setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT-y-1)*WIDTH + (WIDTH-x-1) + Math.floor((HEIGHT-y-1) /ROW_PER_BLOCK) * 2 + 1, value); // x,y mirror
+      if (x != Math.floor(template.width / 2) && y != Math.floor(template.height / 2)) {
+        metadata = setCharacter(metadata, template.bitmap_data_pos, (template.height-y-1)*template.width + (template.width-x-1) + Math.floor((template.height-y-1) /template.row_per_block) * 2 + 1, value); // x,y mirror
       }
   }
   return metadata;

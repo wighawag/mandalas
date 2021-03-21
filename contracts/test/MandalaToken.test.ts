@@ -5,7 +5,7 @@ import {setupUsers, waitFor} from './utils';
 import {Wallet} from '@ethersproject/wallet';
 import {keccak256} from '@ethersproject/solidity';
 import {arrayify} from '@ethersproject/bytes';
-import {generateTokenURI} from 'mandalas-common';
+import {generateTokenURI, template17} from 'mandalas-common';
 import { BigNumber } from 'ethers';
 // import {BigNumber} from '@ethersproject/bignumber';
 
@@ -70,7 +70,7 @@ describe('MandalaToken Specific', function () {
     const uri = await MandalaToken.callStatic.tokenURI(tokenId);
     console.log({uri});
 
-    expect(uri).to.eq(generateTokenURI(tokenId))
+    expect(uri).to.eq(generateTokenURI(tokenId, template17))
   });
 
 
@@ -86,6 +86,26 @@ describe('MandalaToken Specific', function () {
     const txCost = gasPrice.mul(receipt.gasUsed);
     const balanceAfter = await ethers.provider.getBalance(users[1].address);
     expect(balanceAfter).to.equal(balanceBefore.sub(txCost).add(currentPrice.mul(10000 - linkedData.creatorCutPer10000th).div(10000)));
+  });
+
+  it('mint, burn, burn, fails', async function () {
+    const {users, MandalaToken} = await setup();
+    const currentPrice = await MandalaToken.currentPrice();
+    const {tokenId, signature} = await randomMintSignature(users[0].address);
+    await users[0].MandalaToken.mint(users[0].address, signature, {value: currentPrice });
+    await users[0].MandalaToken.transferFrom(users[0].address, users[1].address, tokenId);
+    await waitFor(users[1].MandalaToken.burn(tokenId));
+    await expect(users[1].MandalaToken.burn(tokenId)).to.be.revertedWith("ALREADY_BURNT");
+  });
+
+  it('mint, burn, mint, fails', async function () {
+    const {users, MandalaToken} = await setup();
+    const currentPrice = await MandalaToken.currentPrice();
+    const {tokenId, signature} = await randomMintSignature(users[0].address);
+    await users[0].MandalaToken.mint(users[0].address, signature, {value: currentPrice });
+    await users[0].MandalaToken.transferFrom(users[0].address, users[1].address, tokenId);
+    await waitFor(users[1].MandalaToken.burn(tokenId));
+    await expect(users[1].MandalaToken.mint(users[0].address, signature, {value: currentPrice })).to.be.revertedWith("ALREADY_MINTED");
   });
 
   it('mint, mint, mint transfer, burn', async function () {
