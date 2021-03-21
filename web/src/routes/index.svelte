@@ -69,7 +69,7 @@
     <p class="m-2 text-xs sm:text-base font-black text-yellow-400">+ Refunded Buffer: {($curve.supply && $curve.currentPrice) ? format(computeBuffer($curve.supply, $curve.currentPrice),4) + ' ETH' : 'loading'}</p>
     <button class="m-2 text-xs sm:text-base font-black text-yellow-400 border border-yellow-500 p-1" on:click={() => nfts.reset()}>randomize</button>
   </div>
-  <div class="w-full h-full text-xs sm:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
+  <div class="w-full h-full text-xs text-center sm:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
     <p class="px-4 pt-4">There are millions of millions of Mandalas, all unique. Pick the one you like :)</p>
     <p class="px-4 pb-1">Like <a class="underline" href="https://neolastics.com/" target="_blank">neolastics</a> their price run on a bounding curve. More details <Link name="about" class="underline">here</Link>.</p>
   </div>
@@ -144,17 +144,6 @@
                 </div>
               </div>
               {/if}
-              <!-- <div class="space-y-2">
-                  <div class="text-lg leading-6 font-medium space-y-1">
-                    <h3>Lindsay Walton</h3>
-                    <p class="text-indigo-600">Front-end Developer</p>
-                    <button
-                      disabled={nft.minted}
-                      on:click={() => mint(index)}>mint</button>
-                    <button on:click={() => copyPrivateKey(index)}>copy private
-                      key</button>
-                  </div>
-                </div> -->
             </div>
           </li>
         {:else}Error: No Bitmap could be generated{/each}

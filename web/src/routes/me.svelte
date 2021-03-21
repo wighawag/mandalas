@@ -27,7 +27,16 @@
       <div class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
         <p class="p-4">Here are your Mandalas. You can burn them to get 95% of the current price. Each time a mandala is burnt, the price decrease. Note that once burnt that Mandala cannot be re-created.</p>
       </div>
-    {:else if $wallet.state === 'Ready'}}
+    {:else if $chain.notSupported}}
+    <div class="py-8 px-10 w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
+      <p class="p-4">Please switch network</p>
+          <NavButton
+            label="Disonnect"
+            on:click={() => wallet.disconnect()}>
+            Disonnect
+          </NavButton>
+    </div>
+    {:else if $wallet.state === 'Ready'}
       <div class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
         <p class="p-4">You do not have any Mandala yet.</p>
         <p>get  your  first one <Link name="index" class="underline">here </Link></p>
