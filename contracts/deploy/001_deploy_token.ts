@@ -8,9 +8,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const {deployer} = await getNamedAccounts();
 
-  const initialPrice = parseEther("0.01");
+  const initialPrice = parseEther("0.001");
   const creatorCutPer10000th = 500;
-  const linearCoefficient = parseEther("0.001")
+  const linearCoefficient = parseEther("0.0005")
 
   await deploy('BitmapToken', {
     from: deployer,

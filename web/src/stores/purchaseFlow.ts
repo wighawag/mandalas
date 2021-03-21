@@ -6,19 +6,11 @@ import {randomTokens} from './randomTokens';
 import contractsInfo from '../contracts.json';
 import {keccak256} from '@ethersproject/solidity';
 import {arrayify} from '@ethersproject/bytes';
+import {computeBuffer} from '../utils';
+
 const initialPrice = BigNumber.from(contractsInfo.contracts.BitmapToken.linkedData.initialPrice);
 const creatorCutPer10000th = contractsInfo.contracts.BitmapToken.linkedData.creatorCutPer10000th;
 const coefficient = BigNumber.from(contractsInfo.contracts.BitmapToken.linkedData.linearCoefficient);
-
-
-function computeBuffer(supply: BigNumber, currentPrice: BigNumber): BigNumber {
-  const computed = initialPrice.add(supply.add(3).mul(coefficient)).sub(currentPrice)
-  const min = BigNumber.from("6000000000000000");
-  if (computed.gt(min)) {
-    return computed;
-  }
-  return min;
-}
 
 type Data = {id: string, privateKey: string, currentPrice: BigNumber, supply: BigNumber};
 export type PurchaseFlow = {
