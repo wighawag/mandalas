@@ -46,6 +46,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     address payable public creator;
 
     constructor(address payable _creator, uint256 _initialPrice, uint256 _creatorCutPer10000th) {
+        require(_creatorCutPer10000th < 2000, "CREATOR_CUT_ROO_HIGHT");
         initialPrice = _initialPrice;
         creatorCutPer10000th = _creatorCutPer10000th;
         postUpgrade(_creator, _initialPrice, _creatorCutPer10000th);
@@ -186,7 +187,7 @@ contract BitmapToken is ERC721Base, IERC721Metadata, Proxied {
     }
 
     function _forReserve(uint256 mintPrice) internal view returns (uint256) {
-        return mintPrice * creatorCutPer10000th / 10000;
+        return mintPrice * (10000-creatorCutPer10000th) / 10000;
     }
 
     function _getTokenDataForIds(uint256[] memory ids) internal view returns (TokenDataMintedOrNot[] memory tokens) {

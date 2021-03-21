@@ -6,10 +6,13 @@ import {Wallet} from '@ethersproject/wallet';
 import {keccak256} from '@ethersproject/solidity';
 import {arrayify} from '@ethersproject/bytes';
 import {generateTokenURI} from 'generative-art-common';
+import { BigNumber } from 'ethers';
+import { parseEther } from '@ethersproject/units';
 // import {BigNumber} from '@ethersproject/bignumber';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(['BitmapToken']);
+  const deployment = await deployments.get('BitmapToken')
   const contracts = {
     BitmapToken: <BitmapToken>await ethers.getContract('BitmapToken'),
   };
@@ -17,6 +20,7 @@ const setup = deployments.createFixture(async () => {
   return {
     ...contracts,
     users,
+    linkedData: deployment.linkedData as {initialPrice: string, creatorCutPer10000th: number}
   };
 });
 
@@ -33,7 +37,7 @@ async function randomMintSignature(to: string): Promise<{signature: string, toke
   };
 }
 
-describe('BitmapToken', function () {
+describe('BitmapToken Specific', function () {
 
   it('name succeed', async function () {
     const {users} = await setup();
@@ -69,5 +73,47 @@ describe('BitmapToken', function () {
 
     expect(uri).to.eq(generateTokenURI(tokenId))
   });
+
+
+  it('mint, transfer, burn', async function () {
+    const {users, BitmapToken, linkedData} = await setup();
+    const currentPrice = await BitmapToken.currentPrice();
+    const {tokenId, signature} = await randomMintSignature(users[0].address);
+    await users[0].BitmapToken.mint(users[0].address, signature, {value: currentPrice });
+    await users[0].BitmapToken.transferFrom(users[0].address, users[1].address, tokenId);
+    const balanceBefore = await ethers.provider.getBalance(users[1].address);
+    const gasPrice = await ethers.provider.getGasPrice();
+    const receipt = await waitFor(users[1].BitmapToken.burn(tokenId, {gasPrice}));
+    const txCost = gasPrice.mul(receipt.gasUsed);
+    const balanceAfter = await ethers.provider.getBalance(users[1].address);
+    expect(balanceAfter).to.equal(balanceBefore.sub(txCost).add(currentPrice.mul(10000 - linkedData.creatorCutPer10000th).div(10000)));
+  });
+
+  it('mint, mint, mint transfer, burn', async function () {
+    const {users, BitmapToken, linkedData} = await setup();
+    const currentPrice = await BitmapToken.currentPrice();
+    const {tokenId, signature} = await randomMintSignature(users[0].address);
+    await users[0].BitmapToken.mint(users[0].address, signature, {value: currentPrice });
+    await users[0].BitmapToken.transferFrom(users[0].address, users[1].address, tokenId);
+
+    const currentPrice3 = await BitmapToken.currentPrice();
+    const {signature: signature3} = await randomMintSignature(users[0].address);
+    await users[3].BitmapToken.mint(users[3].address, signature3, {value: currentPrice3 });
+
+    const currentPrice4 = await BitmapToken.currentPrice();
+    const {signature: signature4} = await randomMintSignature(users[0].address);
+    await users[4].BitmapToken.mint(users[4].address, signature4, {value: currentPrice4 });
+
+    const balanceBefore = await ethers.provider.getBalance(users[1].address);
+    const gasPrice = await ethers.provider.getGasPrice();
+    const supply = await BitmapToken.totalSupply();
+    // const newCurrentPrice = await BitmapToken.currentPrice();
+    const burnPrice = BigNumber.from(linkedData.initialPrice).add(supply.sub(1).mul(parseEther("0.001"))).mul(10000 - linkedData.creatorCutPer10000th).div(10000);
+    const receipt = await waitFor(users[1].BitmapToken.burn(tokenId, {gasPrice}));
+    const txCost = gasPrice.mul(receipt.gasUsed);
+    const balanceAfter = await ethers.provider.getBalance(users[1].address);
+    expect(balanceAfter).to.equal(balanceBefore.sub(txCost).add(burnPrice));
+  });
+
 
 });
