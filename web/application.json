@@ -1,17 +1,17 @@
 {
   "appName": "Mandalas",
   "appShortName": "Mandalas",
-  "appDescription": "A Production Ready Template for Decentralised Applications.",
-  "appShortDescription": "Template for Decentralised Applications.",
-  "developerName": "You",
-  "developerURL": "",
+  "appDescription": "Mandalas are uniqure prodecurally generated bitmap NFTs on ethereum",
+  "appShortDescription": "Mandalas are uniqure prodecurally generated bitmap NFTs on ethereum",
+  "developerName": "Ronan Sandford",
+  "developerURL": "https://ronan.eth.link",
   "url": "https://mandalas.eth.link",
   "ensName": "mandalas.eth",
   "background": "#000000",
   "theme_color": "#000000",
   "appleStatusBarStyle": "black-translucent",
   "display": "fullscreen",
-  "icon": "icon.svg",
+  "icon": "icon.png",
   "maskable_icons": [
     {
       "src": "maskable_icon_512x512.png",
