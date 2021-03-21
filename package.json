@@ -86,6 +86,7 @@
     "staging:reset": "rimraf contracts/deployments/staging && run-s staging:contracts web:prepare common:build staging:web:rebuild staging:web:deploy",
 
     "// PRODUCTION : build on mainnet": "",
+    "production:web:dev": "dotenv -e .env.production -e .env -- npm --prefix web run dev",
     "production:web:build": "run-s web:prepare production:contracts:export common:build production:web:rebuild",
     "production:web:build:serve": "run-s production:web:build web:serve",
     "production:web:rebuild": "dotenv -e .env.production -e .env -- npm --prefix web run build",

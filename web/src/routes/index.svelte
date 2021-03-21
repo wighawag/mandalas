@@ -1,22 +1,14 @@
 <script lang="ts">
-  import {keccak256} from '@ethersproject/solidity';
-  import {arrayify} from '@ethersproject/bytes';
   import WalletAccess from '../templates/WalletAccess.svelte';
   import {randomTokens} from '../stores/randomTokens';
   import {curve} from '../stores/curve';
   import {wallet, flow} from '../stores/wallet';
   import {BigNumber} from '@ethersproject/bignumber';
-  import {Wallet} from '@ethersproject/wallet';
   import Link from '../lib/routing/curi/Link.svelte';
   import contractsInfo from '../contracts.json';
-  import {parseEther} from '@ethersproject/units';
   import purchaseFlow from '../stores/purchaseFlow';
   import Modal from '../components/Modal.svelte';
   import {computeBuffer} from '../utils';
-
-  const initialPrice = BigNumber.from(contractsInfo.contracts.MandalaToken.linkedData.initialPrice);
-  const creatorCutPer10000th = contractsInfo.contracts.MandalaToken.linkedData.creatorCutPer10000th;
-  const coefficient = BigNumber.from(contractsInfo.contracts.MandalaToken.linkedData.linearCoefficient);
 
   function format(bn : BigNumber, numDecimals: number): number {
     const precision = Math.pow(10, numDecimals);
@@ -39,16 +31,27 @@
 </script>
 
 <WalletAccess>
+
+
+  {#if $curve.state === 'Stuck'}
   <div
+    class="w-full h-full mx-auto text-center flex-col text-black dark:text-white ">
+   <p class="m-2 text-xs md:text-base font-black text-yellow-400">Please Connect to your wallet see latest price and supply</p>
+   <button class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1" on:click={() => flow.connect()}>Connect</button>
+  </div>
+  {:else}
+    <div
     class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
-    <p class="m-2 text-xs md:text-base font-black text-yellow-400">Current Price: {$curve.currentPrice ? format($curve.currentPrice, 4) + ' ETH' : 'loading'}</p>
-    <p class="m-2 text-xs md:text-base font-black text-yellow-400">Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
+      <p class="m-2 text-xs md:text-base font-black text-yellow-400">Current Price: {$curve.currentPrice ? format($curve.currentPrice, 4) + ' ETH' : 'loading'}</p>
+      <p class="m-2 text-xs md:text-base font-black text-yellow-400">Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
   </div>
   <div
-    class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
-    <!-- <p class="m-2 text-xs md:text-base font-black text-yellow-400">+ Refunded Buffer: {($curve.supply && $curve.currentPrice) ? format(computeBuffer($curve.supply, $curve.currentPrice),4) + ' ETH' : 'loading'}</p> -->
-    <button class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1" on:click={() => nfts.reset()}>reset batch</button>
-  </div>
+  class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
+  <!-- <p class="m-2 text-xs md:text-base font-black text-yellow-400">+ Refunded Buffer: {($curve.supply && $curve.currentPrice) ? format(computeBuffer($curve.supply, $curve.currentPrice),4) + ' ETH' : 'loading'}</p> -->
+  <button class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1" on:click={() => nfts.reset()}>reset batch</button>
+</div>
+  {/if}
+
   <div class="w-full h-full text-xs text-center md:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
     <p class="px-4 pt-4">There are millions of millions of Mandalas, all unique. Pick the one you like :)</p>
     <p class="px-4 pb-1">Their price run on a bounding curve. So as more people collect them, the more they get expensive. And you can burn them to get most of the price back. More details <Link name="about" class="underline">here</Link>.</p>

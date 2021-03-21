@@ -5,7 +5,7 @@ import contractsInfo from '../contracts.json';
 import {parseEther} from '@ethersproject/units';
 
 type Curve = {
-  state: 'Idle' | 'Loading' | 'Ready';
+  state: 'Idle' | 'Loading' | 'Ready' | 'Stuck';
   error?: unknown;
   currentPrice?: BigNumber;
   supply?: BigNumber;
@@ -15,6 +15,7 @@ type Curve = {
 export class CurveStore extends BaseStore<Curve> {
   private timer: NodeJS.Timeout | undefined;
   private counter = 0;
+  private startTime = 0;
   constructor() {
     super({
       state: 'Idle',
@@ -35,7 +36,11 @@ export class CurveStore extends BaseStore<Curve> {
   private async _fetch() {
     const supply = await this.query();
     if (!supply) {
-      this.setPartial({state: 'Loading'});
+      if (Date.now() - this.startTime > 2000) {
+        this.setPartial({state: 'Stuck'});
+      } else {
+        this.setPartial({state: 'Loading'});
+      }
     } else {
       this.setPartial({currentPrice: supply.mul(contractsInfo.contracts.MandalaToken.linkedData.linearCoefficient).add(contractsInfo.contracts.MandalaToken.linkedData.initialPrice), supply, state: 'Ready'});
     }
@@ -60,6 +65,7 @@ export class CurveStore extends BaseStore<Curve> {
   }
 
   start(): CurveStore | void {
+    this.startTime = Date.now();
     this.setPartial({state: 'Loading'});
     this._fetch();
     this.timer = setInterval(() => this._fetch(), 5000); // TODO polling interval config
