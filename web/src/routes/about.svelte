@@ -11,5 +11,7 @@ const base: string = window.basepath || '/';
 
   <p class="p-6">Mandalas have also the particularity that their bitmap and metadata is fully generated on-chain. And contrary to many other on-chain projects, Mandalas make full use of the tokenURI standard. Hence no backend will ever be required to host the image.</p>
 
+  <p class="p-6">The source code can be found <a href="https://github.com/wighawag/mandalas" target="_blank" class="underline">here</a> and the contract address is <a href="https://etherscan.io/address/0xDaCa87395f3b1Bbc46F3FA187e996E03a5dCc985" target="_blank" class="underline">0xDaCa87395f3b1Bbc46F3FA187e996E03a5dCc985</a> </p>
+
   <p class="p-6">This project was created by <a href="https://ronan.eth.link" target="_blank" class="underline">Ronan Sandford</a> (a.k.a <a href="https://twitter.com/wighawag" target="_blank" class="underline">wighawag <img class="w-4 h-4 inline" alt="wighawag" src={`${base}images/wig256x256.jpg`}/></a>) as part of the <a href="https://nft.ethglobal.co/" target="_blank" class="underline">NFT Hack</a>.</p>
 </div>
