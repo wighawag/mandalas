@@ -16,11 +16,19 @@
 </script>
 
 <WalletAccess>
+
+  {#if $curve.state === 'Stuck'}
+  <div
+    class="w-full h-full mx-auto text-center flex-col text-black dark:text-white ">
+   <p class="mt-4 text-xs sm:text-base font-black text-yellow-400">Please Connect to your wallet see latest price and supply</p>
+  </div>
+  {:else}
   <div
     class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
     <p class="m-2 font-black text-xs sm:text-base  text-yellow-400">Current Price: {$curve.currentPrice ? $curve.currentPrice.div("100000000000000").toNumber() / 10000 + ' ETH' : 'loading'}</p>
     <p class="m-2 font-black text-xs sm:text-base  text-yellow-400">Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
   </div>
+  {/if}
 
   {#if $nfts.state === 'Ready'}
     {#if $nfts.tokens.length > 0}

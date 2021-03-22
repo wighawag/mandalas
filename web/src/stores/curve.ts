@@ -36,7 +36,8 @@ export class CurveStore extends BaseStore<Curve> {
   private async _fetch() {
     const supply = await this.query();
     if (!supply) {
-      if (Date.now() - this.startTime > 2000) {
+      if ( this.startTime > 0 && Date.now() - this.startTime > 2000) {
+        console.log("STUCK");
         this.setPartial({state: 'Stuck'});
       } else {
         this.setPartial({state: 'Loading'});
@@ -65,7 +66,10 @@ export class CurveStore extends BaseStore<Curve> {
   }
 
   start(): CurveStore | void {
-    this.startTime = Date.now();
+    if (this.startTime === 0) {
+      this.startTime = Date.now();
+      console.log({start: this.startTime});
+    }
     this.setPartial({state: 'Loading'});
     this._fetch();
     this.timer = setInterval(() => this._fetch(), 5000); // TODO polling interval config
