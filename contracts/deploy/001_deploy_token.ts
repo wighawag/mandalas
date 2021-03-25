@@ -23,6 +23,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       linearCoefficient: linearCoefficient.toString(),
     },
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 };
 export default func;
