@@ -60,12 +60,12 @@
     e.stopImmediatePropagation();
   }
 
-  function formatError(message: string): string{
+  function formatError(message: string): string {
     const messageInside = message.indexOf('"message":');
     if (messageInside >= 0) {
       const subMessage = message.substr(messageInside + 11);
       const nextQuote = message.indexOf('"');
-      return subMessage.substr(0,nextQuote);
+      return subMessage.substr(0, nextQuote);
     } else {
       return message;
     }
@@ -75,17 +75,23 @@
 <slot />
 
 {#if $chain.state === 'Idle' && !$chain.connecting && $fallback.error}
-  <div class="w-full flex items-center justify-center fixed bottom-0" style="z-index: 5;">
+  <div
+    class="w-full flex items-center justify-center fixed bottom-0"
+    style="z-index: 5;">
     <p
       class="w-64 text-center rounded-tl-xl rounded-tr-xl text-gray-200 bg-pink-600 p-1">
-      Network Issues, Please <button class="underline" on:click={connect}>Connect</button>.
+      Network Issues, Please
+      <button class="underline" on:click={connect}>Connect</button>.
     </p>
   </div>
 {:else if $chain.state === 'Idle' && !$chain.connecting && $fallback.state === 'Idle' && !$fallback.connecting}
-  <div class="w-full flex items-center justify-center fixed bottom-0" style="z-index: 5;">
+  <div
+    class="w-full flex items-center justify-center fixed bottom-0"
+    style="z-index: 5;">
     <p
       class="w-64 text-center rounded-tl-xl rounded-tr-xl text-gray-200 bg-pink-600 p-1">
-      Please <button class="underline" on:click={connect}>Connect</button>.
+      Please
+      <button class="underline" on:click={connect}>Connect</button>.
     </p>
   </div>
 {:else if $chain.notSupported}
@@ -95,7 +101,9 @@
     <p
       class="w-64 text-center rounded-tl-xl rounded-tr-xl text-gray-200 bg-pink-600 p-1">
       Wrong network, use
-      {chainName} or <button class="underline" on:click={disconnect}>Disconnect</button>
+      {chainName}
+      or
+      <button class="underline" on:click={disconnect}>Disconnect</button>
     </p>
   </div>
 {/if}

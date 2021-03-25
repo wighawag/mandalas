@@ -19,7 +19,9 @@
 
 <NoInstallPrompt />
 <NewVersionNotification />
-<Router {routes} globalQueryStrings={['debug', 'log', 'trace', '_d_eruda', 'eth_node']}>
+<Router
+  {routes}
+  globalQueryStrings={['debug', 'log', 'trace', '_d_eruda', 'eth_node']}>
   <Notifications />
   <NavBar
     links={[{name: 'index', title: 'MANDALAS'}, {name: 'me', title: 'My Mandalas'}, {name: 'about', title: 'About'}]} />

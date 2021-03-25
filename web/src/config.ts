@@ -1,4 +1,4 @@
-import {params} from './init'
+import {params} from './init';
 const chainId = import.meta.env.SNOWPACK_PUBLIC_CHAIN_ID;
 let nodeUrl: string | undefined;
 let finality = 12;

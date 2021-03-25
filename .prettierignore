@@ -8,3 +8,4 @@ contracts/coverage
 node_modules
 common-lib/lib
 package.json
+typechain/

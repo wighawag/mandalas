@@ -2,7 +2,6 @@ import {chain, fallback} from './wallet';
 import type {BigNumber} from '@ethersproject/bignumber';
 import {BaseStore} from '../lib/utils/stores';
 import contractsInfo from '../contracts.json';
-import {parseEther} from '@ethersproject/units';
 
 type Curve = {
   state: 'Idle' | 'Loading' | 'Ready' | 'Stuck';
@@ -10,7 +9,6 @@ type Curve = {
   currentPrice?: BigNumber;
   supply?: BigNumber;
 };
-
 
 export class CurveStore extends BaseStore<Curve> {
   private timer: NodeJS.Timeout | undefined;
@@ -21,9 +19,8 @@ export class CurveStore extends BaseStore<Curve> {
       state: 'Idle',
     });
   }
-  async query(): Promise<
-    null | BigNumber
-  > {const contracts = chain.contracts || fallback.contracts;
+  async query(): Promise<null | BigNumber> {
+    const contracts = chain.contracts || fallback.contracts;
     if (contracts) {
       return await contracts.MandalaToken.totalSupply();
     } else if (fallback.state === 'Ready') {
@@ -36,14 +33,22 @@ export class CurveStore extends BaseStore<Curve> {
   private async _fetch() {
     const supply = await this.query();
     if (!supply) {
-      if ( this.startTime > 0 && Date.now() - this.startTime > 2000) {
-        console.log("STUCK");
+      if (this.startTime > 0 && Date.now() - this.startTime > 2000) {
+        console.log('STUCK');
         this.setPartial({state: 'Stuck'});
       } else {
         this.setPartial({state: 'Loading'});
       }
     } else {
-      this.setPartial({currentPrice: supply.mul(contractsInfo.contracts.MandalaToken.linkedData.linearCoefficient).add(contractsInfo.contracts.MandalaToken.linkedData.initialPrice), supply, state: 'Ready'});
+      this.setPartial({
+        currentPrice: supply
+          .mul(
+            contractsInfo.contracts.MandalaToken.linkedData.linearCoefficient
+          )
+          .add(contractsInfo.contracts.MandalaToken.linkedData.initialPrice),
+        supply,
+        state: 'Ready',
+      });
     }
   }
 

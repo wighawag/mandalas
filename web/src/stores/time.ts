@@ -1,4 +1,4 @@
-import { blockTime } from '../config';
+import {blockTime} from '../config';
 import {readable} from 'svelte/store';
 import {startTime as initStartTime} from '../init';
 

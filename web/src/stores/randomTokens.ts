@@ -1,9 +1,8 @@
-import {generateTokenURI, template19_bis, template19} from 'mandalas-common';
+import {generateTokenURI, template19_bis} from 'mandalas-common';
 import {BigNumber} from '@ethersproject/bignumber';
 import {Wallet} from '@ethersproject/wallet';
 import {hexlify, hexZeroPad} from '@ethersproject/bytes';
 import {BaseStore} from '../lib/utils/stores';
-
 
 type NFT = {
   id: string;
@@ -26,24 +25,24 @@ type NFTs = {
 type Transaction = {
   hash: string;
   nonce: number;
-}
+};
 type LocalStorageData = {
   claimTXs: {[id: string]: Transaction};
-  random: string,
+  random: string;
   start: number;
-}
+};
 
 export class RandomTokenStore extends BaseStore<NFTs> {
   private timer: NodeJS.Timeout | undefined;
   private counter = 0; // keep count of subscription
   private random = '';
-  private claimTXs: {[id: string]: Transaction} = {}
+  private claimTXs: {[id: string]: Transaction} = {};
   constructor() {
     super({
       state: 'Ready',
       error: undefined,
       tokens: [],
-      startIndex: 0
+      startIndex: 0,
     });
 
     // TODO remove
@@ -65,34 +64,41 @@ export class RandomTokenStore extends BaseStore<NFTs> {
     // })
   }
 
-  record(id: string, hash: string, nonce: number) : void {
-    this.claimTXs[id] = {hash,nonce};
+  record(id: string, hash: string, nonce: number): void {
+    this.claimTXs[id] = {hash, nonce};
     try {
-      localStorage.setItem('_mandalas_generated', JSON.stringify({
-        random: this.random,
-        start: this.$store.startIndex,
-        claimTXs: this.claimTXs
-      }));
-    } catch(e) {
+      localStorage.setItem(
+        '_mandalas_generated',
+        JSON.stringify({
+          random: this.random,
+          start: this.$store.startIndex,
+          claimTXs: this.claimTXs,
+        })
+      );
+    } catch (e) {
       console.error(e);
     }
-    for(const token of this.$store.tokens) {
+    for (const token of this.$store.tokens) {
       if (token.id === id) {
         token.minted = true;
         break;
       }
     }
-    this.setPartial({tokens: this.$store.tokens})
+    this.setPartial({tokens: this.$store.tokens});
   }
 
   loadMore(num: number): void {
     const from = this.$store.startIndex + this.$store.tokens.length;
     const tokens = [];
-    for (let i =0; i < num; i++) {
-      const wallet = new Wallet(BigNumber.from(this.random).add(from + i).toHexString());
+    for (let i = 0; i < num; i++) {
+      const wallet = new Wallet(
+        BigNumber.from(this.random)
+          .add(from + i)
+          .toHexString()
+      );
       const id = wallet.address;
       const tokenURI = generateTokenURI(id, template19_bis);
-      const jsonStart = tokenURI.indexOf(",") + 1;
+      const jsonStart = tokenURI.indexOf(',') + 1;
       const jsonStr = tokenURI.slice(jsonStart);
       const json = JSON.parse(jsonStr);
       tokens.push({
@@ -102,7 +108,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
         name: json.name,
         description: json.description,
         image: json.image,
-        minted: this.claimTXs[id] ? true : false
+        minted: this.claimTXs[id] ? true : false,
       });
     }
     this.setPartial({tokens: this.$store.tokens.concat(tokens)});
@@ -134,7 +140,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
       data = {
         random,
         start: 0,
-        claimTXs: {}
+        claimTXs: {},
       };
       try {
         localStorage.setItem('_mandalas_generated', JSON.stringify(data));
@@ -149,10 +155,12 @@ export class RandomTokenStore extends BaseStore<NFTs> {
     const tokens = [];
 
     for (let i = data.start; i < data.start + num; i++) {
-      const wallet = new Wallet(hexZeroPad(BigNumber.from(data.random).add(i).toHexString(), 40));
+      const wallet = new Wallet(
+        hexZeroPad(BigNumber.from(data.random).add(i).toHexString(), 40)
+      );
       const id = wallet.address;
       const tokenURI = generateTokenURI(id, template19_bis);
-      const jsonStart = tokenURI.indexOf(",") + 1;
+      const jsonStart = tokenURI.indexOf(',') + 1;
       const jsonStr = tokenURI.slice(jsonStart);
       const json = JSON.parse(jsonStr);
       tokens.push({
@@ -162,14 +170,13 @@ export class RandomTokenStore extends BaseStore<NFTs> {
         name: json.name,
         description: json.description,
         image: json.image,
-        minted: data.claimTXs[id] ? true : false
+        minted: data.claimTXs[id] ? true : false,
       });
       // console.log(tokens[tokens.length -1])
     }
 
     this.setPartial({startIndex: data.start, tokens});
   }
-
 
   subscribe(
     run: (value: NFTs) => void,

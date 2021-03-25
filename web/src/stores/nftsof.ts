@@ -2,8 +2,17 @@ import {chain, fallback, transactions} from './wallet';
 import {BaseStore} from '../lib/utils/stores';
 
 // TODO export in web3w
-type ParsedEvent = {args: Record<string, unknown>; name: string; signature: string};
-type TransactionStatus = 'pending' | 'cancelled' | 'success' | 'failure' | 'mined';
+type ParsedEvent = {
+  args: Record<string, unknown>;
+  name: string;
+  signature: string;
+};
+type TransactionStatus =
+  | 'pending'
+  | 'cancelled'
+  | 'success'
+  | 'failure'
+  | 'mined';
 type TransactionRecord = {
   hash: string;
   from: string;
@@ -65,14 +74,14 @@ class NFTOfStore extends BaseStore<NFTs> {
       state: 'Idle',
       error: undefined,
       tokens: [],
-      burning: {}
+      burning: {},
     });
     this.currentOwner = owner?.toLowerCase();
   }
 
   async query(
     address: string
-  ): Promise<null | {tokenURI: string; id: string;}[]> {
+  ): Promise<null | {tokenURI: string; id: string}[]> {
     const contracts = chain.contracts || fallback.contracts;
     if (contracts) {
       const numTokens = await contracts.MandalaToken.balanceOf(address);
@@ -81,11 +90,14 @@ class NFTOfStore extends BaseStore<NFTs> {
         0,
         numTokens
       );
-      const result: {tokenURI: string; id: string;}[] = [];
+      const result: {tokenURI: string; id: string}[] = [];
       for (const token of tokens) {
         result.push({
-          tokenURI: token.tokenURI.replace('image-rendering: pixelated;', 'image-rendering: pixelated; image-rendering: crisp-edges;'),
-          id: token.id
+          tokenURI: token.tokenURI.replace(
+            'image-rendering: pixelated;',
+            'image-rendering: pixelated; image-rendering: crisp-edges;'
+          ),
+          id: token.id,
         });
       }
 
@@ -118,9 +130,7 @@ class NFTOfStore extends BaseStore<NFTs> {
     }
   }
 
-  async _transform(
-    tokens: {tokenURI: string; id: string;}[]
-  ): Promise<NFT[]> {
+  async _transform(tokens: {tokenURI: string; id: string}[]): Promise<NFT[]> {
     // TODO cache
     const newResult: NFT[] = [];
     for (const token of tokens) {
@@ -186,23 +196,23 @@ class NFTOfStore extends BaseStore<NFTs> {
             this.$store.burning[tx.args[0] as string] = true;
           }
         }
-          // const foundIndex = this.$.findIndex(
-          //   (v) => v.id.toLowerCase() === tx.from.toLowerCase()
-          // );
-          // if (foundIndex >= 0) {
-          //   newData[foundIndex].message = tx.args[0] as string;
-          //   newData[foundIndex].pending = tx.confirmations < 1;
-          //   newData[foundIndex].timestamp = Math.floor(
-          //     Date.now() / 1000
-          //   ).toString();
-          // } else {
-          //   newData.unshift({
-          //     id: tx.from.toLowerCase(),
-          //     message: tx.args[0] as string,
-          //     timestamp: Math.floor(Date.now() / 1000).toString(),
-          //     pending: tx.confirmations < 1,
-          //   });
-          // }
+        // const foundIndex = this.$.findIndex(
+        //   (v) => v.id.toLowerCase() === tx.from.toLowerCase()
+        // );
+        // if (foundIndex >= 0) {
+        //   newData[foundIndex].message = tx.args[0] as string;
+        //   newData[foundIndex].pending = tx.confirmations < 1;
+        //   newData[foundIndex].timestamp = Math.floor(
+        //     Date.now() / 1000
+        //   ).toString();
+        // } else {
+        //   newData.unshift({
+        //     id: tx.from.toLowerCase(),
+        //     message: tx.args[0] as string,
+        //     timestamp: Math.floor(Date.now() / 1000).toString(),
+        //     pending: tx.confirmations < 1,
+        //   });
+        // }
       }
     }
     this.setPartial({burning: this.$store.burning});
@@ -214,7 +224,9 @@ class NFTOfStore extends BaseStore<NFTs> {
       this.setPartial({state: 'Loading'});
     }
 
-    this.unsubscribeFromTransactions = transactions.subscribe((txs) => this.onTransactions(txs))
+    this.unsubscribeFromTransactions = transactions.subscribe((txs) =>
+      this.onTransactions(txs)
+    );
     this._fetch();
     this.timer = setInterval(() => this._fetch(), 5000); // TODO polling interval config
     return this;

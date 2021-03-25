@@ -19,11 +19,10 @@ abstract contract ERC721Base is IERC165, IERC721 {
     uint256 internal constant BURN_FLAG = (2**254);
 
     uint256 internal _supply;
-    mapping (uint256 => uint256) internal _owners;
-    mapping (address => EnumerableSet.UintSet) internal _holderTokens;
+    mapping(uint256 => uint256) internal _owners;
+    mapping(address => EnumerableSet.UintSet) internal _holderTokens;
     mapping(address => mapping(address => bool)) internal _operatorsForAll;
     mapping(uint256 => address) internal _operators;
-
 
     /// @notice Approve an operator to spend tokens on the senders behalf.
     /// @param operator The address receiving the approval.
@@ -49,10 +48,7 @@ abstract contract ERC721Base is IERC165, IERC721 {
         require(owner == from, "NOT_OWNER");
         require(to != address(0), "NOT_TO_ZEROADDRESS");
         if (msg.sender != from) {
-            require(
-                _operatorsForAll[from][msg.sender] || (operatorEnabled && _operators[id] == msg.sender),
-                "UNAUTHORIZED_TRANSFER"
-            );
+            require(_operatorsForAll[from][msg.sender] || (operatorEnabled && _operators[id] == msg.sender), "UNAUTHORIZED_TRANSFER");
         }
         _transferFrom(from, to, id);
     }
@@ -137,10 +133,7 @@ abstract contract ERC721Base is IERC165, IERC721 {
         require(owner == from, "NOT_OWNER");
         require(to != address(0), "NOT_TO_ZEROADDRESS");
         if (msg.sender != from) {
-            require(
-                _operatorsForAll[from][msg.sender] || (operatorEnabled && _operators[id] == msg.sender),
-                "UNAUTHORIZED_TRANSFER"
-            );
+            require(_operatorsForAll[from][msg.sender] || (operatorEnabled && _operators[id] == msg.sender), "UNAUTHORIZED_TRANSFER");
         }
         _transferFrom(from, to, id);
         if (to.isContract()) {
@@ -176,7 +169,7 @@ abstract contract ERC721Base is IERC165, IERC721 {
         uint256 id
     ) internal {
         if (operator == address(0)) {
-            _owners[id] =  uint256(owner);
+            _owners[id] = uint256(owner);
         } else {
             _owners[id] = OPERATOR_FLAG | uint256(owner);
             _operators[id] = operator;
@@ -235,7 +228,7 @@ abstract contract ERC721Base is IERC165, IERC721 {
         require(data == 0, "ALREADY_MINTED");
         _holderTokens[to].add(id);
         _owners[id] = uint256(to);
-        _supply ++;
+        _supply++;
         emit Transfer(address(0), to, id);
     }
 
@@ -247,7 +240,7 @@ abstract contract ERC721Base is IERC165, IERC721 {
         require(msg.sender == owner, "NOT_OWNER");
         _holderTokens[owner].remove(id);
         _owners[id] = BURN_FLAG;
-        _supply --;
+        _supply--;
         emit Transfer(msg.sender, address(0), id);
     }
 }

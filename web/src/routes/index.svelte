@@ -10,55 +10,76 @@
   import Modal from '../components/Modal.svelte';
   import {computeBuffer} from '../utils';
 
-  function format(bn : BigNumber, numDecimals: number): number {
+  function format(bn: BigNumber, numDecimals: number): number {
     const precision = Math.pow(10, numDecimals);
-    const base = BigNumber.from("1000000000000000000").div(precision);
+    const base = BigNumber.from('1000000000000000000').div(precision);
     return bn.div(base).toNumber() / precision;
   }
 
   let nfts = randomTokens;
   nfts.generate(32);
 
-  function mint(nft: {id: string, privateKey: string}) {
+  function mint(nft: {id: string; privateKey: string}) {
     purchaseFlow.mint(nft);
   }
 
-  window.onscroll = function() {
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - window.innerHeight / 3) {
-        nfts.loadMore(32);
+  window.onscroll = function () {
+    if (
+      window.innerHeight + window.scrollY >=
+      document.body.offsetHeight - window.innerHeight / 3
+    ) {
+      nfts.loadMore(32);
     }
-};
+  };
 </script>
 
 <WalletAccess>
-
-
   {#if $curve.state === 'Stuck'}
-  <div
-    class="w-full h-full mx-auto text-center flex-col text-black dark:text-white ">
-   <p class="m-2 text-xs md:text-base font-black text-yellow-400">Please Connect to your wallet see latest price and supply</p>
-   <button class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1" on:click={() => flow.connect()}>Connect</button>
-  </div>
+    <div
+      class="w-full h-full mx-auto text-center flex-col text-black dark:text-white ">
+      <p class="m-2 text-xs md:text-base font-black text-yellow-400">
+        Please Connect to your wallet see latest price and supply
+      </p>
+      <button
+        class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
+        on:click={() => flow.connect()}>Connect</button>
+    </div>
   {:else}
     <div
-    class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
-      <p class="m-2 text-xs md:text-base font-black text-yellow-400">Current Price: {$curve.currentPrice ? format($curve.currentPrice, 4) + ' ETH' : 'loading'}</p>
-      <p class="m-2 text-xs md:text-base font-black text-yellow-400">Current Supply: {$curve.supply ? $curve.supply.toNumber() : 'loading'}</p>
-  </div>
-  <div
-  class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
-  <!-- <p class="m-2 text-xs md:text-base font-black text-yellow-400">+ Refunded Buffer: {($curve.supply && $curve.currentPrice) ? format(computeBuffer($curve.supply, $curve.currentPrice),4) + ' ETH' : 'loading'}</p> -->
-  <button class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1" on:click={() => nfts.reset()}>reset batch</button>
-</div>
+      class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
+      <p class="m-2 text-xs md:text-base font-black text-yellow-400">
+        Current Price:
+        {$curve.currentPrice ? format($curve.currentPrice, 4) + ' ETH' : 'loading'}
+      </p>
+      <p class="m-2 text-xs md:text-base font-black text-yellow-400">
+        Current Supply:
+        {$curve.supply ? $curve.supply.toNumber() : 'loading'}
+      </p>
+    </div>
+    <div
+      class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
+      <!-- <p class="m-2 text-xs md:text-base font-black text-yellow-400">+ Refunded Buffer: {($curve.supply && $curve.currentPrice) ? format(computeBuffer($curve.supply, $curve.currentPrice),4) + ' ETH' : 'loading'}</p> -->
+      <button
+        class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
+        on:click={() => nfts.reset()}>reset batch</button>
+    </div>
   {/if}
 
-  <div class="w-full h-full text-xs text-center md:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
-    <p class="px-4 pt-4">There are millions of millions of Mandalas, all unique. Pick the one you like :)</p>
-    <p class="px-4 pb-1">Their price run on a bounding curve. So as more people collect them, the more they get expensive. And you can burn them to get most of the price back. More details <Link name="about" class="underline">here</Link>.</p>
+  <div
+    class="w-full h-full text-xs text-center md:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
+    <p class="px-4 pt-4">
+      There are millions of millions of Mandalas, all unique. Pick the one you
+      like :)
+    </p>
+    <p class="px-4 pb-1">
+      Their price run on a bounding curve. So as more people collect them, the
+      more they get expensive. And you can burn them to get most of the price
+      back. More details
+      <Link name="about" class="underline">here</Link>.
+    </p>
   </div>
   <div
-    class="w-full h-full mx-auto flex items-center justify-center text-black dark:text-white ">
-  </div>
+    class="w-full h-full mx-auto flex items-center justify-center text-black dark:text-white " />
 
   <section
     class="py-8 px-4 w-full h-full mx-auto flex items-center justify-center text-black dark:text-white ">
@@ -75,18 +96,15 @@
         class="grid-cols-2 grid sm:grid-cols-4 sm:gap-x-6 sm:gap-y-12 sm:space-y-0 lg:grid-cols-6 lg:gap-x-8">
         {#each $nfts.tokens as nft, index}
           <li>
-            <div
-              id={nft.id}
-              class="p-8"
-              >
+            <div id={nft.id} class="p-8">
               <div class="aspect-w-3 aspect-h-2">
                 {#if nft.error}
                   Error:
                   {nft.error}
                 {:else if nft.image}
                   <img
-                    on:click={() => mint(nft) }
-                    style={`image-rendering: pixelated; ${ nft.minted ? 'filter: grayscale(100%);' : ''}`}
+                    on:click={() => mint(nft)}
+                    style={`image-rendering: pixelated; ${nft.minted ? 'filter: grayscale(100%);' : ''}`}
                     class={`object-contain h-full w-full ${nft.minted ? '' : 'cursor-pointer'}`}
                     alt={nft.name}
                     src={nft.image} />
@@ -95,11 +113,12 @@
                 {/if}
               </div>
               {#if nft.image}
-              <div class={nft.minted ? 'hidden' : ''}>
-                <div class="mt-2 flex">
-                  <div class="w-0 flex-1 flex">
-                    <button on:click={() => mint(nft) }
-                      class="relative w-0 flex-1 inline-flex items-center
+                <div class={nft.minted ? 'hidden' : ''}>
+                  <div class="mt-2 flex">
+                    <div class="w-0 flex-1 flex">
+                      <button
+                        on:click={() => mint(nft)}
+                        class="relative w-0 flex-1 inline-flex items-center
                         justify-center pb-4 text-sm text-gray-700 dark:text-gray-300 font-medium
                         border border-transparent rounded-br-lg
                         hover:text-gray-500">
@@ -116,11 +135,10 @@
                             d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
                         </svg>
                         <span class="text-xs md:text-base ml-3">Mint It</span>
-
-                    </button>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
               {/if}
             </div>
           </li>
@@ -130,22 +148,21 @@
   </section>
 </WalletAccess>
 
-
 {#if $purchaseFlow.step !== 'IDLE' && $purchaseFlow.step !== 'SUCCESS'}
-
   {#if $purchaseFlow.step !== 'CONFIRM'}
     <!-- Taken care by WalletAccess -->
   {:else}
     <Modal on:close={() => purchaseFlow.cancel()}>
-        {#if !$purchaseFlow.data}
+      {#if !$purchaseFlow.data}
         Error
-        {:else}
+      {:else}
         <div class="text-center">
-          <h2>
-            Mint for {format($purchaseFlow.data.currentPrice, 4)} ETH
-          </h2>
+          <h2>Mint for {format($purchaseFlow.data.currentPrice, 4)} ETH</h2>
           <p class="text-gray-300 mt-2 text-sm">
-            We added a buffer of {format(computeBuffer($purchaseFlow.data.supply, $purchaseFlow.data.currentPrice), 4)} ETH to cover the case someone else  is minting at the same time. You'll be refunded if that does not happen.
+            We added a buffer of
+            {format(computeBuffer($purchaseFlow.data.supply, $purchaseFlow.data.currentPrice), 4)}
+            ETH to cover the case someone else is minting at the same time.
+            You'll be refunded if that does not happen.
           </p>
           <button
             class="mt-5 p-1 border border-yellow-500"
@@ -154,7 +171,7 @@
             Confirm
           </button>
         </div>
-        {/if}
+      {/if}
     </Modal>
   {/if}
 {/if}
