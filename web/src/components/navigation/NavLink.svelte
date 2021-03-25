@@ -1,6 +1,7 @@
 <script lang="ts">
   export let name: string;
   export let params: any = {};
+  export let hash: string | undefined = undefined;
   export let partial: boolean = false;
 
   import Link from '../../lib/routing/curi/Link.svelte';
@@ -25,7 +26,8 @@
     <Link
       class="text-xs sm:text-base inline-block py-2 px-4 mr-3 font-semibold border-b-2 bg-white dark:bg-black dark:text-white text-black"
       {name}
-      {params}>
+      {params}
+      {hash}>
       <slot />
     </Link>
     <div class="w-full h-1 mb-1" />
@@ -37,7 +39,8 @@
     <Link
       class="text-xs sm:text-base inline-block py-2 px-4 mr-3 font-semibold bg-white dark:bg-black dark:text-white text-black"
       {name}
-      {params}>
+      {params}
+      {hash}>
       <slot />
     </Link>
     <div class="w-full h-1 mb-1" />

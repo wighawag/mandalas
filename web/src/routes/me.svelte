@@ -5,8 +5,30 @@
   import {curve} from '../stores/curve';
   import {wallet, flow, chain} from '../stores/wallet';
   import Link from '../lib/routing/curi/Link.svelte';
+  import {getResponse, getRouter} from '@curi/svelte';
+  import {generateBitmapDataURI, template19_bis} from 'mandalas-common';
 
-  $: nfts = nftsof($wallet.address);
+  let router = getRouter();
+  let response = getResponse();
+
+  $: walletAddress = $response.location.hash;
+
+  $: {
+    if ($wallet.address && !walletAddress) {
+      console.log('redirect');
+      router.navigate({
+        url: router.url({name: 'me', hash: $wallet.address}),
+        method: 'replace',
+      });
+    }
+  }
+
+  $: isWalletOwner =
+    $wallet.address &&
+    walletAddress &&
+    $wallet.address.toLowerCase() === walletAddress.toLowerCase();
+
+  $: nfts = nftsof(walletAddress);
 
   function burn({id}: {id: string}) {
     flow.execute(async (contracts) => {
@@ -16,14 +38,7 @@
 </script>
 
 <WalletAccess>
-  {#if $curve.state === 'Stuck'}
-    <div
-      class="w-full h-full mx-auto text-center flex-col text-black dark:text-white ">
-      <p class="mt-4 text-xs sm:text-base font-black text-yellow-400">
-        Please Connect to your wallet see latest price and supply
-      </p>
-    </div>
-  {:else}
+  {#if $curve.supply}
     <div
       class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
       <p class="m-2 font-black text-xs sm:text-base  text-yellow-400">
@@ -39,18 +54,54 @@
     </div>
   {/if}
 
+  {#if $chain.state !== 'Connected' && $chain.state !== 'Ready'}
+    <div
+      class="w-full h-full mx-auto text-center flex-col text-black dark:text-white ">
+      <p class="mt-4 text-xs sm:text-base font-black text-yellow-400">
+        Please Connect to your wallet see the tokens
+      </p>
+      <button
+        class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
+        on:click={() => flow.connect()}>Connect</button>
+    </div>
+  {:else if !walletAddress || walletAddress === ''}
+    <div
+      class="w-full h-full mx-auto text-center flex-col text-black dark:text-white ">
+      <p class="mt-4 text-xs sm:text-base font-black text-yellow-400">
+        Please Connect to your wallet see your tokens
+      </p>
+      <button
+        class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
+        on:click={() => flow.connect()}>Connect</button>
+    </div>
+  {:else if $wallet.address && !isWalletOwner}
+    <div
+      class="w-full h-full mx-auto text-center flex-col text-black dark:text-white ">
+      <div
+        class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
+        <Link
+          name="me"
+          hash={$wallet.address}
+          class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1">
+          Show My Mandalas
+        </Link>
+      </div>
+    </div>
+  {/if}
+
   {#if $nfts.state === 'Ready'}
     {#if $nfts.tokens.length > 0}
       <div
         class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
         <p class="p-6">
-          Here are your Mandalas. You can burn them to get 95% of the current
-          price. Each time a mandala is burnt, the price decrease. Note that
-          once burnt that same Mandala cannot be re-created.
+          {#if isWalletOwner}
+            Here are your Mandalas. You can burn them to get 95% of the current
+            price. Each time a mandala is burnt, the price decrease. Note that
+            once burnt that same Mandala cannot be re-created.
+          {:else}Here are the Mandalas for wallet {walletAddress}.{/if}
         </p>
       </div>
     {:else if $chain.notSupported}
-      }
       <div
         class="py-8 px-10 w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
         <p class="p-4">Please switch network</p>
@@ -61,18 +112,22 @@
     {:else if $wallet.state === 'Ready'}
       <div
         class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
-        <p class="p-4">You do not have any Mandala yet.</p>
-        <p>
-          get your first one
-          <Link name="index" class="underline">here</Link>
-        </p>
+        {#if isWalletOwner}
+          <p class="p-4">You do not have any Mandala yet.</p>
+          <p>
+            get your first one
+            <Link name="index" class="underline">here</Link>
+          </p>
+        {:else}
+          <p class="p-4">No Mandala for {walletAddress}</p>
+        {/if}
       </div>
     {/if}
   {/if}
   <section
     class="py-8 px-10 md:w-3/4 w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
     {#if $wallet.state !== 'Ready'}
-      <form class="mt-5 w-full max-w-sm">
+      <!-- <form class="mt-5 w-full max-w-sm">
         <div class="flex items-center">
           <NavButton
             label="Connect"
@@ -81,7 +136,7 @@
             Connect
           </NavButton>
         </div>
-      </form>
+      </form> -->
     {:else if !$nfts}
       <div>Getting Tokens...</div>
     {:else if $nfts.state === 'Idle'}
@@ -108,12 +163,12 @@
                     style={`image-rendering: pixelated; ${$nfts.burning[nft.id] ? 'filter: grayscale(100%);' : ''}`}
                     class="object-contain h-full w-full"
                     alt={nft.name}
-                    src={nft.image} />
+                    src={generateBitmapDataURI(nft.id, template19_bis)} />
                 {:else}
                   <p class="">{nft.name}</p>
                 {/if}
               </div>
-              {#if nft.image}
+              {#if nft.image && isWalletOwner}
                 <div class={$nfts.burning[nft.id] ? 'hidden' : ''}>
                   <div class="mt-2 flex">
                     <div class="w-0 flex-1 flex">
