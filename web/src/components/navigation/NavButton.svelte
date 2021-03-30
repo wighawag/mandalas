@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {getRouter} from '@curi/svelte';
+  // import {getRouter} from '@curi/svelte';
   import {createEventDispatcher} from 'svelte';
 
   let _class: string = '';
@@ -150,7 +150,7 @@
         ${_class}
     `;
 
-  let router = getRouter();
+  // let router = getRouter();
   let canNavigate = (event: MouseEvent, target: Element) => {
     return (
       !event.defaultPrevented &&
@@ -170,12 +170,12 @@
       const page = split2[0];
       const hash = split1[1];
       const query = split2[1];
-      url = router.url({name: page, params, hash, query});
+      // url = router.url({name: page, params, hash, query});
       target = $$restProps.target;
       handlePageLink = (event) => {
         if (canNavigate(event, target)) {
           event.preventDefault();
-          router.navigate({url, state});
+          // router.navigate({url, state});
         }
       };
     }

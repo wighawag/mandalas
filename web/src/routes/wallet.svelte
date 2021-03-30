@@ -4,8 +4,6 @@
   import {nftsof} from '../stores/nftsof';
   import {curve} from '../stores/curve';
   import {wallet, flow, chain} from '../stores/wallet';
-  import Link from '../lib/routing/curi/Link.svelte';
-  import {getResponse, getRouter} from '@curi/svelte';
   import {generateBitmapDataURI, template19_bis} from 'mandalas-common';
 
   let router = getRouter();
@@ -79,12 +77,11 @@
       class="w-full h-full mx-auto text-center flex-col text-black dark:text-white ">
       <div
         class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
-        <Link
-          name="me"
-          hash={$wallet.address}
+        <a
+          href={`me#${$wallet.address}`}
           class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1">
           Show My Mandalas
-        </Link>
+        </a>
       </div>
     </div>
   {/if}
@@ -114,10 +111,7 @@
         class="w-full h-full mx-auto flex flex-col items-center justify-center text-black dark:text-white ">
         {#if isWalletOwner}
           <p class="p-4">You do not have any Mandala yet.</p>
-          <p>
-            get your first one
-            <Link name="index" class="underline">here</Link>
-          </p>
+          <p>get your first one <a href="/" class="underline">here</a></p>
         {:else}
           <p class="p-4">No Mandala for {walletAddress}</p>
         {/if}

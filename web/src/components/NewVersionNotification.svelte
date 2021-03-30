@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {base} from '$app/paths';
   import {updateAvailable} from '../stores/appUpdates';
 
   function skip() {
@@ -9,8 +10,6 @@
     $updateAvailable = false;
     window.location.reload(true);
   }
-
-  const base: string = window.basepath || '/';
 </script>
 
 <svelte:window on:click={skip} />

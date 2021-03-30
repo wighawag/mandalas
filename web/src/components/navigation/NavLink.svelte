@@ -1,48 +1,37 @@
 <script lang="ts">
-  export let name: string;
-  export let params: any = {};
-  export let hash: string | undefined = undefined;
+  export let active: boolean = false;
+  export let name: string; // TODO rename to href
+  export let params: any = {}; // TODO remove
+  export let hash: string | undefined = undefined; // TOOD remove
   export let partial: boolean = false;
 
-  import Link from '../../lib/routing/curi/Link.svelte';
-  import {getRouter, getResponse} from '@curi/svelte';
-  import {active as activeInteraction} from '@curi/interactions';
-
-  let router = getRouter();
-  let response = getResponse();
-
-  let active: boolean;
-  $: route = router.route(name);
-  $: active =
-    $response && activeInteraction(route, $response, {params, partial});
-
-  const base: string = window.basepath || '/';
+  // import {page} from '$app/stores';
 </script>
 
 {#if active}
   <li class="">
     <!-- <div class="w-full h-1 mt-1" style={`background: url(${base}images/multicolor_line_x8.png);`}></div> -->
     <div class="w-full h-1 mb-1" />
-    <Link
+    <a
       class="text-xs sm:text-base inline-block py-2 px-4 mr-3 font-semibold border-b-2 bg-white dark:bg-black dark:text-white text-black"
-      {name}
+      href={name}
       {params}
       {hash}>
       <slot />
-    </Link>
+    </a>
     <div class="w-full h-1 mb-1" />
     <!-- <div class="w-full h-1 mb-1" style={`background: url(${base}images/multicolor_line_x8.png);`}></div> -->
   </li>
 {:else}
   <li>
     <div class="w-full h-1 mb-1" />
-    <Link
+    <a
       class="text-xs sm:text-base inline-block py-2 px-4 mr-3 font-semibold bg-white dark:bg-black dark:text-white text-black"
-      {name}
+      href={name}
       {params}
       {hash}>
       <slot />
-    </Link>
+    </a>
     <div class="w-full h-1 mb-1" />
   </li>
 {/if}

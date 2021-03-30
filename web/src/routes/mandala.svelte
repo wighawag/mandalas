@@ -1,15 +1,11 @@
 <script lang="ts">
-  import NavButton from '../components/navigation/NavButton.svelte';
-  import {getResponse} from '@curi/svelte';
   import {
     generateTokenURI,
     template19_bis,
-    generatePureSVGTokenURI,
-    pure_svg_template_19_bis,
     generateBitmapDataURI,
   } from 'mandalas-common';
-  let response = getResponse();
-  $: mandalaId = $response.location.hash;
+
+  $: mandalaId = '11'; // TODO$response.location.hash;
 
   // $: tokenURI = generatePureSVGTokenURI(mandalaId, pure_svg_template_19_bis);
   $: tokenURI = generateTokenURI(mandalaId, template19_bis);

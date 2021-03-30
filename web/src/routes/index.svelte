@@ -4,7 +4,6 @@
   import {curve} from '../stores/curve';
   import {wallet, flow} from '../stores/wallet';
   import {BigNumber} from '@ethersproject/bignumber';
-  import Link from '../lib/routing/curi/Link.svelte';
   import contractsInfo from '../contracts.json';
   import purchaseFlow from '../stores/purchaseFlow';
   import Modal from '../components/Modal.svelte';
@@ -75,7 +74,7 @@
       Their price run on a bounding curve. So as more people collect them, the
       more they get expensive. And you can burn them to get most of the price
       back. More details
-      <Link name="about" class="underline">here</Link>.
+      <a href="about" class="underline">here</a>.
     </p>
   </div>
   <div

@@ -1,7 +1,7 @@
 .env*
 !*.default
 
-.snowpack
+.svelte
 build/
 
 node_modules/
@@ -11,9 +11,10 @@ src/contracts.json
 .vscode/*
 !.vscode/settings.json.default
 
-public/index.html
-public/pwa/
-public/robots.txt
+static/index.html
+static/pwa/
+static/robots.txt
+
 
 .yalc/
 yalc.lock

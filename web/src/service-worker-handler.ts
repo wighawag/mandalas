@@ -1,3 +1,4 @@
+// TODO svelte-kit
 import {logs} from 'named-logs-console';
 import {updateAvailable} from './stores/appUpdates';
 
