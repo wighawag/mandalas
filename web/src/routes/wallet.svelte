@@ -1,23 +1,28 @@
 <script lang="ts">
-  import WalletAccess from '../templates/WalletAccess.svelte';
-  import NavButton from '../components/navigation/NavButton.svelte';
-  import {nftsof} from '../stores/nftsof';
-  import {curve} from '../stores/curve';
-  import {wallet, flow, chain} from '../stores/wallet';
+  import WalletAccess from '$lib/WalletAccess.svelte';
+  import NavButton from '$lib/components/navigation/NavButton.svelte';
+  import {nftsof} from '$lib/stores/nftsof';
+  import {curve} from '$lib/stores/curve';
+  import {wallet, flow, chain} from '$lib/stores/wallet';
   import {generateBitmapDataURI, template19_bis} from 'mandalas-common';
+  import {page} from '$app/stores';
+  import {goto} from '$app/navigation';
+  import { url } from '$lib/utils/url';
 
-  let router = getRouter();
-  let response = getResponse();
+  let walletAddress: string = undefined;
+  //TODO
+  $: {
 
-  $: walletAddress = $response.location.hash;
+    walletAddress = ($page.path && typeof location !== "undefined") ? location.hash.substr(1): undefined
+    console.log({path: $page.path, walletAddress, locationHash: typeof location !== "undefined" && location.hash});
+  }
 
   $: {
     if ($wallet.address && !walletAddress) {
       console.log('redirect');
-      router.navigate({
-        url: router.url({name: 'wallet', hash: $wallet.address}),
-        method: 'replace',
-      });
+      goto(url(`wallet#${$wallet.address}`), {replaceState: true}).then(() => {
+        walletAddress = ($page.path && typeof location !== "undefined") ? location.hash.substr(1): undefined
+      })
     }
   }
 

@@ -1,12 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		%svelte.head%
-	</head>
-	<body>
-		<div id="svelte">%svelte.body%</div>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <link rel="shortcut icon" href="/pwa/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/pwa/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/pwa/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/pwa/favicon-48x48.png">
+    <link rel="manifest" href="/pwa/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    <meta name="application-name" content="Jolly Roger">
+    <link rel="apple-touch-icon" sizes="57x57" href="/pwa/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/pwa/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/pwa/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/pwa/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/pwa/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/pwa/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/pwa/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/pwa/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/pwa/apple-touch-icon-167x167.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/pwa/apple-touch-icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="1024x1024" href="/pwa/apple-touch-icon-1024x1024.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Jolly Roger">
+    <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/pwa/apple-touch-startup-image-640x1136.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/pwa/apple-touch-startup-image-750x1334.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/pwa/apple-touch-startup-image-828x1792.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/pwa/apple-touch-startup-image-1125x2436.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/pwa/apple-touch-startup-image-1242x2208.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/pwa/apple-touch-startup-image-1242x2688.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/pwa/apple-touch-startup-image-1536x2048.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/pwa/apple-touch-startup-image-1668x2224.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/pwa/apple-touch-startup-image-1668x2388.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/pwa/apple-touch-startup-image-2048x2732.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/pwa/apple-touch-startup-image-1620x2160.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/pwa/apple-touch-startup-image-1136x640.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/pwa/apple-touch-startup-image-1334x750.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/pwa/apple-touch-startup-image-1792x828.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="/pwa/apple-touch-startup-image-2436x1125.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="/pwa/apple-touch-startup-image-2208x1242.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="/pwa/apple-touch-startup-image-2688x1242.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/pwa/apple-touch-startup-image-2048x1536.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/pwa/apple-touch-startup-image-2224x1668.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/pwa/apple-touch-startup-image-2388x1668.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/pwa/apple-touch-startup-image-2732x2048.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/pwa/apple-touch-startup-image-2160x1620.png">
+    <link rel="icon" type="image/png" sizes="228x228" href="/pwa/coast-228x228.png">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="msapplication-TileImage" content="/pwa/mstile-144x144.png">
+    <meta name="msapplication-config" content="/pwa/browserconfig.xml">
+    <link rel="yandex-tableau-widget" href="/pwa/yandex-browser-manifest.json">
+    <!--SCRIPTS-->
+
+    <!-- inject named-logs-console -->
+    <!-- prettier-ignore -->
+    <script>
+      "use strict";var noop=function(){},W="undefined"!=typeof window?window:globalThis,oldConsole=W.console,disabledRegexps=[],enabledRegexps=[];function bindCall(e,l,s,a){return l.enabled&&(l.level>=a||logs.level>=a)?s<=a||logs.traceLevel<=a?oldConsole.trace.bind(oldConsole):e.bind(oldConsole):noop}var loggers={},logs=function(e){var l=loggers[e];if(l)return l;var s=logs.level,a=logs.traceLevel;return l=loggers[e]={get assert(){return bindCall(oldConsole.assert,l,a,1)},get error(){return bindCall(oldConsole.error,l,a,1)},get warn(){return bindCall(oldConsole.warn,l,a,2)},get info(){return bindCall(oldConsole.info,l,a,3)},get log(){return bindCall(oldConsole.log,l,a,4)},get debug(){return bindCall(oldConsole.debug,l,a,5)},get trace(){return bindCall(oldConsole.trace,l,a,6)},get dir(){return bindCall(oldConsole.dir,l,a,5)},get table(){return bindCall(oldConsole.table||oldConsole.debug,l,a,5)},get level(){return s},set level(e){s=e},get traceLevel(){return a},set traceLevel(e){a=e},enabled:enabled(e,{disabledRegexps:disabledRegexps,enabledRegexps:enabledRegexps})}},logLevels={error:1,warn:2,info:3,log:4,debug:5,trace:6};function enabled(e,l){var s,a,r=l.disabledRegexps,o=l.enabledRegexps;if("*"===e[e.length-1])return!0;for(s=0,a=r.length;s<a;s++)if(r[s].test(e))return!1;for(s=0,a=o.length;s<a;s++)if(o[s].test(e))return!0;return!1}function processNamespaces(e,l,s){for(var a=l.disabledRegexps,r=l.enabledRegexps,o=("string"==typeof e?e:"").split(/[\s,]+/),n=o.length,t=0;t<n;t++)o[t]&&("-"===(e=o[t].replace(/\*/g,".*?"))[0]?a.push(new RegExp("^"+e.substr(1)+"$")):r.push(new RegExp("^"+e+"$")));for(var g=0,d=Object.keys(loggers);g<d.length;g++){var i=d[g];s(i,enabled(i,{disabledRegexps:a,enabledRegexps:r}))}}logs.level=2,logs.traceLevel=6,logs.setTraceLevelFor=function(e,l){processNamespaces(e||"*",{disabledRegexps:[],enabledRegexps:[]},(function(e,s){s&&(loggers[e].traceLevel=l)}))},logs.disable=function(){disabledRegexps.splice(0,disabledRegexps.length),enabledRegexps.splice(0,enabledRegexps.length);for(var e=0,l=Object.keys(loggers);e<l.length;e++){var s=l[e];loggers[s].enabled=!1}try{localStorage.removeItem("debug")}catch(e){}},logs.enable=function(e){disabledRegexps.splice(0,disabledRegexps.length),enabledRegexps.splice(0,enabledRegexps.length),processNamespaces(e=""===e?"*":e||"*",{disabledRegexps:disabledRegexps,enabledRegexps:enabledRegexps},(function(e,l){return loggers[e].enabled=l}));try{localStorage.setItem("debug",e)}catch(e){}};try{var str=localStorage.getItem("debug");str&&""!==str&&logs.enable(str)}catch(e){}for(var vars=W.location?W.location.search.slice(1).split("&"):[],_i=0,vars_1=vars;_i<vars_1.length;_i++){var variable=vars_1[_i];if(variable.startsWith("debug="))""===(val=variable.slice(6))?logs.disable():logs.enable(val);else if(variable.startsWith("log=")){var val=variable.slice(4);logs.level=logLevels[val]||parseInt(val)||logs.level}else if(variable.startsWith("trace=")){val=variable.slice(6);logs.traceLevel=logLevels[val]||parseInt(val)||logs.level}}window._logFactory=logs;
+    </script>
+
+    %svelte.head%
+  </head>
+  <body class="bg-white dark:bg-black">
+    <div id="svelte">%svelte.body%</div>
+    <script>
+      // darkMode
+      document.body.classList.add('dark:bg-black');
+      document.body.classList.add('bg-white');
+      document.documentElement.classList.add('dark');
+    </script>
+  </body>
 </html>

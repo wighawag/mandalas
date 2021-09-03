@@ -1,5 +1,5 @@
 <script lang="ts">
-  const base: string = window.basepath || '/';
+  import {base} from '$app/paths';
 </script>
 
 <div

@@ -1,11 +1,9 @@
 <script lang="ts">
   import {onMount} from 'svelte';
+  import { url } from '$lib/utils/url';
+  import {goto} from '$app/navigation';
   onMount(() => {
-    // TODO
-    // router.navigate({
-    //   url: router.url({name: 'wallet'}),
-    //   method: 'replace',
-    // });
+    goto(url(`wallet`), {replaceState: true});
   });
 </script>
 
