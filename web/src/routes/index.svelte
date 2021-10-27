@@ -42,7 +42,7 @@ import { onMount } from 'svelte';
         Please Connect to your wallet see latest price and supply
       </p>
       <button
-        class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
+        class="block m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
         on:click={() => flow.connect()}>Connect</button>
     </div>
   {:else}
