@@ -1,0 +1,34 @@
+specVersion: 0.0.3
+description: Mandalas
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: MandalaToken
+    network: {{chainName}}
+    source:
+      address: '{{contracts.MandalaToken.address}}'
+      abi: MandalaTokenContract
+      startBlock: {{contracts.MandalaToken.receipt.blockNumber}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      entities:
+        - Owner
+        - Mandala
+        - All
+      abis:
+        - name: MandalaTokenContract
+          file: ./abis/MandalaToken.json
+      eventHandlers:
+        #event Minted(uint256 indexed id, uint256 indexed pricePaid);
+        - event: Minted(indexed uint256,indexed uint256)
+          handler: handleMinted
+        #event Burned(uint256 indexed id, uint256 indexed priceReceived);
+        - event: Burned(indexed uint256,indexed uint256)
+          handler: handleBurned
+        #event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts

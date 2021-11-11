@@ -2,3 +2,4 @@ packages:
   - 'contracts'
   - 'web'
   - 'common-lib'
+  - 'subgraph'

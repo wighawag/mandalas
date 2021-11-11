@@ -1,0 +1,21 @@
+type Owner @entity {
+  id: ID!
+  numMandalas: BigInt!
+  numMandalasMinted: BigInt!
+  mandalasMinted: [Mandala!]! @derivedFrom(field: "minter")
+  mandalas: [Mandala!]! @derivedFrom(field: "owner")
+}
+
+type Mandala @entity {
+  id: ID!
+  owner: Owner
+  minter: Owner!
+}
+
+type All @entity {
+  id: ID!
+  numOwners: BigInt!
+  numMinters: BigInt!
+  numMandalasMinted: BigInt!
+  numMandalas: BigInt!
+}
