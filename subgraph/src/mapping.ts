@@ -9,8 +9,19 @@ let ZERO_ADDRESS: Bytes = Bytes.fromHexString('0x0000000000000000000000000000000
 let ZERO = BigInt.fromI32(0);
 let ONE = BigInt.fromI32(1);
 
+function handleOwnerViaId(id: string): Owner {
+  let entity = Owner.load(id);
+  if (entity) {
+    return entity as Owner;
+  }
+  entity = new Owner(id);
+  entity.numMandalas = ZERO;
+  entity.numMandalasMinted = ZERO;
+  entity.save();
+  return entity as Owner;
+}
 
-export function handleMinted(event: Minted): void {
+function handleAll(): All {
   let all = All.load('all');
   if (!all) {
     all = new All('all');
@@ -19,124 +30,84 @@ export function handleMinted(event: Minted): void {
     all.numMinters = ZERO;
     all.numOwners = ZERO;
   }
-  all.numMandalas = all.numMandalas.plus(ONE);
-  all.numMandalasMinted = all.numMandalasMinted.plus(ONE);
+  return all as All;
+}
 
-  let mandalaId = event.params.id.toString();
+function handleMandala(id : BigInt, minter: Address): Mandala {
+  let mandalaId = id.toString();
   let entity = Mandala.load(mandalaId)
   if (!entity) {
     entity = new Mandala(mandalaId);
+    entity.minter = minter.toHexString();
   }
-  entity.minter = event.transaction.from.toHexString();
-  entity.save();
+  return entity as Mandala;
+}
 
 
-  let owner = Owner.load(entity.minter)
-  if (!owner) {
-    owner = new Owner(entity.minter)
-    owner.numMandalas = ZERO;
-    owner.numMandalasMinted = ZERO;
-  }
+export function handleMinted(event: Minted): void {
+  let all = handleAll();
+  all.numMandalas = all.numMandalas.plus(ONE);
+  all.numMandalasMinted = all.numMandalasMinted.plus(ONE);
 
+  let mandala = handleMandala(event.params.id, event.transaction.from);
+  mandala.save();
+
+  let owner = handleOwnerViaId(mandala.minter)
   if (owner.numMandalasMinted.equals(ZERO)) {
     all.numMinters = all.numMinters.plus(ONE);
   }
-
   owner.numMandalasMinted = owner.numMandalasMinted.plus(ONE);
   owner.save();
-
 
   all.save();
 }
 
 
 export function handleBurned(event: Burned): void {
-  let all = All.load('all');
-  if (!all) {
-    all = new All('all');
-    all.numMandalas = ZERO;
-    all.numMandalasMinted = ZERO;
-    all.numMinters = ZERO;
-    all.numOwners = ZERO;
-  }
+  let all = handleAll();
   all.numMandalas = all.numMandalas.minus(ONE);
-  let mandalaId = event.params.id.toString();
-  let entity = Mandala.load(mandalaId)
-  if (!entity) {
-    entity = new Mandala(mandalaId);
-    // not possible
-  }
-  entity.owner = null;
-  entity.save();
-
+  let mandala = Mandala.load(event.params.id.toString())
+  mandala.owner = null;
+  mandala.save();
 
   all.save();
 }
 
 
 export function handleTransfer(event: Transfer): void {
-  let all = All.load('all');
-  if (!all) {
-    all = new All('all');
-    all.numMandalas = ZERO;
-    all.numMandalasMinted = ZERO;
-    all.numMinters = ZERO;
-    all.numOwners = ZERO;
-  }
-  let mandalaId = event.params.tokenId.toString();
-  let entity = Mandala.load(mandalaId)
-  if (!entity) {
-    entity = new Mandala(mandalaId);
-    entity.minter = event.transaction.from.toHexString();
-  }
-  let newOnwer = event.params.to.toHexString();
-  entity.owner = newOnwer == ZERO_ADDRESS.toHexString() ? null : newOnwer;
-  entity.save();
+  let all = handleAll();
+  let mandala = handleMandala(event.params.tokenId, event.transaction.from)
 
   let to = event.params.to.toHexString();
   let from = event.params.from.toHexString();
   if (event.params.from == ZERO_ADDRESS) {
-    let owner = Owner.load(to)
-    if (!owner) {
-      owner = new Owner(to)
-      owner.numMandalas = ZERO;
-      owner.numMandalasMinted = ZERO;
-    }
+    mandala.owner = event.params.to.toHexString();
+
+    let owner = handleOwnerViaId(to);
     if (owner.numMandalas.equals(ZERO)) {
       all.numOwners = all.numOwners.plus(ONE);
     }
     owner.numMandalas = owner.numMandalas.plus(ONE);
     owner.save();
+
   } else if (event.params.to == ZERO_ADDRESS) {
-    let owner = Owner.load(from)
-    if (!owner) {
-      owner = new Owner(from)
-      owner.numMandalas = ZERO;
-      owner.numMandalasMinted = ZERO;
-    }
-    owner.numMandalas = owner.numMandalas.plus(ONE);
+    mandala.owner = null;
+
+    let owner = handleOwnerViaId(from);
+    owner.numMandalas = owner.numMandalas.minus(ONE);
     if (owner.numMandalas.equals(ZERO)) {
       all.numOwners = all.numOwners.minus(ONE);
     }
     owner.save();
   } else {
-    let ownerTo = Owner.load(to)
-    if (!ownerTo) {
-      ownerTo = new Owner(to)
-      ownerTo.numMandalas = ZERO;
-      ownerTo.numMandalasMinted = ZERO;
-    }
+    let ownerTo = handleOwnerViaId(to);
     ownerTo.numMandalas = ownerTo.numMandalas.plus(ONE);
     ownerTo.save();
 
-    let ownerFrom = Owner.load(from)
-    if (!ownerFrom) {
-      ownerFrom = new Owner(from)
-      ownerFrom.numMandalas = ZERO;
-      ownerFrom.numMandalasMinted = ZERO;
-    }
+    let ownerFrom =handleOwnerViaId(from);
     ownerFrom.numMandalas = ownerFrom.numMandalas.minus(ONE);
     ownerFrom.save();
   }
+  mandala.save();
   all.save();
 }
