@@ -4,12 +4,16 @@ type Owner @entity {
   numMandalasMinted: BigInt!
   mandalasMinted: [Mandala!]! @derivedFrom(field: "minter")
   mandalas: [Mandala!]! @derivedFrom(field: "owner")
+  numSpent: BigInt!
+  numCollected: BigInt!
 }
 
 type Mandala @entity {
   id: ID!
   owner: Owner
   minter: Owner!
+  numSpent: BigInt!
+  numCollected: BigInt!
 }
 
 type All @entity {
@@ -18,4 +22,6 @@ type All @entity {
   numMinters: BigInt!
   numMandalasMinted: BigInt!
   numMandalas: BigInt!
+  numSpent: BigInt!
+  numCollected: BigInt!
 }
