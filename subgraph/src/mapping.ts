@@ -121,12 +121,21 @@ export function handleTransfer(event: Transfer): void {
     owner.save();
   } else {
     let ownerTo = handleOwnerViaId(to);
+
+    if (ownerTo.numMandalas.equals(ZERO)) {
+      all.numOwners = all.numOwners.plus(ONE);
+    }
+
     ownerTo.numMandalas = ownerTo.numMandalas.plus(ONE);
     ownerTo.save();
 
     let ownerFrom =handleOwnerViaId(from);
     ownerFrom.numMandalas = ownerFrom.numMandalas.minus(ONE);
     ownerFrom.save();
+
+    if (ownerFrom.numMandalas.equals(ZERO)) {
+      all.numOwners = all.numOwners.minus(ONE);
+    }
   }
   mandala.save();
   all.save();
