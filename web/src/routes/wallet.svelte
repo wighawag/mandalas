@@ -83,7 +83,7 @@
       <div
         class="w-full h-full mx-auto flex justify-between text-black dark:text-white ">
         <a
-          href={url(`wallet`, `#${$wallet.address}`)}
+          href={url(`wallet/`, `${$wallet.address}`)}
           class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1">
           Show My Mandalas
         </a>
