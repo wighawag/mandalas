@@ -74,7 +74,7 @@
       <img
         class="w-4 h-4 inline"
         alt="wighawag"
-        src={`${base}images/wig256x256.jpg`} /></a>) as part of the
+        src={`${base}/images/wig256x256.jpg`} /></a>) as part of the
     <a href="https://nft.ethglobal.co/" target="_blank" class="underline">NFT
       Hack</a>.
   </p>
