@@ -11,7 +11,7 @@
   "theme_color": "#000000",
   "appleStatusBarStyle": "black-translucent",
   "display": "fullscreen",
-  "icon": "icon.svg",
+  "icon": "icon.png",
   "maskable_icons": [
     {
       "src": "maskable_icon_512x512.png",
