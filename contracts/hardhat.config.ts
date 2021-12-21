@@ -5,7 +5,8 @@ import '@nomiclabs/hardhat-ethers';
 import 'hardhat-gas-reporter';
 import '@typechain/hardhat';
 import 'solidity-coverage';
-import {node_url, accounts} from './utils/network';
+import 'hardhat-deploy-tenderly';
+import {node_url, accounts, addForkConfiguration} from './utils/network';
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -21,19 +22,9 @@ const config: HardhatUserConfig = {
     deployer: 0,
     simpleERC20Beneficiary: 1,
   },
-  networks: {
+  networks: addForkConfiguration({
     hardhat: {
-      // process.env.HARDHAT_FORK will specify the network that the fork is made from.
-      // this line ensure the use of the corresponding accounts
-      accounts: accounts(process.env.HARDHAT_FORK),
-      forking: process.env.HARDHAT_FORK
-        ? {
-            url: node_url(process.env.HARDHAT_FORK),
-            blockNumber: process.env.HARDHAT_FORK_NUMBER
-              ? parseInt(process.env.HARDHAT_FORK_NUMBER)
-              : undefined,
-          }
-        : undefined,
+      initialBaseFeePerGas: 0, // to fix : https://github.com/sc-forks/solidity-coverage/issues/652, see https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136
     },
     localhost: {
       url: node_url('localhost'),
@@ -63,7 +54,7 @@ const config: HardhatUserConfig = {
       url: node_url('goerli'),
       accounts: accounts('goerli'),
     },
-  },
+  }),
   paths: {
     sources: 'src',
   },
@@ -91,6 +82,11 @@ const config: HardhatUserConfig = {
         },
       }
     : undefined,
+
+  tenderly: {
+    project: 'mandalas',
+    username: process.env.TENDERLY_USERNAME as string,
+  },
 };
 
 export default config;

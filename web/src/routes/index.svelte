@@ -1,13 +1,13 @@
 <script lang="ts">
-  import WalletAccess from '$lib/WalletAccess.svelte';
+  import WalletAccess from '$lib/blockchain/WalletAccess.svelte';
   import {randomTokens} from '$lib/stores/randomTokens';
   import {curve} from '$lib/stores/curve';
-  import {wallet, flow} from '$lib/stores/wallet';
+  import {flow} from '$lib/blockchain/wallet';
   import {BigNumber} from '@ethersproject/bignumber';
   import purchaseFlow from '$lib/stores/purchaseFlow';
-  import Modal from '$lib/components/Modal.svelte';
+  import Modal from '$lib/components/styled/Modal.svelte';
   import {computeBuffer} from '$lib/utils';
-import { onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   function format(bn: BigNumber, numDecimals: number): number {
     const precision = Math.pow(10, numDecimals);

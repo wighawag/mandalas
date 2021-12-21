@@ -28,19 +28,12 @@ function copyPrettierFixVSCodeSettings(p) {
       fs.mkdirSync(`${p}/.vscode`);
     }
   }
-  copyUnlessExists(
-    '_prettier-vscode-fix/vscode-settings.json',
-    `${p}/.vscode/settings.json`
-  );
+  copyUnlessExists('_prettier-vscode-fix/vscode-settings.json', `${p}/.vscode/settings.json`);
 }
 
-['mandalas.code-workspace', '.env', '.env.production', '.env.staging'].map(
-  copyFromDefault
-);
+['mandalas.code-workspace', '.env', '.env.production', '.env.staging'].map(copyFromDefault);
 
-['common-lib', 'contracts', 'web'].map(
-  copyPrettierFixVSCodeSettings
-);
+['common-lib', 'contracts', 'subgraph', 'web'].map(copyPrettierFixVSCodeSettings);
 
 switch (process.platform) {
   case 'win32':

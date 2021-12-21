@@ -1,4 +1,4 @@
-import {wallet, flow} from './wallet';
+import {wallet, flow} from '$lib/blockchain/wallet';
 import {BaseStoreWithData} from '$lib/utils/stores';
 import {BigNumber} from '@ethersproject/bignumber';
 import {Wallet} from '@ethersproject/wallet';

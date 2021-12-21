@@ -1,20 +1,57 @@
 <script lang="ts">
-  import {updateAvailable} from '$lib/stores/appUpdates';
+  import {onMount} from 'svelte';
+  import localCache from '$lib/utils/localCache';
   import {base} from '$app/paths';
+  type BeforeInstallPromptEvent = Event & {
+    prompt: () => void;
+    userChoice: Promise<{outcome: string}>;
+  };
 
+  let show = false;
+
+  let deferredPrompt: BeforeInstallPromptEvent;
+  function getVisited() {
+    return localCache.getItem('install-prompt') === 'true';
+  }
+  function setVisited() {
+    localCache.setItem('install-prompt', 'true');
+  }
+  function beforeinstallprompt(event: Event) {
+    event.preventDefault();
+    deferredPrompt = event as BeforeInstallPromptEvent;
+  }
+  function decline() {
+    show = false;
+    setVisited();
+  }
   function skip() {
-    $updateAvailable = false;
+    show = false;
   }
-
-  function reload() {
-    $updateAvailable = false;
-    window.location.reload(true);
+  function install() {
+    show = false;
+    setVisited();
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      // (choice) => {}
+      // TODO ?
+    });
   }
+  function trigger() {
+    if (!getVisited() && performance.now() > 2000) {
+      setTimeout(() => (show = true), 1000);
+    }
+  }
+  onMount(() => {
+    window.addEventListener('beforeinstallprompt', beforeinstallprompt);
+  });
 </script>
 
-<svelte:window on:click={skip} />
+<!-- this fails typing, so instead we use onMount-->
+<!-- <svelte:window on:beforeinstallprompt={beforeinstallprompt} /> -->
 
-{#if $updateAvailable}
+<svelte:window on:click={skip} on:scroll={trigger} />
+
+{#if deferredPrompt && show}
   <div
     on:click={(e) => {
       e.preventDefault();
@@ -36,36 +73,36 @@
       <div class="p-4">
         <div class="flex items-start">
           <div class="flex-shrink-0 pt-0.5">
-            <img class="h-10 w-10 rounded-full" src={`${base}/maskable_icon_512x512.png`} alt="Jolly Roger" />
+            <img class="h-10 w-10 rounded-full" src={`${base}/maskable_icon_512x512.png`} alt="Mandalas" />
           </div>
           <div class="ml-3 w-0 flex-1">
             <p class="text-sm font-medium dark:text-gray-100 text-black">
-              A new version is available. Reload to get the update.
+              Do you want to install Mandalas on your home screen?
             </p>
             <!-- <p class="mt-1 text-sm text-gray-500">
             Install it for later
           </p> -->
             <div class="mt-4 flex">
               <button
-                on:click={reload}
+                on:click={install}
                 type="button"
                 class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
               >
-                Reload
+                Install
               </button>
               <button
-                on:click={skip}
+                on:click={decline}
                 type="button"
                 class="ml-3 inline-flex items-center px-3 py-2 border border-red-800 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-200 bg-red-500 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-300"
               >
-                Skip
+                Decline
               </button>
             </div>
           </div>
           <div class="ml-4 flex-shrink-0 flex">
             <button
-              on:click={skip}
-              class="dark:bg-gray-900 bg-white rounded-md inline-flex text-red-400 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              on:click={decline}
+              class="dark:bg-gray-900 bg-white  rounded-md inline-flex text-red-400 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
               <span class="sr-only">Close</span>
               <!-- Heroicon name: solid/x -->

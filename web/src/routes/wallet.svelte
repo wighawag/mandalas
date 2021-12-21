@@ -1,9 +1,9 @@
 <script lang="ts">
-  import WalletAccess from '$lib/WalletAccess.svelte';
-  import NavButton from '$lib/components/navigation/NavButton.svelte';
+  import WalletAccess from '$lib/blockchain/WalletAccess.svelte';
+  import NavButton from '$lib/components/styled/navigation/NavButton.svelte';
   import {nftsof} from '$lib/stores/nftsof';
   import {curve} from '$lib/stores/curve';
-  import {wallet, flow, chain} from '$lib/stores/wallet';
+  import {wallet, flow, chain} from '$lib/blockchain/wallet';
   import {generateBitmapDataURI, template19_bis} from 'mandalas-common';
   import {page} from '$app/stores';
   import {goto} from '$app/navigation';
@@ -20,7 +20,7 @@
   $: {
     if ($wallet.address && !walletAddress) {
       console.log('redirect');
-      goto(url(`wallet#${$wallet.address}`), {replaceState: true}).then(() => {
+      goto(url(`wallet/`, `${$wallet.address}`), {replaceState: true}).then(() => {
         walletAddress = ($page.path && typeof location !== "undefined") ? location.hash.substr(1): undefined
       })
     }

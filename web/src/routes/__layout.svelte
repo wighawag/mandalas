@@ -1,15 +1,15 @@
 <script lang="ts">
   import '../service-worker-handler';
   import '../global.css';
-  import Notifications from '$lib/components/notification/Notifications.svelte';
-  import NoInstallPrompt from '$lib/components/NoInstallPrompt.svelte';
-  import NewVersionNotification from '$lib/components/NewVersionNotification.svelte';
-  // import Install from './components/Install.svelte';
+  import NavBar from '$lib/components/styled/navigation/NavBar.svelte';
+  import Notifications from '$lib/components/styled/notification/Notifications.svelte';
+  import NoInstallPrompt from '$lib/components/generic/NoInstallPrompt.svelte';
+  import NewVersionNotification from '$lib/components/styled/NewVersionNotification.svelte';
 
   import {appDescription, url as appUrl} from '../../application.json';
-  import NavBar from '$lib/components/navigation/NavBar.svelte';
+import { url } from '$lib/utils/url';
 
-  const title = 'Jolly Roger, Template for Decentralised Applications.';
+  const title = 'Mandalas - Mandalas are uniqure prodecurally generated bitmap NFTs on ethereum. The first to use tokenURI to remove the need for amy client-code';
   const description = appDescription;
   const host = appUrl.endsWith('/') ? appUrl : appUrl + '/';
   const previewImage = host + 'preview.png';
@@ -35,6 +35,7 @@
 <NewVersionNotification />
 <Notifications />
 <NavBar
-  links={[{href: '/', title: 'MANDALAS'}, {href: 'wallet', title: 'Wallet'}, {href: 'about', title: 'About'}]} />
+  links={[{href: url(''), title: 'MANDALAS'}, {href: url('wallet/'), title: 'Wallet'}, {href: url('about/'), title: 'About'}]} />
 
 <slot />
+

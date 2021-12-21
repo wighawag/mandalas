@@ -1,4 +1,4 @@
-import {chain, fallback, transactions} from './wallet';
+import {chain, fallback, transactions} from '$lib/blockchain/wallet';
 import {BaseStore} from '$lib/utils/stores';
 
 // TODO export in web3w

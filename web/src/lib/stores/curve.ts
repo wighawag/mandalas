@@ -1,4 +1,4 @@
-import {chain, fallback} from './wallet';
+import {chain, fallback} from '$lib/blockchain/wallet';
 import type {BigNumber} from '@ethersproject/bignumber';
 import {BaseStore} from '$lib/utils/stores';
 import contractsInfo from '$lib/contracts.json';

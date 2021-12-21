@@ -3,7 +3,7 @@
   import { url } from '$lib/utils/url';
   import {goto} from '$app/navigation';
   onMount(() => {
-    goto(url(`wallet`), {replaceState: true});
+    goto(url(`wallet/`), {replaceState: true});
   });
 </script>
 

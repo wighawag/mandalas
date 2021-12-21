@@ -2,7 +2,7 @@
 import {Bytes, ByteArray, BigInt, Address} from '@graphprotocol/graph-ts';
 import {Burned, Minted, Transfer} from '../generated/MandalaToken/MandalaTokenContract';
 import {All, Mandala, Owner} from '../generated/schema';
-// import {log} from '@graphprotocol/graph-ts';
+import {log} from '@graphprotocol/graph-ts';
 
 
 let ZERO_ADDRESS: Bytes = Bytes.fromHexString('0x0000000000000000000000000000000000000000') as Bytes;
@@ -79,7 +79,21 @@ export function handleBurned(event: Burned): void {
   all.numMandalas = all.numMandalas.minus(ONE);
   let mandala = Mandala.load(event.params.id.toString())
 
-  let owner = handleOwnerViaId(mandala.owner)
+  if (!mandala) {
+    // not possible
+    log.error(`non existing mandala cannot be burned!`, [])
+    return;
+  }
+
+  if (mandala.owner == null) {
+    // not possible
+    log.error(`mandala without own cannot be burned!`, [])
+    return;
+  }
+
+  let ownerID = mandala.owner as string;
+
+  let owner = handleOwnerViaId(ownerID)
   owner.numCollected = owner.numCollected.plus(event.params.priceReceived);
   owner.save();
 
