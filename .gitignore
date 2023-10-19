@@ -1,5 +1,5 @@
-.env*
-!.env*.default
-.newsh.json
-node_modules
-mandalas.code-workspace
+# environment variables
+.env*.local
+
+# node modules
+node_modules/

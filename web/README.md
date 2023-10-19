@@ -1,1 +1,1 @@
-# Mandalas Web App
+# Jolly Roger Frontend
