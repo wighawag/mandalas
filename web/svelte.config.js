@@ -1,59 +1,49 @@
-import preprocess from 'svelte-preprocess';
-import adapter_ipfs from 'sveltejs-adapter-ipfs';
+import adapter from '@sveltejs/adapter-static';
+import {vitePreprocess} from '@sveltejs/vite-plugin-svelte';
 import {execSync} from 'child_process';
-import fs from 'fs';
 
-function loadJSON(filepath) {
+let VERSION = `timestamp_${Date.now()}`;
+try {
+  VERSION = execSync('git rev-parse --short HEAD', {
+    stdio: ['ignore', 'pipe', 'ignore'],
+  })
+    .toString()
+    .trim();
   try {
-    return JSON.parse(fs.readFileSync(filepath).toString());
-  } catch (e) {
-    return {};
+    // This command returns empty string if no changes
+    const output = execSync('git status --porcelain', {encoding: 'utf8'});
+    if (output.trim().length > 0) {
+      VERSION += '-dirty';
+      console.warn(`[!] repo has some uncommited changes...`);
+    }
+  } catch (error) {
+    console.error('Error checking git status:', error);
+    process.exit(1);
   }
-}
-const pkg = loadJSON('./package.json');
-
-const VERSION = execSync('git rev-parse --short HEAD').toString().trim();
-
-if (!process.env.VITE_CHAIN_ID) {
-  try {
-    const contractsInfo = JSON.parse(fs.readFileSync('./src/lib/contracts.json'));
-    process.env.VITE_CHAIN_ID = contractsInfo.chainId;
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-let outputFolder = './build';
-
-if (process.env.VERCEL) {
-  // allow no config when creating a vercel project
-  outputFolder = '../public';
-  console.log('building on VERCEL...');
+} catch (e) {
+  console.error(e);
 }
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  preprocess: preprocess({
-    sourceMap: true,
-  }),
+  preprocess: vitePreprocess(),
 
   kit: {
-    adapter: adapter_ipfs({
-      assets: outputFolder,
-      pages: outputFolder,
-      removeBuiltInServiceWorkerRegistration: true,
-      injectPagesInServiceWorker: true,
-      injectDebugConsole: true,
+    version: {
+      // we create a deterministic building using a deterministic version (via git commit, see above)
+      name: VERSION,
+    },
+    adapter: adapter({
+      assets: 'build',
+      pages: 'build',
     }),
-    target: '#svelte',
-    trailingSlash: 'ignore',
-    vite: {
-      build: {
-        sourcemap: true,
-      },
-      define: {
-        __VERSION__: JSON.stringify(VERSION),
-      },
+    serviceWorker: {
+      // we handle it ourselves here
+      register: false,
+    },
+    paths: {
+      // this is to make it work on ipfs (on an unknown path)
+      relative: true,
     },
   },
 };

@@ -45,7 +45,7 @@ class BaseQueryStore<T, V extends Record<string, unknown> = Record<string, unkno
       variables?: V;
       path?: string;
       list?: ListOptions;
-    }
+    },
   ) {
     super({
       step: 'IDLE',
@@ -148,7 +148,7 @@ export class TimedQueryStore<T, V extends Record<string, unknown> = Record<strin
       variables?: V;
       path?: string;
       frequency?: number;
-    }
+    },
   ) {
     super(endpoint, query, options);
     this.extraOptions = options;
@@ -196,7 +196,7 @@ export class HookedQueryStore<T, V extends Record<string, unknown> = Record<stri
       variables?: V;
       path?: string;
       list?: ListOptions;
-    }
+    },
   ) {
     super(endpoint, query, options);
     this.hook = hook;
@@ -213,7 +213,7 @@ export class HookedQueryStore<T, V extends Record<string, unknown> = Record<stri
     if (this.listenerCount === 1) {
       console.info(`start fetching`);
       this.stopUpdates = this.hook.subscribe((chainInfo: ChainTempoInfo) =>
-        this.fetch({blockNumber: chainInfo.lastBlockNumber})
+        this.fetch({blockNumber: chainInfo.lastBlockNumber}),
       );
     }
     const unsubscribe = this.store.subscribe(run, invalidate);

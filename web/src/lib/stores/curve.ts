@@ -1,33 +1,45 @@
-import {chain, fallback} from '$lib/blockchain/wallet';
-import type {BigNumber} from '@ethersproject/bignumber';
+import {get} from 'svelte/store';
+import type {PublicClient} from 'viem';
 import {BaseStore} from '$lib/utils/stores';
 import contractsInfo from '$lib/contracts.json';
 
 type Curve = {
   state: 'Idle' | 'Loading' | 'Ready' | 'Stuck';
   error?: unknown;
-  currentPrice?: BigNumber;
-  supply?: BigNumber;
+  currentPrice?: bigint;
+  supply?: bigint;
 };
 
 export class CurveStore extends BaseStore<Curve> {
-  private timer: NodeJS.Timeout | undefined;
+  private timer: ReturnType<typeof setInterval> | undefined;
   private counter = 0;
   private startTime = 0;
+  private publicClient: PublicClient | null = null;
+
   constructor() {
     super({
       state: 'Idle',
     });
   }
-  async query(): Promise<null | BigNumber> {
-    const contracts = chain.contracts || fallback.contracts;
-    if (contracts) {
-      return await contracts.MandalaToken.totalSupply();
-    } else if (fallback.state === 'Ready') {
-      throw new Error('no contracts to fetch with');
-    } else {
-      return null;
+
+  setPublicClient(client: PublicClient) {
+    this.publicClient = client;
+  }
+
+  async query(): Promise<null | bigint> {
+    if (this.publicClient) {
+      try {
+        return await this.publicClient.readContract({
+          address: contractsInfo.contracts.MandalaToken.address as `0x${string}`,
+          abi: contractsInfo.contracts.MandalaToken.abi,
+          functionName: 'totalSupply',
+        });
+      } catch (e) {
+        console.error('Error fetching totalSupply:', e);
+        return null;
+      }
     }
+    return null;
   }
 
   private async _fetch() {
@@ -40,22 +52,17 @@ export class CurveStore extends BaseStore<Curve> {
         this.setPartial({state: 'Loading'});
       }
     } else {
+      const linkedData = contractsInfo.contracts.MandalaToken.linkedData;
+      const currentPrice = supply * BigInt(linkedData.linearCoefficient) + BigInt(linkedData.initialPrice);
       this.setPartial({
-        currentPrice: supply
-          .mul(
-            contractsInfo.contracts.MandalaToken.linkedData.linearCoefficient
-          )
-          .add(contractsInfo.contracts.MandalaToken.linkedData.initialPrice),
+        currentPrice,
         supply,
         state: 'Ready',
       });
     }
   }
 
-  subscribe(
-    run: (value: Curve) => void,
-    invalidate?: (value?: Curve) => void
-  ): () => void {
+  subscribe(run: (value: Curve) => void, invalidate?: (value?: Curve) => void): () => void {
     if (this.counter === 0) {
       this.start();
     }

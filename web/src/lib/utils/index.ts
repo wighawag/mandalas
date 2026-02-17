@@ -1,24 +1,14 @@
-import {BigNumber} from '@ethersproject/bignumber';
 import contractsInfo from '../contracts.json';
 
-const initialPrice = BigNumber.from(
-  contractsInfo.contracts.MandalaToken.linkedData.initialPrice
-);
+const initialPrice = BigInt(contractsInfo.contracts.MandalaToken.linkedData.initialPrice);
 // const creatorCutPer10000th =
 //   contractsInfo.contracts.MandalaToken.linkedData.creatorCutPer10000th;
-const coefficient = BigNumber.from(
-  contractsInfo.contracts.MandalaToken.linkedData.linearCoefficient
-);
+const coefficient = BigInt(contractsInfo.contracts.MandalaToken.linkedData.linearCoefficient);
 
-export function computeBuffer(
-  supply: BigNumber,
-  currentPrice: BigNumber
-): BigNumber {
-  const computed = initialPrice
-    .add(supply.add(3).mul(coefficient))
-    .sub(currentPrice);
-  const min = BigNumber.from('10000000000000000');
-  if (computed.gt(min)) {
+export function computeBuffer(supply: bigint, currentPrice: bigint): bigint {
+  const computed = initialPrice + (supply + BigInt(3)) * coefficient - currentPrice;
+  const min = BigInt('10000000000000000');
+  if (computed > min) {
     return computed;
   }
   return min;

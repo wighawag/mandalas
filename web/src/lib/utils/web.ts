@@ -84,7 +84,7 @@ export function rebuildLocationHash(hashParams: Record<string, string>): void {
     window.history.replaceState(
       '',
       document.title,
-      window.location.pathname + window.location.search + reconstructedHash
+      window.location.pathname + window.location.search + reconstructedHash,
     );
   } else {
     // Prevent scrolling by storing the page's current scroll offset
@@ -174,7 +174,7 @@ export function isPrivateWindow(): Promise<boolean | null> {
             (window as any).TEMPORARY,
             100,
             () => resolve(false),
-            () => resolve(true)
+            () => resolve(true),
           );
         }
       }

@@ -1,8 +1,6 @@
 import {generateTokenURI, template19_bis} from 'mandalas-common';
-import {BigNumber} from '@ethersproject/bignumber';
-import {Wallet} from '@ethersproject/wallet';
-import {hexlify, hexZeroPad} from '@ethersproject/bytes';
 import {BaseStore} from '$lib/utils/stores';
+import {privateKeyToAccount} from 'viem/accounts';
 
 type NFT = {
   id: string;
@@ -33,7 +31,7 @@ type LocalStorageData = {
 };
 
 export class RandomTokenStore extends BaseStore<NFTs> {
-  private timer: NodeJS.Timeout | undefined;
+  private timer: ReturnType<typeof setInterval> | undefined;
   private counter = 0; // keep count of subscription
   private random = '';
   private claimTXs: {[id: string]: Transaction} = {};
@@ -44,24 +42,6 @@ export class RandomTokenStore extends BaseStore<NFTs> {
       tokens: [],
       startIndex: 0,
     });
-
-    // TODO remove
-    // let currentTemplate = template19
-    // window.addEventListener('click', () => {
-    //   if (currentTemplate === template19) {
-    //     currentTemplate = template19_bis;
-    //   } else {
-    //     currentTemplate = template19;
-    //   }
-    //   for (const token of this.$store.tokens) {
-    //     const tokenURI = generateTokenURI(token.id, currentTemplate);
-    //     const jsonStart = tokenURI.indexOf(",") + 1;
-    //     const jsonStr = tokenURI.slice(jsonStart);
-    //     const json = JSON.parse(jsonStr);
-    //     token.image = json.image || json.image_url;
-    //   }
-    //   this.setPartial({tokens: this.$store.tokens});
-    // })
   }
 
   record(id: string, hash: string, nonce: number): void {
@@ -73,7 +53,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
           random: this.random,
           start: this.$store.startIndex,
           claimTXs: this.claimTXs,
-        })
+        }),
       );
     } catch (e) {
       console.error(e);
@@ -91,11 +71,10 @@ export class RandomTokenStore extends BaseStore<NFTs> {
     const from = this.$store.startIndex + this.$store.tokens.length;
     const tokens = [];
     for (let i = 0; i < num; i++) {
-      const wallet = new Wallet(
-        BigNumber.from(this.random)
-          .add(from + i)
-          .toHexString()
-      );
+      const randomBigInt = BigInt(this.random) + BigInt(from + i);
+      // Convert to 32-byte hex string
+      const privateKey = '0x' + randomBigInt.toString(16).padStart(64, '0');
+      const wallet = privateKeyToAccount(privateKey as `0x${string}`);
       const id = wallet.address;
       const tokenURI = generateTokenURI(id, template19_bis);
       const jsonStart = tokenURI.indexOf(',') + 1;
@@ -104,11 +83,11 @@ export class RandomTokenStore extends BaseStore<NFTs> {
       tokens.push({
         id,
         tokenURI,
-        privateKey: wallet.privateKey,
+        privateKey: privateKey, // Store the original private key
         name: json.name,
         description: json.description,
         image: json.image,
-        minted: this.claimTXs[id] ? true : false,
+        minted: !!this.claimTXs[id],
       });
     }
     this.setPartial({tokens: this.$store.tokens.concat(tokens)});
@@ -134,9 +113,13 @@ export class RandomTokenStore extends BaseStore<NFTs> {
 
     if (!data) {
       const array = new Uint8Array(32);
-      if (typeof window !== "undefined") {
+      if (typeof window !== 'undefined') {
         window.crypto.getRandomValues(array);
-        const random = hexlify(array);
+        const random =
+          '0x' +
+          Array.from(array)
+            .map((b) => b.toString(16).padStart(2, '0'))
+            .join('');
         console.log({random});
         data = {
           random,
@@ -145,10 +128,10 @@ export class RandomTokenStore extends BaseStore<NFTs> {
         };
       } else {
         data = {
-          random: "0x01",
+          random: '0x01',
           start: 0,
-          claimTXs: {}
-        }
+          claimTXs: {},
+        };
       }
 
       try {
@@ -164,9 +147,10 @@ export class RandomTokenStore extends BaseStore<NFTs> {
     const tokens = [];
 
     for (let i = data.start; i < data.start + num; i++) {
-      const wallet = new Wallet(
-        hexZeroPad(BigNumber.from(data.random).add(i).toHexString(), 40)
-      );
+      const randomBigInt = BigInt(data.random) + BigInt(i);
+      // Convert to 32-byte hex string
+      const privateKey = '0x' + randomBigInt.toString(16).padStart(64, '0');
+      const wallet = privateKeyToAccount(privateKey as `0x${string}`);
       const id = wallet.address;
       const tokenURI = generateTokenURI(id, template19_bis);
       const jsonStart = tokenURI.indexOf(',') + 1;
@@ -175,22 +159,18 @@ export class RandomTokenStore extends BaseStore<NFTs> {
       tokens.push({
         id,
         tokenURI,
-        privateKey: wallet.privateKey,
+        privateKey: privateKey, // Store the original private key
         name: json.name,
         description: json.description,
         image: json.image,
-        minted: data.claimTXs[id] ? true : false,
+        minted: !!data.claimTXs[id],
       });
-      // console.log(tokens[tokens.length -1])
     }
 
     this.setPartial({startIndex: data.start, tokens});
   }
 
-  subscribe(
-    run: (value: NFTs) => void,
-    invalidate?: (value?: NFTs) => void
-  ): () => void {
+  subscribe(run: (value: NFTs) => void, invalidate?: (value?: NFTs) => void): () => void {
     if (this.counter === 0) {
       this.start();
     }

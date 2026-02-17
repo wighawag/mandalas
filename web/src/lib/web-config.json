@@ -1,0 +1,14 @@
+{
+  "name": "Mandalas",
+  "short_name": "Mandalas",
+  "description": "Mandalas are unique prodecurally generated bitmap NFTs on ethereum. The first to use tokenURI to remove the need for any client-code",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "url": "https://mandalas.eth.limo",
+  "icons": [],
+  "appDescription": "Mandalas are unique prodecurally generated bitmap NFTs on ethereum. The first to use tokenURI to remove the need for any client-code",
+  "developerName": "wighawag",
+  "developerURL": "https://github.com/wighawag"
+}
