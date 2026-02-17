@@ -207,7 +207,6 @@
 					</p>
 					<button
 						class="mt-5 p-1 border border-yellow-500"
-						label="Mint"
 						onclick={() => purchaseFlow.confirm()}>
 						Confirm
 					</button>

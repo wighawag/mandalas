@@ -6,7 +6,8 @@
 	import NewVersionNotification from '$lib/components/styled/NewVersionNotification.svelte';
 
 	import webConfig from '$lib/web-config.json';
-	import {url} from '$lib/utils/url';
+  import WalletOnlyConnectionFlow from '$lib/core/connection/WalletOnlyConnectionFlow.svelte';
+  import { url } from '$lib/core/utils/web/path';
 
 	const title = 'Mandalas - Mandalas are unique prodecurally generated bitmap NFTs on ethereum. The first to use tokenURI to remove the need for any client-code';
 	const description = webConfig.description;
@@ -29,12 +30,14 @@
 	<meta property="twitter:description" content={description} />
 	<meta property="twitter:image" content={previewImage} />
 </svelte:head>
-
+ 
 
 <NoInstallPrompt />
 <NewVersionNotification />
 <Notifications />
 <NavBar
 	links={[{href: url(''), title: 'MANDALAS'}, {href: url('wallet/'), title: 'Wallet'}, {href: url('about/'), title: 'About'}]} />
+
+<WalletOnlyConnectionFlow connection={connection} />
 
 <slot />

@@ -4,7 +4,7 @@
     template19_bis,
     generateBitmapDataURI,
   } from 'mandalas-common';
-import { onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   let name: string;
   let image: string;
