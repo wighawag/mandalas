@@ -1,9 +1,8 @@
-import {get} from 'svelte/store';
 import {BaseStoreWithData} from '$lib/utils/stores';
 import {keccak256, parseEther} from 'viem';
 import {privateKeyToAccount} from 'viem/accounts';
-import {randomTokens} from './randomTokens';
-import contractsInfo from '../contracts.json';
+import {randomTokens} from '../stores/randomTokens';
+import contractsInfo from '../deployments';
 import type {PublicClient, WalletClient} from 'viem';
 
 const initialPrice = BigInt(contractsInfo.contracts.MandalaToken.linkedData.initialPrice);
@@ -23,7 +22,7 @@ export type PurchaseFlow = {
   data?: Data;
 };
 
-class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
+export class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
   private publicClient: PublicClient | null = null;
   private walletClient: WalletClient | null = null;
 
@@ -115,8 +114,6 @@ class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
     this.setPartial({step: 'IDLE', data: undefined});
   }
 }
-
-export default new PurchaseFlowStore();
 
 // Helper function
 function computeBuffer(supply: bigint, currentPrice: bigint): bigint {

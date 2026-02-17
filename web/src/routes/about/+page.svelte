@@ -1,5 +1,6 @@
 <script lang="ts">
-	import {base} from '$lib/utils/url';
+  import { url } from "$lib/core/utils/web/path";
+
 </script>
 
 <div class="w-full h-full mx-auto flex text-center flex-col items-center justify-center text-black dark:text-white">
@@ -49,7 +50,7 @@
 		<a href="https://ronan.eth.link" target="_blank" class="underline">Ronan Sandford</a>
 		(a.k.a
 		<a href="https://twitter.com/wighawag" target="_blank" class="underline">wighawag
-		<img class="w-4 h-4 inline" alt="wighawag" src={`${base}/images/wig256x256.jpg`} /></a>) as part of the
+		<img class="w-4 h-4 inline" alt="wighawag" src={`${url('/images/wig256x256.jpg')}`} /></a>) as part of the
 		<a href="https://nft.ethglobal.co/" target="_blank" class="underline">NFT Hack</a>.
 	</p>
 </div>

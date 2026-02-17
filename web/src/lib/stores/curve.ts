@@ -1,7 +1,7 @@
 import {get} from 'svelte/store';
 import type {PublicClient} from 'viem';
 import {BaseStore} from '$lib/utils/stores';
-import contractsInfo from '$lib/contracts.json';
+import contractsInfo from '$lib/deployments';
 
 type Curve = {
   state: 'Idle' | 'Loading' | 'Ready' | 'Stuck';

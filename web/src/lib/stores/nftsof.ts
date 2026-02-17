@@ -1,5 +1,5 @@
 import {BaseStore} from '$lib/utils/stores';
-import contractsInfo from '$lib/contracts.json';
+import contractsInfo from '$lib/deployments';
 import type {PublicClient} from 'viem';
 
 function fixURI(uri?: string): string {

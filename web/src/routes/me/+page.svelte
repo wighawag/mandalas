@@ -1,9 +1,9 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import { url } from '$lib/utils/url';
   import {goto} from '$app/navigation';
+  import { url } from '$lib/core/utils/web/path';
   onMount(() => {
-    goto(url(`wallet/`), {replaceState: true});
+    goto(url(`/wallet/`), {replaceState: true});
   });
 </script>
 

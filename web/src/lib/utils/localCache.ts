@@ -1,5 +1,5 @@
-import {VERSION} from '$lib/config';
 import {base} from '$app/paths';
+import {VERSION} from '$lib/core/config';
 
 class LocalCache {
   private _prefix: string;

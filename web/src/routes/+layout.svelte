@@ -1,13 +1,11 @@
 <script lang="ts">
 	import '../global.css';
 	import NavBar from '$lib/components/styled/navigation/NavBar.svelte';
-	import Notifications from '$lib/components/styled/notification/Notifications.svelte';
-	import NoInstallPrompt from '$lib/components/generic/NoInstallPrompt.svelte';
-	import NewVersionNotification from '$lib/components/styled/NewVersionNotification.svelte';
 
 	import webConfig from '$lib/web-config.json';
-  import WalletOnlyConnectionFlow from '$lib/core/connection/WalletOnlyConnectionFlow.svelte';
-  import { url } from '$lib/core/utils/web/path';
+	import WalletOnlyConnectionFlow from '$lib/core/connection/WalletOnlyConnectionFlow.svelte';
+	import { url } from '$lib/core/utils/web/path';
+	import { connection } from '$lib';
 
 	const title = 'Mandalas - Mandalas are unique prodecurally generated bitmap NFTs on ethereum. The first to use tokenURI to remove the need for any client-code';
 	const description = webConfig.description;
@@ -32,11 +30,8 @@
 </svelte:head>
  
 
-<NoInstallPrompt />
-<NewVersionNotification />
-<Notifications />
 <NavBar
-	links={[{href: url(''), title: 'MANDALAS'}, {href: url('wallet/'), title: 'Wallet'}, {href: url('about/'), title: 'About'}]} />
+	links={[{href: url('/'), title: 'MANDALAS'}, {href: url('/wallet/'), title: 'Wallet'}, {href: url('/about/'), title: 'About'}]} />
 
 <WalletOnlyConnectionFlow connection={connection} />
 

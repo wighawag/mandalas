@@ -1,0 +1,71 @@
+import {get} from 'svelte/store';
+import {createContext} from 'svelte';
+import {establishRemoteConnection} from './core/connection';
+import {createBalanceStore} from './core/connection/balance';
+import {createGasFeeStore} from './core/connection/gasFee';
+import {PurchaseFlowStore} from './ui/purchaseFlow';
+import type {Dependencies} from './types.js';
+
+export async function createDependencies(): Promise<Dependencies> {
+  const window = globalThis as any;
+
+  // ----------------------------------------------------------------------------
+  // CONNECTION
+  // ----------------------------------------------------------------------------
+
+  const {signer, connection, walletClient, publicClient, account, deployments} = await establishRemoteConnection();
+
+  window.connection = connection;
+  window.walletClient = walletClient;
+  window.publicClient = publicClient;
+  window.deployments = deployments;
+
+  // ----------------------------------------------------------------------------
+
+  // ----------------------------------------------------------------------------
+  // BALANCE AND COSTS
+  // ----------------------------------------------------------------------------
+
+  const balance = createBalanceStore({publicClient, signer});
+  window.balance = balance;
+
+  // ----------------------------------------------------------------------------
+
+  // TODO use deployment store ?
+  const gasFee = createGasFeeStore({
+    publicClient: publicClient as any, // TODO fix publicClient type
+    deployments: deployments.current,
+  });
+  window.gasFee = gasFee;
+
+  // TODO remove
+  // we trigger it
+  gasFee.subscribe((v) => {
+    console.log(`gas fee updated`, v);
+  });
+  window.gasFee = gasFee;
+  // ----------------------------------------------------------------------------
+
+  const purchaseFlow = new PurchaseFlowStore();
+
+  return {
+    gasFee,
+    balance,
+    connection,
+    walletClient,
+    publicClient,
+    account,
+    deployments,
+    purchaseFlow,
+  };
+}
+
+(globalThis as any).get = get;
+
+// const [getUserContextFunction, setUserContext] = createContext<() => Dependencies>();
+
+// const getUserContext = () => getUserContextFunction()();
+// export {getUserContext, setUserContext};
+
+export const {gasFee, balance, connection, walletClient, publicClient, account, deployments, purchaseFlow} =
+  await createDependencies();

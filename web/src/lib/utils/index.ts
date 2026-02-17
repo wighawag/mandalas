@@ -1,4 +1,4 @@
-import contractsInfo from '../contracts.json';
+import contractsInfo from '../deployments';
 
 const initialPrice = BigInt(contractsInfo.contracts.MandalaToken.linkedData.initialPrice);
 // const creatorCutPer10000th =

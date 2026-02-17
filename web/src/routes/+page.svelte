@@ -2,16 +2,11 @@
 	import {onMount} from 'svelte';
 	import {randomTokens} from '$lib/stores/randomTokens';
 	import {curve} from '$lib/stores/curve';
-	import purchaseFlow from '$lib/stores/purchaseFlow';
-	import Modal from '$lib/components/styled/Modal.svelte';
+	import {purchaseFlow} from '$lib';
 	import {computeBuffer} from '$lib/utils';
-	import {establishRemoteConnection} from '$lib/core/connection';
 
 	let connected = false;
 	let connecting = false;
-	let connection: any = null;
-	let publicClient: any = null;
-	let walletClient: any = null;
 
 	function format(bn: bigint, numDecimals: number): number {
 		const precision = Math.pow(10, numDecimals);
@@ -25,26 +20,8 @@
 		purchaseFlow.mint(nft);
 	}
 
-	async function connect() {
-		connecting = true;
-		try {
-			const established = await establishRemoteConnection();
-			connection = established.connection;
-			publicClient = established.publicClient;
-			walletClient = established.walletClient;
-			curve.setPublicClient(publicClient);
-			connected = true;
-		} catch (e) {
-			console.error('Failed to connect:', e);
-		} finally {
-			connecting = false;
-		}
-	}
-
+	
 	onMount(() => {
-		// Try to connect on mount
-		connect();
-
 		window.onscroll = function () {
 			if (
 				window.innerHeight + window.scrollY >=
@@ -188,10 +165,10 @@
 		{/if}
 	</section>
 </div>
-
+<!-- 
 {#if $purchaseFlow.step !== 'IDLE' && $purchaseFlow.step !== 'SUCCESS'}
 	{#if $purchaseFlow.step !== 'CONFIRM'}
-		<!-- Taken care by connection flow -->
+		Taken care by connection flow 
 	{:else}
 		<Modal on:close={() => purchaseFlow.cancel()}>
 			{#if !$purchaseFlow.data}
@@ -214,4 +191,4 @@
 			{/if}
 		</Modal>
 	{/if}
-{/if}
+{/if} -->
