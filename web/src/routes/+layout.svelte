@@ -6,6 +6,7 @@
   import WalletOnlyConnectionFlow from '$lib/core/connection/WalletOnlyConnectionFlow.svelte';
   import {url} from '$lib/core/utils/web/path';
   import {connection} from '$lib';
+  import Modal from '$lib/core/ui/modal/Modal.svelte';
 
   const title =
     'Mandalas - Mandalas are unique prodecurally generated bitmap NFTs on ethereum. The first to use tokenURI to remove the need for any client-code';
@@ -41,5 +42,12 @@
 />
 
 <WalletOnlyConnectionFlow {connection} />
+
+<!-- <Modal openWhen={true} onCancel={() => connection.back('Idle')}>
+  {#snippet title()}
+    Waiting for Wallet Connection...
+  {/snippet}
+  Please Accept Connection Request...
+</Modal> -->
 
 {@render children?.()}
