@@ -9,57 +9,59 @@ import {RandomTokenStore} from './stores/randomTokens';
 import {NFTOfStore} from './stores/nftsof';
 
 export async function createDependencies(): Promise<Dependencies> {
-  const window = globalThis as any;
+	const window = globalThis as any;
 
-  // ----------------------------------------------------------------------------
-  // CONNECTION
-  // ----------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------
+	// CONNECTION
+	// ----------------------------------------------------------------------------
 
-  const {signer, connection, walletClient, publicClient, account, deployments} = await establishRemoteConnection();
+	const {signer, connection, walletClient, publicClient, account, deployments} =
+		await establishRemoteConnection();
 
-  window.connection = connection;
-  window.walletClient = walletClient;
-  window.publicClient = publicClient;
-  window.deployments = deployments;
+	window.connection = connection;
+	window.walletClient = walletClient;
+	window.publicClient = publicClient;
+	window.deployments = deployments;
 
-  // ----------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------
 
-  // ----------------------------------------------------------------------------
-  // BALANCE AND COSTS
-  // ----------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------
+	// BALANCE AND COSTS
+	// ----------------------------------------------------------------------------
 
-  const balance = createBalanceStore({publicClient, signer});
-  window.balance = balance;
+	const balance = createBalanceStore({publicClient, signer});
+	window.balance = balance;
 
-  // ----------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------
 
-  // TODO use deployment store ?
-  const gasFee = createGasFeeStore({
-    publicClient: publicClient as any, // TODO fix publicClient type
-    deployments: deployments.current,
-  });
-  window.gasFee = gasFee;
+	// TODO use deployment store ?
+	const gasFee = createGasFeeStore({
+		publicClient: publicClient as any, // TODO fix publicClient type
+		deployments: deployments.current,
+	});
+	window.gasFee = gasFee;
 
-  // TODO remove
-  // we trigger it
-  gasFee.subscribe((v) => {
-    console.log(`gas fee updated`, v);
-  });
-  window.gasFee = gasFee;
-  // ----------------------------------------------------------------------------
+	// TODO remove
+	// we trigger it
+	gasFee.subscribe((v) => {
+		console.log(`gas fee updated`, v);
+	});
+	window.gasFee = gasFee;
+	// ----------------------------------------------------------------------------
 
-  const purchaseFlow = new PurchaseFlowStore(publicClient, walletClient);
+	const purchaseFlow = new PurchaseFlowStore(publicClient, walletClient);
+	window.purchaseFlow = purchaseFlow;
 
-  return {
-    gasFee,
-    balance,
-    connection,
-    walletClient,
-    publicClient,
-    account,
-    deployments,
-    purchaseFlow,
-  };
+	return {
+		gasFee,
+		balance,
+		connection,
+		walletClient,
+		publicClient,
+		account,
+		deployments,
+		purchaseFlow,
+	};
 }
 
 (globalThis as any).get = get;
@@ -69,17 +71,25 @@ export async function createDependencies(): Promise<Dependencies> {
 // const getUserContext = () => getUserContextFunction()();
 // export {getUserContext, setUserContext};
 
-export const {gasFee, balance, connection, walletClient, publicClient, account, deployments, purchaseFlow} =
-  await createDependencies();
+export const {
+	gasFee,
+	balance,
+	connection,
+	walletClient,
+	publicClient,
+	account,
+	deployments,
+	purchaseFlow,
+} = await createDependencies();
 
 export const curve = new CurveStore(publicClient);
 export const randomTokens = new RandomTokenStore();
 
 const cache: {[owner: string]: NFTOfStore} = {};
 export function nftsof(owner?: string): NFTOfStore {
-  const fromCache = cache[owner || ''];
-  if (fromCache) {
-    return fromCache;
-  }
-  return (cache[owner || ''] = new NFTOfStore(publicClient, owner));
+	const fromCache = cache[owner || ''];
+	if (fromCache) {
+		return fromCache;
+	}
+	return (cache[owner || ''] = new NFTOfStore(publicClient, owner));
 }

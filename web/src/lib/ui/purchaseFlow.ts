@@ -55,6 +55,7 @@ export class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
 
 	async mint(nft: {id: string; privateKey: string}): Promise<void> {
 		this.setPartial({step: 'LOADING_CURRENT_PRICE'});
+
 		try {
 			const supply = (await this.publicClient.readContract({
 				address: contractsInfo.contracts.MandalaToken.address as `0x${string}`,
@@ -67,6 +68,10 @@ export class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
 				data: {id: nft.id, privateKey: nft.privateKey, currentPrice, supply},
 				step: 'CONFIRM',
 			});
+			const currentConnection = await connection.ensureConnected(
+				'WalletConnected',
+				{type: 'wallet'},
+			);
 		} catch (e) {
 			console.error('Error loading current price:', e);
 			this._reset();

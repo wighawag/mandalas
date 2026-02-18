@@ -73,7 +73,12 @@
 		</div>
 	{:else}
 		You need a web3 wallet to connect
-		<a target="_blank" rel="noopener noreferrer" class="underline" href="https://metamask.io">Download Metamask</a>
+		<a
+			target="_blank"
+			rel="noopener noreferrer"
+			class="underline"
+			href="https://metamask.io">Download Metamask</a
+		>
 	{/if}
 </Modal>
 
@@ -101,9 +106,8 @@
 
 <!-- TODO not a Modal -->
 <BasicModal
-	openWhen={($connection.step === 'SignedIn' &&
-		$connection.wallet?.invalidChainId) ||
-		false}
+	openWhen={$connection.step === 'WalletConnected' &&
+		$connection.wallet?.invalidChainId}
 	title={`Require Connection to ${connection.chainInfo.name || `network with chainId: ${connection.chainId}`}`}
 	cancel={true}
 	confirm={{
