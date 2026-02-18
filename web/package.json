@@ -7,7 +7,7 @@
     "@etherplay/connect": "^0.0.35",
     "@lucide/svelte": "^0.574.0",
     "abitype": "^1.2.3",
-    "bits-ui": "^2.15.7",
+    "bits-ui": "^2.14.4",
     "clsx": "^2.1.1",
     "mandalas-common": "workspace:*",
     "named-logs": "^0.4.1",
