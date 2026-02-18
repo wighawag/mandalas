@@ -1,152 +1,139 @@
 <script lang="ts">
-	import {onMount} from 'svelte';
-	import {connection, purchaseFlow, randomTokens, curve} from '$lib';
+  import {onMount} from 'svelte';
+  import {connection, purchaseFlow, randomTokens, curve} from '$lib';
 
+  function format(bn: bigint, numDecimals: number): number {
+    const precision = 10n ** BigInt(numDecimals);
+    return Number((bn * precision) / 1000000000000000000n) / Number(precision);
+  }
 
-	function format(bn: bigint, numDecimals: number): number {
-		const precision = Math.pow(10, numDecimals);
-		return Number(bn) / precision / 1e18;
-	}
+  let nfts = randomTokens;
+  nfts.generate(32);
 
-	let nfts = randomTokens;
-	nfts.generate(32);
+  function mint(nft: {id: string; privateKey: string}) {
+    purchaseFlow.mint(nft);
+  }
 
-	function mint(nft: {id: string; privateKey: string}) {
-		purchaseFlow.mint(nft);
-	}
-
-	
-	onMount(() => {
-		window.onscroll = function () {
-			if (
-				window.innerHeight + window.scrollY >=
-				document.body.offsetHeight - window.innerHeight / 3
-			) {
-				nfts.loadMore(32);
-			}
-		};
-	});
+  onMount(() => {
+    window.onscroll = function () {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - window.innerHeight / 3) {
+        nfts.loadMore(32);
+      }
+    };
+  });
 </script>
 
 <div class="w-full">
-	{#if $curve.state === 'Stuck'}
-		<div class="w-full h-full mx-auto text-center flex-col text-black dark:text-white">
-			<p class="m-2 text-xs md:text-base font-black text-yellow-400">
-				Please Connect to your wallet see latest price and supply
-			</p>
-			<button
-				class="block m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
-				onclick={() => connection.connect()}
-			>
-				Connect
-			</button>
-		</div>
-	{:else}
-		<div
-			class="w-full h-full mx-auto flex justify-between text-black dark:text-white "
-		>
-			<p class="m-2 text-xs md:text-base font-black text-yellow-400">
-				Current Price:
-				{$curve.currentPrice ? format($curve.currentPrice, 4) + ' ETH' : 'loading'}
-			</p>
-			<p class="m-2 text-xs md:text-base font-black text-yellow-400">
-				Current Supply:
-				{$curve.supply ? $curve.supply.toString() : 'loading'}
-			</p>
-		</div>
-		<div
-			class="w-full h-full mx-auto flex justify-between text-black dark:text-white "
-		>
-			<button
-				class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
-				onclick={() => nfts.reset()}>reset batch</button>
-		</div>
-	{/if}
+  {#if $curve.state === 'Stuck'}
+    <div class="w-full h-full mx-auto text-center flex-col text-black dark:text-white">
+      <p class="m-2 text-xs md:text-base font-black text-yellow-400">
+        Please Connect to your wallet see latest price and supply
+      </p>
+      <button
+        class="block m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
+        onclick={() => connection.connect()}
+      >
+        Connect
+      </button>
+    </div>
+  {:else}
+    <div class="w-full h-full mx-auto flex justify-between text-black dark:text-white">
+      <p class="m-2 text-xs md:text-base font-black text-yellow-400">
+        Current Price:
+        {$curve.currentPrice ? format($curve.currentPrice, 4) + ' ETH' : 'loading'}
+      </p>
+      <p class="m-2 text-xs md:text-base font-black text-yellow-400">
+        Current Supply:
+        {$curve.supply ? $curve.supply.toString() : 'loading'}
+      </p>
+    </div>
+    <div class="w-full h-full mx-auto flex justify-between text-black dark:text-white">
+      <button
+        class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
+        onclick={() => nfts.reset()}>reset batch</button
+      >
+    </div>
+  {/if}
 
-	<div
-		class="w-full h-full text-xs text-center md:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white "
-	>
-		<p class="px-4 pt-4">
-			There are millions of Mandalas, all unique. Pick the one you like :)
-		</p>
-		<p class="px-4 pb-1">
-			Their price run on a bonding curve. So as more people collect them, the
-			more they get expensive. And you can burn them to get most of the price
-			back. More details
-			<a href="about" class="underline">here</a>.
-		</p>
-	</div>
-	<div
-		class="w-full h-full mx-auto flex items-center justify-center text-black dark:text-white "
-	></div>
+  <div
+    class="w-full h-full text-xs text-center md:text-base mx-auto flex flex-col items-center justify-center text-black dark:text-white"
+  >
+    <p class="px-4 pt-4">There are millions of Mandalas, all unique. Pick the one you like :)</p>
+    <p class="px-4 pb-1">
+      Their price run on a bonding curve. So as more people collect them, the more they get expensive. And you can burn
+      them to get most of the price back. More details
+      <a href="about" class="underline">here</a>.
+    </p>
+  </div>
+  <div class="w-full h-full mx-auto flex items-center justify-center text-black dark:text-white"></div>
 
-	<section
-		class="py-8 px-4 w-full h-full mx-auto flex items-center justify-center text-black dark:text-white "
-	>
-		{#if !$nfts}
-			<div>Generating Mandalas...</div>
-		{:else if $nfts.state === 'Idle'}
-			<div>Mandalas not loaded</div>
-		{:else if $nfts.error}
-			<div>Error: {$nfts.error}</div>
-		{:else if $nfts.tokens.length === 0 && $nfts.state === 'Loading'}
-			<div>Loading Mandalas...</div>
-		{:else}
-			<ul
-				class="grid-cols-2 grid sm:grid-cols-4 sm:gap-x-6 sm:gap-y-12 sm:space-y-0 lg:grid-cols-6 lg:gap-x-8"
-			>
-				{#each $nfts.tokens as nft, index}
-					<li>
-						<div id={nft.id} class="p-8">
-							<div class="aspect-w-3 aspect-h-2">
-								{#if nft.error}
-									Error:
-									{nft.error}
-								{:else if nft.image}
-									<img
-										onclick={() => mint(nft)}
-										style={`image-rendering: pixelated; ${nft.minted ? 'filter: grayscale(100%);' : ''}`}
-										class={`object-contain h-full w-full ${nft.minted ? '' : 'cursor-pointer'}`}
-										alt={nft.name}
-										src={nft.image} />
-								{:else}
-									<p class="">{nft.name}</p>
-								{/if}
-							</div>
-							{#if nft.image}
-								<div class={nft.minted ? 'hidden' : ''}>
-									<div class="mt-2 flex">
-										<div class="w-0 flex-1 flex">
-											<button
-												onclick={() => mint(nft)}
-												class="relative w-0 flex-1 inline-flex items-center
+  <section class="py-8 px-4 w-full h-full mx-auto flex items-center justify-center text-black dark:text-white">
+    {#if !$nfts}
+      <div>Generating Mandalas...</div>
+    {:else if $nfts.state === 'Idle'}
+      <div>Mandalas not loaded</div>
+    {:else if $nfts.error}
+      <div>Error: {$nfts.error}</div>
+    {:else if $nfts.tokens.length === 0 && $nfts.state === 'Loading'}
+      <div>Loading Mandalas...</div>
+    {:else}
+      <ul class="grid-cols-2 grid sm:grid-cols-4 sm:gap-x-6 sm:gap-y-12 sm:space-y-0 lg:grid-cols-6 lg:gap-x-8">
+        {#each $nfts.tokens as nft, index}
+          <li>
+            <div id={nft.id} class="p-8">
+              <div class="aspect-w-3 aspect-h-2">
+                {#if nft.error}
+                  Error:
+                  {nft.error}
+                {:else if nft.image}
+                  <img
+                    onclick={() => mint(nft)}
+                    style={`image-rendering: pixelated; ${nft.minted ? 'filter: grayscale(100%);' : ''}`}
+                    class={`object-contain h-full w-full ${nft.minted ? '' : 'cursor-pointer'}`}
+                    alt={nft.name}
+                    src={nft.image}
+                  />
+                {:else}
+                  <p class="">{nft.name}</p>
+                {/if}
+              </div>
+              {#if nft.image}
+                <div class={nft.minted ? 'hidden' : ''}>
+                  <div class="mt-2 flex">
+                    <div class="w-0 flex-1 flex">
+                      <button
+                        onclick={() => mint(nft)}
+                        class="relative w-0 flex-1 inline-flex items-center
                          justify-center pb-4 text-sm text-gray-700 dark:text-gray-300 font-medium
                          border border-transparent rounded-br-lg
-                         hover:text-gray-500">
-												<svg
-													class="w-6 h-6"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke="currentColor">
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" />
-												</svg>
-												<span class="text-xs md:text-base ml-3">Mint It</span>
-											</button>
-										</div>
-									</div>
-								</div>
-							{/if}
-						</div>
-					</li>
-				{:else}Error: No Mandala could be generated{/each}
-			</ul>
-		{/if}
-	</section>
+                         hover:text-gray-500"
+                      >
+                        <svg
+                          class="w-6 h-6"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"
+                          />
+                        </svg>
+                        <span class="text-xs md:text-base ml-3">Mint It</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              {/if}
+            </div>
+          </li>
+        {:else}Error: No Mandala could be generated{/each}
+      </ul>
+    {/if}
+  </section>
 </div>
 <!-- 
 {#if $purchaseFlow.step !== 'IDLE' && $purchaseFlow.step !== 'SUCCESS'}
