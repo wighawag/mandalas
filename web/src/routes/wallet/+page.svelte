@@ -7,6 +7,7 @@
 	import {goto} from '$app/navigation';
 	import {url} from '$lib/core/utils/web/path';
 	import {page} from '$app/stores';
+	import Modal from '$lib/core/ui/modal/Modal.svelte';
 
 	let addressFromURI = $state<string | undefined>(undefined);
 
@@ -60,20 +61,27 @@
 		return (Number(price) / 1e18).toFixed(4);
 	}
 
+	let txStatus = $state<'WAITING_TX' | undefined>(undefined);
+
 	// Burn function would need to be implemented with viem writeContract
 	async function burn({id}: {id: bigint}) {
 		const currentConnection = await connection.ensureConnected(
 			'WalletConnected',
 			{type: 'wallet'},
 		);
-		const walletAddress = currentConnection.mechanism.address;
-		const MandalaToken = contractsInfo.contracts.MandalaToken;
-		await walletClient.writeContract({
-			account: walletAddress,
-			...MandalaToken,
-			functionName: 'burn',
-			args: [id],
-		});
+		txStatus = 'WAITING_TX';
+		try {
+			const walletAddress = currentConnection.mechanism.address;
+			const MandalaToken = contractsInfo.contracts.MandalaToken;
+			await walletClient.writeContract({
+				account: walletAddress,
+				...MandalaToken,
+				functionName: 'burn',
+				args: [id],
+			});
+		} finally {
+			txStatus = undefined;
+		}
 	}
 </script>
 
@@ -232,3 +240,10 @@
 		{/if}
 	</section>
 </div>
+
+<Modal openWhen={txStatus === 'WAITING_TX'}>
+	<div class="text-center">
+		<h2>Confirm the transaction...</h2>
+		<p class="mt-2 text-sm text-gray-300"></p>
+	</div>
+</Modal>
