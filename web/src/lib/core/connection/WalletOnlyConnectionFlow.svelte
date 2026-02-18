@@ -72,8 +72,8 @@
 			{/each}
 		</div>
 	{:else}
-		We plan to support credit card payment but for now you need a web3 wallet to
-		make the purchase
+		You need a web3 wallet to connect
+		<a target="_blank" rel="noopener noreferrer" class="underline" href="https://metamask.io">Download Metamask</a>
 	{/if}
 </Modal>
 
