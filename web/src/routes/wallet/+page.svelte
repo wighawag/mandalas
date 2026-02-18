@@ -148,7 +148,7 @@
 					{:else}Here are the Mandalas for wallet {addressToLook}.{/if}
 				</p>
 			</div>
-		{:else}
+		{:else if addressToLook}
 			<div
 				class="mx-auto flex h-full w-full flex-col items-center justify-center text-black dark:text-white"
 			>
@@ -183,7 +183,11 @@
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<div
 							id={nft.id.toString()}
-							onclick={() => burn(nft)}
+							onclick={() => {
+								if (isWalletOwner) {
+									burn(nft);
+								}
+							}}
 							class="space-y-4 p-8"
 						>
 							<div class="aspect-w-3 aspect-h-2">
