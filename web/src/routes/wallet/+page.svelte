@@ -1,51 +1,27 @@
 <script lang="ts">
 	import {onMount} from 'svelte';
-	import NavButton from '$lib/components/styled/navigation/NavButton.svelte';
-	import {nftsof} from '$lib/stores/nftsof';
-	import {curve} from '$lib/stores/curve';
 	import {generateBitmapDataURI, template19_bis} from 'mandalas-common';
-	import {establishRemoteConnection} from '$lib/core/connection';
+	import { curve, nftsof, connection } from '$lib';
 
-	let connected = false;
-	let connecting = false;
-	let connection: any = null;
-	let publicClient: any = null;
-	let walletClient: any = null;
 	let account: any = null;
 
 	let walletAddress: string | undefined = undefined;
 
 	onMount(async () => {
-		// Try to connect on mount
-		connect();
-
+		
 		// Get wallet address from URL hash
 		if (typeof window !== 'undefined' && window.location.hash) {
 			walletAddress = window.location.hash.substring(1);
 		}
 	});
 
-	async function connect() {
-		connecting = true;
-		try {
-			const established = await establishRemoteConnection();
-			connection = established.connection;
-			publicClient = established.publicClient;
-			walletClient = established.walletClient;
-			account = established.account;
-			curve.setPublicClient(publicClient);
-			connected = true;
-		} catch (e) {
-			console.error('Failed to connect:', e);
-		} finally {
-			connecting = false;
-		}
-	}
 
 	$: currentAddress = $account;
 	$: isWalletOwner = currentAddress && walletAddress && currentAddress.toLowerCase() === walletAddress.toLowerCase();
 
 	$: nfts = nftsof(walletAddress);
+
+	$: connected = $connection.step === 'WalletConnected' || $connection.step === 'SignedIn';
 
 	function formatPrice(price: bigint): string {
 		return (Number(price) / 1e18).toFixed(4);
@@ -75,9 +51,9 @@
 			</p>
 			<button
 				class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
-				onclick={() => connect()}
+				onclick={() => connection.connect()}
 			>
-				{connecting ? 'Connecting...' : 'Connect'}
+				Connect
 			</button>
 		</div>
 	{:else if !walletAddress || walletAddress === ''}
@@ -87,7 +63,7 @@
 			</p>
 			<button
 				class="m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
-				onclick={() => connect()}
+				onclick={() => connection.connect()}
 			>
 				Connect
 			</button>
@@ -147,16 +123,16 @@
 			<ul class="grid grid-cols-2 sm:grid-cols-3 sm:gap-x-12 sm:gap-y-20 sm:space-y-0 lg:grid-cols-4 lg:gap-x-16">
 				{#each $nfts.tokens as nft, index}
 					<li>
-						<div id={nft.id} class="space-y-4 p-8">
+						<div id={nft.id.toString()} class="space-y-4 p-8">
 							<div class="aspect-w-3 aspect-h-2">
 								{#if nft.error}
 									Error: {nft.error}
 								{:else if nft.image}
 									<img
-										style={`image-rendering: pixelated; ${$nfts.burning[nft.id] ? 'filter: grayscale(100%);' : ''}`}
+										style={`image-rendering: pixelated; ${$nfts.burning[nft.id.toString()] ? 'filter: grayscale(100%);' : ''}`}
 										class="object-contain h-full w-full"
 										alt={nft.name}
-										src={generateBitmapDataURI(nft.id, template19_bis)} />
+										src={generateBitmapDataURI(nft.id.toString(), template19_bis)} />
 								{:else}
 									<p class="">{nft.name}</p>
 								{/if}

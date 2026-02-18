@@ -12,6 +12,9 @@ export default {
         http: ['https://ethereum.etherplay.io'],
       },
     },
+    properties: {
+      expectedWorstGasPrice: '100000000000',
+    },
   },
   contracts: {
     MandalaToken: {
@@ -659,4 +662,4 @@ export default {
       },
     },
   },
-};
+} as const;

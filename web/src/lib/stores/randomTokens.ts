@@ -201,5 +201,3 @@ export class RandomTokenStore extends BaseStore<NFTs> {
     this.setPartial({error: undefined});
   }
 }
-
-export const randomTokens = new RandomTokenStore();

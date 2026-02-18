@@ -14,16 +14,11 @@ export class CurveStore extends BaseStore<Curve> {
   private timer: ReturnType<typeof setInterval> | undefined;
   private counter = 0;
   private startTime = 0;
-  private publicClient: PublicClient | null = null;
 
-  constructor() {
+  constructor(private publicClient: PublicClient) {
     super({
       state: 'Idle',
     });
-  }
-
-  setPublicClient(client: PublicClient) {
-    this.publicClient = client;
   }
 
   async query(): Promise<null | bigint> {
@@ -99,5 +94,3 @@ export class CurveStore extends BaseStore<Curve> {
     this.setPartial({error: undefined});
   }
 }
-
-export const curve = new CurveStore();

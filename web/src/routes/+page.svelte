@@ -1,12 +1,7 @@
 <script lang="ts">
 	import {onMount} from 'svelte';
-	import {randomTokens} from '$lib/stores/randomTokens';
-	import {curve} from '$lib/stores/curve';
-	import {purchaseFlow} from '$lib';
-	import {computeBuffer} from '$lib/utils';
+	import {connection, purchaseFlow, randomTokens, curve} from '$lib';
 
-	let connected = false;
-	let connecting = false;
 
 	function format(bn: bigint, numDecimals: number): number {
 		const precision = Math.pow(10, numDecimals);
@@ -34,26 +29,14 @@
 </script>
 
 <div class="w-full">
-	{#if !connected}
+	{#if $curve.state === 'Stuck'}
 		<div class="w-full h-full mx-auto text-center flex-col text-black dark:text-white">
 			<p class="m-2 text-xs md:text-base font-black text-yellow-400">
 				Please Connect to your wallet see latest price and supply
 			</p>
 			<button
 				class="block m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
-				onclick={() => connect()}
-			>
-				{connecting ? 'Connecting...' : 'Connect'}
-			</button>
-		</div>
-	{:else if $curve.state === 'Stuck'}
-		<div class="w-full h-full mx-auto text-center flex-col text-black dark:text-white">
-			<p class="m-2 text-xs md:text-base font-black text-yellow-400">
-				Please Connect to your wallet see latest price and supply
-			</p>
-			<button
-				class="block m-2 text-xs md:text-base font-black text-yellow-400 border border-yellow-500 p-1"
-				onclick={() => connect()}
+				onclick={() => connection.connect()}
 			>
 				Connect
 			</button>

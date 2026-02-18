@@ -1,7 +1,7 @@
 import deploymentsFromFiles from '$lib/deployments';
 import type {ConnectionStore, UnderlyingEthereumProvider} from '@etherplay/connect';
 import type {Readable} from 'svelte/store';
-import type {PublicClient, WalletClient} from 'viem';
+import type {Chain, PublicClient, Transport, WalletClient} from 'viem';
 
 export type Signer = {
   owner: `0x${string}`;
@@ -22,8 +22,8 @@ export type DeploymentsStore = Readable<TypedDeployments> & {
 
 export type EstablishedConnection = {
   connection: ConnectionStore<UnderlyingEthereumProvider>;
-  walletClient: WalletClient;
-  publicClient: PublicClient;
+  walletClient: WalletClient<Transport, Chain>;
+  publicClient: PublicClient<Transport, Chain>;
   account: AccountStore;
   signer: OptionalSignerStore;
   deployments: DeploymentsStore;

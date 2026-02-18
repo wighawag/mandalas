@@ -13,7 +13,7 @@ function fixURI(uri?: string): string {
 }
 
 type NFT = {
-  id: string;
+  id: bigint;
   tokenURI: string;
   name: string;
   description: string;
@@ -28,13 +28,15 @@ type NFTs = {
   burning: {[id: string]: boolean};
 };
 
-class NFTOfStore extends BaseStore<NFTs> {
+export class NFTOfStore extends BaseStore<NFTs> {
   private timer: ReturnType<typeof setInterval> | undefined;
   private counter = 0;
   private currentOwner?: string;
-  private publicClient: PublicClient | null = null;
 
-  constructor(owner?: string) {
+  constructor(
+    private publicClient: PublicClient,
+    owner?: string,
+  ) {
     super({
       state: 'Idle',
       error: undefined,
@@ -44,11 +46,7 @@ class NFTOfStore extends BaseStore<NFTs> {
     this.currentOwner = owner?.toLowerCase();
   }
 
-  setPublicClient(client: PublicClient) {
-    this.publicClient = client;
-  }
-
-  async query(address: string): Promise<null | {tokenURI: string; id: string}[]> {
+  async query(address: string): Promise<null | {tokenURI: string; id: bigint}[]> {
     if (this.publicClient) {
       try {
         const numTokens = (await this.publicClient.readContract({
@@ -62,14 +60,14 @@ class NFTOfStore extends BaseStore<NFTs> {
           return [];
         }
 
-        const tokens = (await this.publicClient.readContract({
-          address: contractsInfo.contracts.MandalaToken.address as `0x${string}`,
-          abi: contractsInfo.contracts.MandalaToken.abi,
+        const MandalaToken = contractsInfo.contracts.MandalaToken;
+        const tokens = await this.publicClient.readContract({
+          ...MandalaToken,
           functionName: 'getTokenDataOfOwner',
           args: [address as `0x${string}`, BigInt(0), numTokens],
-        })) as {tokenURI: string; id: string}[];
+        });
 
-        const result: {tokenURI: string; id: string}[] = [];
+        const result: {tokenURI: string; id: bigint}[] = [];
         for (const token of tokens) {
           result.push({
             tokenURI: token.tokenURI.replace(
@@ -108,7 +106,7 @@ class NFTOfStore extends BaseStore<NFTs> {
     }
   }
 
-  async _transform(tokens: {tokenURI: string; id: string}[]): Promise<NFT[]> {
+  async _transform(tokens: {tokenURI: string; id: bigint}[]): Promise<NFT[]> {
     // TODO cache
     const newResult: NFT[] = [];
     for (const token of tokens) {
@@ -183,13 +181,4 @@ class NFTOfStore extends BaseStore<NFTs> {
   acknowledgeError() {
     this.setPartial({error: undefined});
   }
-}
-
-const cache: {[owner: string]: NFTOfStore} = {};
-export function nftsof(owner?: string): NFTOfStore {
-  const fromCache = cache[owner || ''];
-  if (fromCache) {
-    return fromCache;
-  }
-  return (cache[owner || ''] = new NFTOfStore(owner));
 }

@@ -1,9 +1,9 @@
 import {BaseStoreWithData} from '$lib/utils/stores';
 import {keccak256, parseEther} from 'viem';
 import {privateKeyToAccount} from 'viem/accounts';
-import {randomTokens} from '../stores/randomTokens';
 import contractsInfo from '../deployments';
-import type {PublicClient, WalletClient} from 'viem';
+import type {Chain, PublicClient, Transport, WalletClient} from 'viem';
+import {randomTokens} from '$lib';
 
 const initialPrice = BigInt(contractsInfo.contracts.MandalaToken.linkedData.initialPrice);
 // const creatorCutPer10000th =
@@ -23,19 +23,14 @@ export type PurchaseFlow = {
 };
 
 export class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
-  private publicClient: PublicClient | null = null;
-  private walletClient: WalletClient | null = null;
-
-  public constructor() {
+  public constructor(
+    private publicClient: PublicClient<Transport, Chain>,
+    private walletClient: WalletClient<Transport, Chain>,
+  ) {
     super({
       type: 'PURCHASE',
       step: 'IDLE',
     });
-  }
-
-  setClients(publicClient: PublicClient, walletClient: WalletClient) {
-    this.publicClient = publicClient;
-    this.walletClient = walletClient;
   }
 
   async cancel(): Promise<void> {
@@ -93,11 +88,12 @@ export class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
 
       const buffer = computeBuffer(purchaseFlow.data.supply, purchaseFlow.data.currentPrice);
 
+      const MandalaToken = contractsInfo.contracts.MandalaToken;
       const tx = await this.walletClient.writeContract({
-        address: contractsInfo.contracts.MandalaToken.address as `0x${string}`,
-        abi: contractsInfo.contracts.MandalaToken.abi,
+        account: this.walletClient.account!,
+        ...MandalaToken,
         functionName: 'mint',
-        args: [this.walletClient.account.address as `0x${string}`, signature],
+        args: [this.walletClient.account!.address, signature],
         value: purchaseFlow.data.currentPrice + buffer,
       });
 

@@ -1,10 +1,12 @@
 import {get} from 'svelte/store';
-import {createContext} from 'svelte';
 import {establishRemoteConnection} from './core/connection';
 import {createBalanceStore} from './core/connection/balance';
 import {createGasFeeStore} from './core/connection/gasFee';
 import {PurchaseFlowStore} from './ui/purchaseFlow';
 import type {Dependencies} from './types.js';
+import {CurveStore} from './stores/curve';
+import {RandomTokenStore} from './stores/randomTokens';
+import {NFTOfStore} from './stores/nftsof';
 
 export async function createDependencies(): Promise<Dependencies> {
   const window = globalThis as any;
@@ -46,7 +48,7 @@ export async function createDependencies(): Promise<Dependencies> {
   window.gasFee = gasFee;
   // ----------------------------------------------------------------------------
 
-  const purchaseFlow = new PurchaseFlowStore();
+  const purchaseFlow = new PurchaseFlowStore(publicClient, walletClient);
 
   return {
     gasFee,
@@ -69,3 +71,15 @@ export async function createDependencies(): Promise<Dependencies> {
 
 export const {gasFee, balance, connection, walletClient, publicClient, account, deployments, purchaseFlow} =
   await createDependencies();
+
+export const curve = new CurveStore(publicClient);
+export const randomTokens = new RandomTokenStore();
+
+const cache: {[owner: string]: NFTOfStore} = {};
+export function nftsof(owner?: string): NFTOfStore {
+  const fromCache = cache[owner || ''];
+  if (fromCache) {
+    return fromCache;
+  }
+  return (cache[owner || ''] = new NFTOfStore(publicClient, owner));
+}
