@@ -28,6 +28,9 @@ try {
 const config = {
   preprocess: vitePreprocess(),
 
+  compilerOptions: {
+    runes: true,
+  },
   kit: {
     version: {
       // we create a deterministic building using a deterministic version (via git commit, see above)

@@ -1,6 +1,11 @@
 <script lang="ts">
   type LinkInfo = {href: string; title: string};
-  export let links: LinkInfo[];
+
+  interface Props {
+		links:  LinkInfo[];
+	}
+	let {links}: Props = $props();
+
   import NavLink from './NavLink.svelte';
   import {page} from '$app/stores';
   import {base} from '$app/paths';

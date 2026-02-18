@@ -3,9 +3,8 @@
 	import {generateBitmapDataURI, template19_bis} from 'mandalas-common';
 	import { curve, nftsof, connection } from '$lib';
 
-	let account: any = null;
 
-	let walletAddress: string | undefined = undefined;
+	let walletAddress = $state<string | undefined>(undefined);
 
 	onMount(async () => {
 		
@@ -16,12 +15,12 @@
 	});
 
 
-	$: currentAddress = $account;
-	$: isWalletOwner = currentAddress && walletAddress && currentAddress.toLowerCase() === walletAddress.toLowerCase();
+	let currentAddress = $derived($connection.step === "WalletConnected" ? $connection.mechanism.address: undefined);
+	let isWalletOwner = $derived(currentAddress && walletAddress && currentAddress.toLowerCase() === walletAddress.toLowerCase());
 
-	$: nfts = nftsof(walletAddress);
+	let nfts = $derived(nftsof(walletAddress));
 
-	$: connected = $connection.step === 'WalletConnected' || $connection.step === 'SignedIn';
+	let connected = $derived($connection.step === 'WalletConnected' || $connection.step === 'SignedIn');
 
 	function formatPrice(price: bigint): string {
 		return (Number(price) / 1e18).toFixed(4);

@@ -6,8 +6,8 @@
   } from 'mandalas-common';
   import { onMount } from 'svelte';
 
-  let name: string;
-  let image: string;
+  let name = $state<string | undefined>(undefined);
+  let image = $state<string | undefined>(undefined);
   onMount(() => {
     let mandalaId = typeof location !== "undefined" ? location.hash.substr(1): "0x00";
     console.log({mandalaId});

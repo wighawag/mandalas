@@ -13,6 +13,10 @@
 	}
 
 	let {connection}: Props = $props();
+
+	$effect(() => {
+		console.log($connection.step);
+	})
 </script>
 
 <Modal
