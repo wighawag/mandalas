@@ -1,30 +1,32 @@
-import {HardhatRuntimeEnvironment} from 'hardhat/types';
-import {DeployFunction} from 'hardhat-deploy/types';
-import {parseEther} from '@ethersproject/units';
+import {deployScript, artifacts} from '../rocketh/deploy.js';
+import {parseEther} from 'viem';
 
-const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const {deployments, getNamedAccounts} = hre;
-  const {deploy} = deployments;
+export default deployScript(
+	async (env) => {
+		// Get named accounts configured in rocketh/config.ts
+		const {deployer, admin} = env.namedAccounts;
 
-  const {deployer} = await getNamedAccounts();
+		const initialPrice = parseEther('0.001');
+		const creatorCutPer10000th = 500n;
+		const linearCoefficient = parseEther('0.0005');
 
-  const initialPrice = parseEther('0.001');
-  const creatorCutPer10000th = 500;
-  const linearCoefficient = parseEther('0.0005');
-
-  await deploy('MandalaToken', {
-    from: deployer,
-    log: true,
-    args: [deployer, initialPrice, creatorCutPer10000th, linearCoefficient],
-    proxy: !hre.network.live ? 'postUpgrade' : false,
-    linkedData: {
-      initialPrice: initialPrice.toString(),
-      creatorCutPer10000th,
-      linearCoefficient: linearCoefficient.toString(),
-    },
-    autoMine: true,
-    skipIfAlreadyDeployed: hre.network.live,
-  });
-};
-export default func;
-func.tags = ['MandalaToken'];
+		await env.deployViaProxy(
+			'MandalaToken',
+			{
+				account: deployer,
+				artifact: artifacts.MandalaToken,
+				args: [deployer, initialPrice, creatorCutPer10000th, linearCoefficient],
+			},
+			{
+				proxyDisabled: env.name === 'localhost', // TODO tags ?
+				execute: 'postUpgrade',
+				linkedData: {
+					initialPrice: initialPrice,
+					creatorCutPer10000th,
+					linearCoefficient: linearCoefficient,
+				},
+			},
+		);
+	},
+	{tags: ['MandalaToken', 'MandalaToken_deploy']},
+);

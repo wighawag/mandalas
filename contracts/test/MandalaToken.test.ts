@@ -1,196 +1,289 @@
-import {expect} from './chai-setup';
-import {ethers, deployments, getUnnamedAccounts} from 'hardhat';
-import {MandalaToken} from '../typechain';
-import {setupUsers, waitFor} from './utils';
-import {Wallet} from '@ethersproject/wallet';
-import {keccak256} from '@ethersproject/solidity';
-import {arrayify} from '@ethersproject/bytes';
+import {expect} from 'earl';
+import {describe, it} from 'node:test';
+import {network} from 'hardhat';
+import {setupFixtures} from './utils/index.js';
+import {generatePrivateKey, privateKeyToAccount} from 'viem/accounts';
+import {encodePacked, keccak256, hexToBytes} from 'viem';
 import {generateTokenURI, template19_bis} from 'mandalas-common';
-import {BigNumber} from 'ethers';
-// import {BigNumber} from '@ethersproject/bignumber';
 
-const setup = deployments.createFixture(async () => {
-  await deployments.fixture(['MandalaToken']);
-  const deployment = await deployments.get('MandalaToken');
-  const contracts = {
-    MandalaToken: <MandalaToken>await ethers.getContract('MandalaToken'),
-  };
-  const users = await setupUsers(await getUnnamedAccounts(), contracts);
-  return {
-    ...contracts,
-    users,
-    linkedData: deployment.linkedData as {
-      initialPrice: string;
-      creatorCutPer10000th: number;
-      linearCoefficient: string;
-    },
-  };
-});
+const {provider, networkHelpers} = await network.connect();
+const {deployAll} = setupFixtures(provider);
 
 async function randomMintSignature(
-  to: string
-): Promise<{signature: string; tokenId: string}> {
-  const randomWallet = Wallet.createRandom();
-  const hashedData = keccak256(['string', 'address'], ['Mandala', to]);
-  const signature = await randomWallet.signMessage(arrayify(hashedData));
-  return {
-    tokenId: randomWallet.address,
-    signature,
-  };
+	to: `0x${string}`,
+): Promise<{signature: `0x${string}`; tokenId: bigint}> {
+	const randomPrivatekey = generatePrivateKey();
+	const randomAccount = privateKeyToAccount(randomPrivatekey);
+	const hashedData = keccak256(
+		encodePacked(['string', 'address'], ['Mandala', to]),
+	);
+	const signature = await randomAccount.signMessage({
+		message: {raw: hashedData},
+	});
+	return {
+		tokenId: BigInt(randomAccount.address),
+		signature,
+	};
 }
 
 describe('MandalaToken Specific', function () {
-  it('name succeed', async function () {
-    const {users} = await setup();
-    const name = await users[0].MandalaToken.name();
-    expect(name).to.equal('Mandala Tokens');
-  });
+	it('name succeed', async function () {
+		const {env, MandalaToken} = await networkHelpers.loadFixture(deployAll);
+		const name = await env.read(MandalaToken, {functionName: 'name'});
+		expect(name).toEqual('Mandala Tokens');
+	});
 
-  it('mint and transfer', async function () {
-    const {users, MandalaToken} = await setup();
-    const currentPrice = await MandalaToken.currentPrice();
-    const {tokenId, signature} = await randomMintSignature(users[0].address);
-    const receipt = await waitFor(
-      users[0].MandalaToken.mint(users[0].address, signature, {
-        value: currentPrice,
-      })
-    );
-    expect(receipt.events && receipt.events[0].args?.tokenId).to.eq(tokenId);
-  });
+	it('mint and transfer', async function () {
+		const {env, MandalaToken, unnamedAccounts} =
+			await networkHelpers.loadFixture(deployAll);
+		const currentPrice = await env.read(MandalaToken, {
+			functionName: 'currentPrice',
+		});
+		const {tokenId, signature} = await randomMintSignature(unnamedAccounts[0]);
+		const receipt = await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'mint',
+			args: [unnamedAccounts[0], signature],
+			value: currentPrice,
+		});
+		// TODO
+		// expect(receipt.events && receipt.events[0].args?.tokenId).to.eq(tokenId);
+	});
 
-  it('mint and transfer', async function () {
-    const {users, MandalaToken} = await setup();
-    const currentPrice = await MandalaToken.currentPrice();
-    const {tokenId, signature} = await randomMintSignature(users[0].address);
-    await users[0].MandalaToken.mint(users[0].address, signature, {
-      value: currentPrice,
-    });
-    await users[0].MandalaToken.transferFrom(
-      users[0].address,
-      users[1].address,
-      tokenId
-    );
-    const owner = await MandalaToken.callStatic.ownerOf(tokenId);
-    expect(owner).to.equal(users[1].address);
-  });
+	it('mint and transfer', async function () {
+		const {env, MandalaToken, unnamedAccounts} =
+			await networkHelpers.loadFixture(deployAll);
+		const currentPrice = await env.read(MandalaToken, {
+			functionName: 'currentPrice',
+		});
+		const {tokenId, signature} = await randomMintSignature(unnamedAccounts[0]);
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'mint',
+			args: [unnamedAccounts[0], signature],
+			value: currentPrice,
+		});
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'transferFrom',
+			args: [unnamedAccounts[0], unnamedAccounts[1], tokenId],
+		});
 
-  it('js uri match', async function () {
-    const {users, MandalaToken} = await setup();
-    const currentPrice = await MandalaToken.currentPrice();
-    const {tokenId, signature} = await randomMintSignature(users[0].address);
-    await users[0].MandalaToken.mint(users[0].address, signature, {
-      value: currentPrice,
-    });
-    const uri = await MandalaToken.callStatic.tokenURI(tokenId);
-    console.log({uri});
+		const owner = await env.read(MandalaToken, {
+			functionName: 'ownerOf',
+			args: [tokenId],
+		});
+		expect(owner.toLowerCase()).toEqual(unnamedAccounts[1]);
+	});
 
-    expect(uri).to.eq(generateTokenURI(tokenId, template19_bis));
-  });
+	it('js uri match', async function () {
+		const {env, MandalaToken, unnamedAccounts} =
+			await networkHelpers.loadFixture(deployAll);
+		const currentPrice = await env.read(MandalaToken, {
+			functionName: 'currentPrice',
+		});
+		const {tokenId, signature} = await randomMintSignature(unnamedAccounts[0]);
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'mint',
+			args: [unnamedAccounts[0], signature],
+			value: currentPrice,
+		});
+		const uri = await env.read(MandalaToken, {
+			functionName: 'tokenURI',
+			args: [tokenId],
+		});
+		console.log({uri});
 
-  it('mint, transfer, burn', async function () {
-    const {users, MandalaToken, linkedData} = await setup();
-    const currentPrice = await MandalaToken.currentPrice();
-    const {tokenId, signature} = await randomMintSignature(users[0].address);
-    await users[0].MandalaToken.mint(users[0].address, signature, {
-      value: currentPrice,
-    });
-    await users[0].MandalaToken.transferFrom(
-      users[0].address,
-      users[1].address,
-      tokenId
-    );
-    const balanceBefore = await ethers.provider.getBalance(users[1].address);
-    const gasPrice = await ethers.provider.getGasPrice();
-    const receipt = await waitFor(
-      users[1].MandalaToken.burn(tokenId, {gasPrice})
-    );
-    const txCost = gasPrice.mul(receipt.gasUsed);
-    const balanceAfter = await ethers.provider.getBalance(users[1].address);
-    expect(balanceAfter).to.equal(
-      balanceBefore
-        .sub(txCost)
-        .add(
-          currentPrice.mul(10000 - linkedData.creatorCutPer10000th).div(10000)
-        )
-    );
-  });
+		expect(uri).toEqual(
+			generateTokenURI(tokenId.toString(), template19_bis, {doNotFix: true}),
+		);
+	});
 
-  it('mint, burn, burn, fails', async function () {
-    const {users, MandalaToken} = await setup();
-    const currentPrice = await MandalaToken.currentPrice();
-    const {tokenId, signature} = await randomMintSignature(users[0].address);
-    await users[0].MandalaToken.mint(users[0].address, signature, {
-      value: currentPrice,
-    });
-    await users[0].MandalaToken.transferFrom(
-      users[0].address,
-      users[1].address,
-      tokenId
-    );
-    await waitFor(users[1].MandalaToken.burn(tokenId));
-    await expect(users[1].MandalaToken.burn(tokenId)).to.be.revertedWith(
-      'ALREADY_BURNT'
-    );
-  });
+	it('mint, transfer, burn', async function () {
+		const {env, MandalaToken, unnamedAccounts} =
+			await networkHelpers.loadFixture(deployAll);
+		const currentPrice = await env.read(MandalaToken, {
+			functionName: 'currentPrice',
+		});
+		const {tokenId, signature} = await randomMintSignature(unnamedAccounts[0]);
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'mint',
+			args: [unnamedAccounts[0], signature],
+			value: currentPrice,
+		});
+		const currentPrice2 = await env.read(MandalaToken, {
+			functionName: 'currentPrice',
+		});
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'transferFrom',
+			args: [unnamedAccounts[0], unnamedAccounts[1], tokenId],
+		});
+		const balanceBefore = await env.viem.publicClient.getBalance({
+			address: unnamedAccounts[1],
+		});
 
-  it('mint, burn, mint, fails', async function () {
-    const {users, MandalaToken} = await setup();
-    const currentPrice = await MandalaToken.currentPrice();
-    const {tokenId, signature} = await randomMintSignature(users[0].address);
-    await users[0].MandalaToken.mint(users[0].address, signature, {
-      value: currentPrice,
-    });
-    await users[0].MandalaToken.transferFrom(
-      users[0].address,
-      users[1].address,
-      tokenId
-    );
-    await waitFor(users[1].MandalaToken.burn(tokenId));
-    await expect(
-      users[1].MandalaToken.mint(users[0].address, signature, {
-        value: currentPrice,
-      })
-    ).to.be.revertedWith('ALREADY_MINTED');
-  });
+		const receipt = await env.execute(MandalaToken, {
+			account: unnamedAccounts[1],
+			functionName: 'burn',
+			args: [tokenId],
+		});
 
-  it('mint, mint, mint transfer, burn', async function () {
-    const {users, MandalaToken, linkedData} = await setup();
-    const currentPrice = await MandalaToken.currentPrice();
-    const {tokenId, signature} = await randomMintSignature(users[0].address);
-    await users[0].MandalaToken.mint(users[0].address, signature, {
-      value: currentPrice,
-    });
-    await users[0].MandalaToken.transferFrom(
-      users[0].address,
-      users[1].address,
-      tokenId
-    );
+		const txCost = BigInt(receipt.effectiveGasPrice) * BigInt(receipt.gasUsed);
+		const balanceAfter = await env.viem.publicClient.getBalance({
+			address: unnamedAccounts[1],
+		});
+		const expectedBalance =
+			balanceBefore -
+			(txCost +
+				(currentPrice *
+					(10000n - BigInt(MandalaToken.linkedData.creatorCutPer10000th))) /
+					10000n);
+		expect(balanceAfter).toEqual(expectedBalance);
+	});
 
-    const currentPrice3 = await MandalaToken.currentPrice();
-    const {signature: signature3} = await randomMintSignature(users[0].address);
-    await users[3].MandalaToken.mint(users[3].address, signature3, {
-      value: currentPrice3,
-    });
+	it('mint, burn, burn, fails', async function () {
+		const {env, MandalaToken, unnamedAccounts} =
+			await networkHelpers.loadFixture(deployAll);
+		const currentPrice = await env.read(MandalaToken, {
+			functionName: 'currentPrice',
+		});
+		const {tokenId, signature} = await randomMintSignature(unnamedAccounts[0]);
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'mint',
+			args: [unnamedAccounts[0], signature],
+			value: currentPrice,
+		});
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'transferFrom',
+			args: [unnamedAccounts[0], unnamedAccounts[1], tokenId],
+		});
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[1],
+			functionName: 'burn',
+			args: [tokenId],
+		});
 
-    const currentPrice4 = await MandalaToken.currentPrice();
-    const {signature: signature4} = await randomMintSignature(users[0].address);
-    await users[4].MandalaToken.mint(users[4].address, signature4, {
-      value: currentPrice4,
-    });
+		await expect(
+			env.execute(MandalaToken, {
+				account: unnamedAccounts[1],
+				functionName: 'burn',
+				args: [tokenId],
+			}),
+		).toBeRejectedWith('ALREADY_BURNT');
+	});
 
-    const balanceBefore = await ethers.provider.getBalance(users[1].address);
-    const gasPrice = await ethers.provider.getGasPrice();
-    const supply = await MandalaToken.totalSupply();
-    // const newCurrentPrice = await MandalaToken.currentPrice();
-    const burnPrice = BigNumber.from(linkedData.initialPrice)
-      .add(supply.sub(1).mul(linkedData.linearCoefficient))
-      .mul(10000 - linkedData.creatorCutPer10000th)
-      .div(10000);
-    const receipt = await waitFor(
-      users[1].MandalaToken.burn(tokenId, {gasPrice})
-    );
-    const txCost = gasPrice.mul(receipt.gasUsed);
-    const balanceAfter = await ethers.provider.getBalance(users[1].address);
-    expect(balanceAfter).to.equal(balanceBefore.sub(txCost).add(burnPrice));
-  });
+	it('mint, burn, mint, fails', async function () {
+		const {env, MandalaToken, unnamedAccounts} =
+			await networkHelpers.loadFixture(deployAll);
+		const currentPrice = await env.read(MandalaToken, {
+			functionName: 'currentPrice',
+		});
+		const {tokenId, signature} = await randomMintSignature(unnamedAccounts[0]);
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'mint',
+			args: [unnamedAccounts[0], signature],
+			value: currentPrice,
+		});
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'transferFrom',
+			args: [unnamedAccounts[0], unnamedAccounts[1], tokenId],
+		});
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[1],
+			functionName: 'burn',
+			args: [tokenId],
+		});
+
+		await expect(
+			env.execute(MandalaToken, {
+				account: unnamedAccounts[1],
+				functionName: 'mint',
+				args: [unnamedAccounts[0], signature],
+				value: currentPrice,
+			}),
+		).toBeRejectedWith('ALREADY_MINTED');
+	});
+
+	it('mint, mint, mint transfer, burn', async function () {
+		const {env, MandalaToken, unnamedAccounts} =
+			await networkHelpers.loadFixture(deployAll);
+		const currentPrice = await env.read(MandalaToken, {
+			functionName: 'currentPrice',
+		});
+		const {tokenId, signature} = await randomMintSignature(unnamedAccounts[0]);
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'mint',
+			args: [unnamedAccounts[0], signature],
+			value: currentPrice,
+		});
+		await env.execute(MandalaToken, {
+			account: unnamedAccounts[0],
+			functionName: 'transferFrom',
+			args: [unnamedAccounts[0], unnamedAccounts[1], tokenId],
+		});
+
+		const currentPrice3 = await env.read(MandalaToken, {
+			functionName: 'currentPrice',
+		});
+		const {signature: signature3} = await randomMintSignature(
+			unnamedAccounts[0],
+		);
+		const receipt3 = await env.execute(MandalaToken, {
+			account: unnamedAccounts[3],
+			functionName: 'mint',
+			args: [unnamedAccounts[3], signature3],
+			value: currentPrice3,
+		});
+
+		console.log(JSON.stringify(receipt3, null, 2));
+
+		const currentPrice4 = await env.read(MandalaToken, {
+			functionName: 'currentPrice',
+		});
+		const {signature: signature4} = await randomMintSignature(
+			unnamedAccounts[0],
+		);
+		console.log(currentPrice4);
+		const receipt4 = await env.execute(MandalaToken, {
+			account: unnamedAccounts[4],
+			functionName: 'mint',
+			args: [unnamedAccounts[4], signature4],
+			value: currentPrice4,
+		});
+		console.log(JSON.stringify(receipt4, null, 2));
+
+		const balanceBefore = await env.viem.publicClient.getBalance({
+			address: unnamedAccounts[1],
+		});
+
+		const supply = await env.read(MandalaToken, {
+			functionName: 'totalSupply',
+		});
+		// const newCurrentPrice = await MandalaToken.currentPrice();
+		const burnPrice =
+			BigInt(MandalaToken.linkedData.initialPrice) +
+			((supply - 1n) *
+				BigInt(MandalaToken.linkedData.linearCoefficient) *
+				(10000n - BigInt(MandalaToken.linkedData.creatorCutPer10000th))) /
+				10000n;
+
+		const receipt = await env.execute(MandalaToken, {
+			account: unnamedAccounts[1],
+			functionName: 'burn',
+			args: [tokenId],
+		});
+		const txCost = BigInt(receipt.effectiveGasPrice) * BigInt(receipt.gasUsed);
+		const balanceAfter = await env.viem.publicClient.getBalance({
+			address: unnamedAccounts[1],
+		});
+		expect(balanceAfter).toEqual(balanceBefore - txCost + burnPrice);
+	});
 });

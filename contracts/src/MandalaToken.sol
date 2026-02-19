@@ -7,26 +7,32 @@ pragma experimental ABIEncoderV2;
 import "./ERC721Base.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol";
 import "@openzeppelin/contracts/cryptography/ECDSA.sol";
-import "hardhat-deploy/solc_0.7/proxy/Proxied.sol";
+import "@rocketh/proxy/solc_0_7/ERC1967/Proxied.sol";
 
 contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
     using EnumerableSet for EnumerableSet.UintSet;
     using ECDSA for bytes32;
 
     // solhint-disable-next-line quotes
-    bytes internal constant TEMPLATE = "data:text/plain,{\"name\":\"Mandala 0x0000000000000000000000000000000000000000\",\"description\":\"A Unique Mandala\",\"image\":\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' shape-rendering='crispEdges' width='512' height='512'><g transform='scale(64)'><image width='8' height='8' style='image-rendering: pixelated;' href='data:image/gif;base64,R0lGODdhEwATAMQAAAAAAPb+Y/7EJfN3NNARQUUKLG0bMsR1SujKqW7wQwe/dQBcmQeEqjDR0UgXo4A0vrlq2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkKAAAALAAAAAATABMAAAdNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA6gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGBADs='/></g></svg>\"}";
+    bytes internal constant TEMPLATE =
+        "data:text/plain,{\"name\":\"Mandala 0x0000000000000000000000000000000000000000\",\"description\":\"A Unique Mandala\",\"image\":\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' shape-rendering='crispEdges' width='512' height='512'><g transform='scale(64)'><image width='8' height='8' style='image-rendering: pixelated;' href='data:image/gif;base64,R0lGODdhEwATAMQAAAAAAPb+Y/7EJfN3NNARQUUKLG0bMsR1SujKqW7wQwe/dQBcmQeEqjDR0UgXo4A0vrlq2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkKAAAALAAAAAATABMAAAdNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA6gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGBADs='/></g></svg>\"}";
     uint256 internal constant IMAGE_DATA_POS = 521;
     uint256 internal constant ADDRESS_NAME_POS = 74;
 
     uint256 internal constant WIDTH = 19;
     uint256 internal constant HEIGHT = 19;
     uint256 internal constant ROW_PER_BLOCK = 4;
-    bytes32 internal constant xs = 0x8934893467893456789456789567896789789899000000000000000000000000;
-    bytes32 internal constant ys = 0x0011112222223333333444444555556666777889000000000000000000000000;
+    bytes32 internal constant xs =
+        0x8934893467893456789456789567896789789899000000000000000000000000;
+    bytes32 internal constant ys =
+        0x0011112222223333333444444555556666777889000000000000000000000000;
 
     event Minted(uint256 indexed id, uint256 indexed pricePaid);
     event Burned(uint256 indexed id, uint256 indexed priceReceived);
-    event CreatorshipTransferred(address indexed previousCreator, address indexed newCreator);
+    event CreatorshipTransferred(
+        address indexed previousCreator,
+        address indexed newCreator
+    );
 
     uint256 public immutable linearCoefficient;
     uint256 public immutable initialPrice;
@@ -43,7 +49,12 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
         initialPrice = _initialPrice;
         creatorCutPer10000th = _creatorCutPer10000th;
         linearCoefficient = _linearCoefficient;
-        postUpgrade(_creator, _initialPrice, _creatorCutPer10000th, _linearCoefficient);
+        postUpgrade(
+            _creator,
+            _initialPrice,
+            _creatorCutPer10000th,
+            _linearCoefficient
+        );
     }
 
     // solhint-disable-next-line no-unused-vars
@@ -78,7 +89,9 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
         return "MANDALA";
     }
 
-    function tokenURI(uint256 id) public view virtual override returns (string memory) {
+    function tokenURI(
+        uint256 id
+    ) public view virtual override returns (string memory) {
         address owner = _ownerOf(id);
         require(owner != address(0), "NOT_EXISTS");
         return _tokenURI(id);
@@ -91,7 +104,9 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
     /// 0x780e9d63 is for ERC721 enumerable
     /// @param id The id of the interface.
     /// @return Whether the interface is supported.
-    function supportsInterface(bytes4 id) public pure virtual override(ERC721Base, IERC165) returns (bool) {
+    function supportsInterface(
+        bytes4 id
+    ) public pure virtual override(ERC721Base, IERC165) returns (bool) {
         return ERC721Base.supportsInterface(id) || id == 0x5b5e139f;
     }
 
@@ -117,7 +132,10 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
         }
     }
 
-    function mint(address to, bytes memory signature) external payable returns (uint256) {
+    function mint(
+        address to,
+        bytes memory signature
+    ) external payable returns (uint256) {
         uint256 mintPrice = _curve(_supply);
         require(msg.value >= mintPrice, "NOT_ENOUGH_ETH");
 
@@ -137,7 +155,9 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
         }
 
         if (!success || msg.value > mintPrice) {
-            msg.sender.transfer(msg.value - mintPrice + (!success ? forCreator : 0));
+            msg.sender.transfer(
+                msg.value - mintPrice + (!success ? forCreator : 0)
+            );
         }
 
         emit Minted(uint256(signer), mintPrice);
@@ -177,32 +197,97 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
             }
             uint256 x = extract(xs, i);
             uint256 y = extract(ys, i);
-            setCharacter(metadata, IMAGE_DATA_POS, y * WIDTH + x + (y / ROW_PER_BLOCK) * 2 + 1, value);
+            setCharacter(
+                metadata,
+                IMAGE_DATA_POS,
+                y * WIDTH + x + (y / ROW_PER_BLOCK) * 2 + 1,
+                value
+            );
 
             if (x != y) {
-                setCharacter(metadata, IMAGE_DATA_POS, x * WIDTH + y + (x / ROW_PER_BLOCK) * 2 + 1, value);
+                setCharacter(
+                    metadata,
+                    IMAGE_DATA_POS,
+                    x * WIDTH + y + (x / ROW_PER_BLOCK) * 2 + 1,
+                    value
+                );
                 if (y != HEIGHT / 2) {
-                    setCharacter(metadata, IMAGE_DATA_POS, x * WIDTH + (WIDTH - y - 1) + (x / ROW_PER_BLOCK) * 2 + 1, value); // x mirror
+                    setCharacter(
+                        metadata,
+                        IMAGE_DATA_POS,
+                        x *
+                            WIDTH +
+                            (WIDTH - y - 1) +
+                            (x / ROW_PER_BLOCK) *
+                            2 +
+                            1,
+                        value
+                    ); // x mirror
                 }
 
                 if (x != WIDTH / 2) {
-                    setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT - x - 1) * WIDTH + y + ((HEIGHT - x - 1) / ROW_PER_BLOCK) * 2 + 1, value); // y mirror
+                    setCharacter(
+                        metadata,
+                        IMAGE_DATA_POS,
+                        (HEIGHT - x - 1) *
+                            WIDTH +
+                            y +
+                            ((HEIGHT - x - 1) / ROW_PER_BLOCK) *
+                            2 +
+                            1,
+                        value
+                    ); // y mirror
                 }
 
                 if (x != WIDTH / 2 && y != HEIGHT / 2) {
-                    setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT - x - 1) * WIDTH + (WIDTH - y - 1) + ((HEIGHT - x - 1) / ROW_PER_BLOCK) * 2 + 1, value); // x,y mirror
+                    setCharacter(
+                        metadata,
+                        IMAGE_DATA_POS,
+                        (HEIGHT - x - 1) *
+                            WIDTH +
+                            (WIDTH - y - 1) +
+                            ((HEIGHT - x - 1) / ROW_PER_BLOCK) *
+                            2 +
+                            1,
+                        value
+                    ); // x,y mirror
                 }
             }
 
             if (x != WIDTH / 2) {
-                setCharacter(metadata, IMAGE_DATA_POS, y * WIDTH + (WIDTH - x - 1) + (y / ROW_PER_BLOCK) * 2 + 1, value); // x mirror
+                setCharacter(
+                    metadata,
+                    IMAGE_DATA_POS,
+                    y * WIDTH + (WIDTH - x - 1) + (y / ROW_PER_BLOCK) * 2 + 1,
+                    value
+                ); // x mirror
             }
             if (y != HEIGHT / 2) {
-                setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT - y - 1) * WIDTH + x + ((HEIGHT - y - 1) / ROW_PER_BLOCK) * 2 + 1, value); // y mirror
+                setCharacter(
+                    metadata,
+                    IMAGE_DATA_POS,
+                    (HEIGHT - y - 1) *
+                        WIDTH +
+                        x +
+                        ((HEIGHT - y - 1) / ROW_PER_BLOCK) *
+                        2 +
+                        1,
+                    value
+                ); // y mirror
             }
 
             if (x != WIDTH / 2 && y != HEIGHT / 2) {
-                setCharacter(metadata, IMAGE_DATA_POS, (HEIGHT - y - 1) * WIDTH + (WIDTH - x - 1) + ((HEIGHT - y - 1) / ROW_PER_BLOCK) * 2 + 1, value); // x,y mirror
+                setCharacter(
+                    metadata,
+                    IMAGE_DATA_POS,
+                    (HEIGHT - y - 1) *
+                        WIDTH +
+                        (WIDTH - x - 1) +
+                        ((HEIGHT - y - 1) / ROW_PER_BLOCK) *
+                        2 +
+                        1,
+                    value
+                ); // x,y mirror
             }
         }
         return string(metadata);
@@ -220,11 +305,17 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
         if (bit == 0) {
             metadata[base64Slot] = uint8ToBase64(value >> 2);
             uint8 extraValue = base64ToUint8(metadata[base64Slot + 1]);
-            metadata[base64Slot + 1] = uint8ToBase64(((value % 4) << 4) | (0x0F & extraValue));
+            metadata[base64Slot + 1] = uint8ToBase64(
+                ((value % 4) << 4) | (0x0F & extraValue)
+            );
         } else if (bit == 2) {
-            metadata[base64Slot] = uint8ToBase64((value >> 4) | (0x30 & existingValue));
+            metadata[base64Slot] = uint8ToBase64(
+                (value >> 4) | (0x30 & existingValue)
+            );
             uint8 extraValue = base64ToUint8(metadata[base64Slot + 1]);
-            metadata[base64Slot + 1] = uint8ToBase64(((value % 16) << 2) | (0x03 & extraValue));
+            metadata[base64Slot + 1] = uint8ToBase64(
+                ((value % 16) << 2) | (0x03 & extraValue)
+            );
         } else {
             // bit == 4)
             // metadata[base64Slot] = uint8ToBase64((value >> 6) | (0x3C & existingValue)); // skip as value are never as big
@@ -236,8 +327,10 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
         return (uint256(arr) >> (256 - (i + 1) * 4)) % 16;
     }
 
-    bytes32 internal constant base64Alphabet_1 = 0x4142434445464748494A4B4C4D4E4F505152535455565758595A616263646566;
-    bytes32 internal constant base64Alphabet_2 = 0x6768696A6B6C6D6E6F707172737475767778797A303132333435363738392B2F;
+    bytes32 internal constant base64Alphabet_1 =
+        0x4142434445464748494A4B4C4D4E4F505152535455565758595A616263646566;
+    bytes32 internal constant base64Alphabet_2 =
+        0x6768696A6B6C6D6E6F707172737475767778797A303132333435363738392B2F;
 
     function base64ToUint8(bytes1 s) internal pure returns (uint8 v) {
         if (uint8(s) == 0x2B) {

@@ -1,92 +1,80 @@
-import 'dotenv/config';
-import {HardhatUserConfig} from 'hardhat/types';
-import 'hardhat-deploy';
-import '@nomiclabs/hardhat-ethers';
-import 'hardhat-gas-reporter';
-import '@typechain/hardhat';
-import 'solidity-coverage';
-import 'hardhat-deploy-tenderly';
-import {node_url, accounts, addForkConfiguration} from './utils/network';
+import type {HardhatUserConfig} from 'hardhat/config';
+
+import HardhatNodeTestRunner from '@nomicfoundation/hardhat-node-test-runner';
+import HardhatViem from '@nomicfoundation/hardhat-viem';
+import HardhatNetworkHelpers from '@nomicfoundation/hardhat-network-helpers';
+import HardhatKeystore from '@nomicfoundation/hardhat-keystore';
+
+import HardhatDeploy from 'hardhat-deploy';
+import {
+	addForkConfiguration,
+	addNetworksFromEnv,
+	addNetworksFromKnownList,
+} from 'hardhat-deploy/helpers';
 
 const config: HardhatUserConfig = {
-  solidity: {
-    version: '0.7.1',
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 2000,
-      },
-    },
-  },
-  namedAccounts: {
-    deployer: 0,
-    simpleERC20Beneficiary: 1,
-  },
-  networks: addForkConfiguration({
-    hardhat: {
-      initialBaseFeePerGas: 0, // to fix : https://github.com/sc-forks/solidity-coverage/issues/652, see https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136
-    },
-    localhost: {
-      url: node_url('localhost'),
-      accounts: accounts(),
-    },
-    staging: {
-      url: node_url('rinkeby'),
-      accounts: accounts('rinkeby'),
-    },
-    production: {
-      url: node_url('mainnet'),
-      accounts: accounts('mainnet'),
-    },
-    mainnet: {
-      url: node_url('mainnet'),
-      accounts: accounts('mainnet'),
-    },
-    rinkeby: {
-      url: node_url('rinkeby'),
-      accounts: accounts('rinkeby'),
-    },
-    kovan: {
-      url: node_url('kovan'),
-      accounts: accounts('kovan'),
-    },
-    goerli: {
-      url: node_url('goerli'),
-      accounts: accounts('goerli'),
-    },
-  }),
-  paths: {
-    sources: 'src',
-  },
-  gasReporter: {
-    currency: 'USD',
-    gasPrice: 100,
-    enabled: process.env.REPORT_GAS ? true : false,
-    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
-    maxMethodDiff: 10,
-  },
-  typechain: {
-    outDir: 'typechain',
-    target: 'ethers-v5',
-  },
-  mocha: {
-    timeout: 0,
-  },
-  external: process.env.HARDHAT_FORK
-    ? {
-        deployments: {
-          // process.env.HARDHAT_FORK will specify the network that the fork is made from.
-          // these lines allow it to fetch the deployments from the network being forked from both for node and deploy task
-          hardhat: ['deployments/' + process.env.HARDHAT_FORK],
-          localhost: ['deployments/' + process.env.HARDHAT_FORK],
-        },
-      }
-    : undefined,
-
-  tenderly: {
-    project: 'mandalas',
-    username: process.env.TENDERLY_USERNAME as string,
-  },
+	plugins: [
+		HardhatNodeTestRunner,
+		HardhatViem,
+		HardhatNetworkHelpers,
+		HardhatKeystore,
+		HardhatDeploy,
+	],
+	solidity: {
+		profiles: {
+			default: {
+				version: '0.7.1',
+			},
+			production: {
+				version: '0.7.1',
+				settings: {
+					optimizer: {
+						enabled: true,
+						runs: 2000,
+					},
+				},
+			},
+		},
+	},
+	networks:
+		// This add the fork configuration for chosen network
+		addForkConfiguration(
+			// this add a network config for all known chain using kebab-cases names
+			// Note that MNEMONIC_<network> (or MNEMONIC if the other is not set) will
+			// be used for account
+			// Similarly ETH_NODE_URI_<network> will be used for rpcUrl
+			// Note that if you set these env variable to have the value: "SECRET" it will be like using:
+			//  configVariable('SECRET_ETH_NODE_URI_<network>')
+			//  configVariable('SECRET_MNEMONIC_<network>')
+			addNetworksFromKnownList(
+				// this add network for each respective env var found (ETH_NODE_URI_<network>)
+				// it will also read MNEMONIC_<network> to populate the accounts
+				// And like above it will use configVariable if set to SECRET
+				addNetworksFromEnv(
+					// and you can add in your specific network here
+					{
+						default: {
+							type: 'edr-simulated',
+							chainType: 'l1',
+							accounts: {
+								mnemonic: process.env.MNEMONIC || undefined,
+							},
+						},
+					},
+				),
+			),
+		),
+	paths: {
+		sources: ['src'],
+	},
+	generateTypedArtifacts: {
+		destinations: [
+			{
+				folder: './generated',
+				mode: 'typescript',
+			},
+		],
+	},
 };
 
 export default config;

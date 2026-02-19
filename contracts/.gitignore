@@ -1,23 +1,22 @@
-cache/
-artifacts/
+/node_modules
 
-coverage*
-typechain/
+*.local
 
-.vscode/*
-!.vscode/settings.json.default
-!.vscode/launch.json.default
-!.vscode/extensions.json.default
-
-node_modules/
-.env
-
-.yalc
-yalc.lock
-
-contractsInfo.json
-deployments/hardhat
+# rocketh
+generated
 deployments/localhost
+deployments/hardhat*
+deployments/lan
+deployments/default
+_metadata
 
-.dapp/
-_lib/
+# hardhat
+/coverage
+/coverage.json
+/.coverage-config.json
+/.coverage-data.json
+cache
+artifacts
+docs
+
+dist/

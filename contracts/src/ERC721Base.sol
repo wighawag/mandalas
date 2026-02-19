@@ -15,8 +15,8 @@ abstract contract ERC721Base is IERC165, IERC721 {
     bytes4 internal constant ERC721_RECEIVED = 0x150b7a02;
     bytes4 internal constant ERC165ID = 0x01ffc9a7;
 
-    uint256 internal constant OPERATOR_FLAG = (2**255);
-    uint256 internal constant BURN_FLAG = (2**254);
+    uint256 internal constant OPERATOR_FLAG = (2 ** 255);
+    uint256 internal constant BURN_FLAG = (2 ** 254);
 
     uint256 internal _supply;
     mapping(uint256 => uint256) internal _owners;
@@ -30,7 +30,10 @@ abstract contract ERC721Base is IERC165, IERC721 {
     function approve(address operator, uint256 id) external override {
         address owner = _ownerOf(id);
         require(owner != address(0), "NONEXISTENT_TOKEN");
-        require(owner == msg.sender || _operatorsForAll[owner][msg.sender], "UNAUTHORIZED_APPROVAL");
+        require(
+            owner == msg.sender || _operatorsForAll[owner][msg.sender],
+            "UNAUTHORIZED_APPROVAL"
+        );
         _approveFor(owner, operator, id);
     }
 
@@ -48,7 +51,11 @@ abstract contract ERC721Base is IERC165, IERC721 {
         require(owner == from, "NOT_OWNER");
         require(to != address(0), "NOT_TO_ZEROADDRESS");
         if (msg.sender != from) {
-            require(_operatorsForAll[from][msg.sender] || (operatorEnabled && _operators[id] == msg.sender), "UNAUTHORIZED_TRANSFER");
+            require(
+                _operatorsForAll[from][msg.sender] ||
+                    (operatorEnabled && _operators[id] == msg.sender),
+                "UNAUTHORIZED_TRANSFER"
+            );
         }
         _transferFrom(from, to, id);
     }
@@ -68,14 +75,19 @@ abstract contract ERC721Base is IERC165, IERC721 {
     /// @notice Set the approval for an operator to manage all the tokens of the sender.
     /// @param operator The address receiving the approval.
     /// @param approved The determination of the approval.
-    function setApprovalForAll(address operator, bool approved) external override {
+    function setApprovalForAll(
+        address operator,
+        bool approved
+    ) external override {
         _setApprovalForAll(msg.sender, operator, approved);
     }
 
     /// @notice Get the number of tokens owned by an address.
     /// @param owner The address to look for.
     /// @return balance The number of tokens owned by the address.
-    function balanceOf(address owner) external view override returns (uint256 balance) {
+    function balanceOf(
+        address owner
+    ) external view override returns (uint256 balance) {
         require(owner != address(0), "ZERO_ADDRESS_OWNER");
         balance = _holderTokens[owner].length();
     }
@@ -83,12 +95,17 @@ abstract contract ERC721Base is IERC165, IERC721 {
     /// @notice Get the owner of a token.
     /// @param id The id of the token.
     /// @return owner The address of the token owner.
-    function ownerOf(uint256 id) external view override returns (address owner) {
+    function ownerOf(
+        uint256 id
+    ) external view override returns (address owner) {
         owner = _ownerOf(id);
         require(owner != address(0), "NONEXISTANT_TOKEN");
     }
 
-    function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256) {
+    function tokenOfOwnerByIndex(
+        address owner,
+        uint256 index
+    ) external view returns (uint256) {
         return _holderTokens[owner].at(index);
     }
 
@@ -113,7 +130,10 @@ abstract contract ERC721Base is IERC165, IERC721 {
     /// @param owner The address of the owner.
     /// @param operator The address of the operator.
     /// @return isOperator The status of the approval.
-    function isApprovedForAll(address owner, address operator) external view override returns (bool isOperator) {
+    function isApprovedForAll(
+        address owner,
+        address operator
+    ) external view override returns (bool isOperator) {
         return _operatorsForAll[owner][operator];
     }
 
@@ -133,11 +153,18 @@ abstract contract ERC721Base is IERC165, IERC721 {
         require(owner == from, "NOT_OWNER");
         require(to != address(0), "NOT_TO_ZEROADDRESS");
         if (msg.sender != from) {
-            require(_operatorsForAll[from][msg.sender] || (operatorEnabled && _operators[id] == msg.sender), "UNAUTHORIZED_TRANSFER");
+            require(
+                _operatorsForAll[from][msg.sender] ||
+                    (operatorEnabled && _operators[id] == msg.sender),
+                "UNAUTHORIZED_TRANSFER"
+            );
         }
         _transferFrom(from, to, id);
         if (to.isContract()) {
-            require(_checkOnERC721Received(msg.sender, from, to, id, data), "ERC721_TRANSFER_REJECTED");
+            require(
+                _checkOnERC721Received(msg.sender, from, to, id, data),
+                "ERC721_TRANSFER_REJECTED"
+            );
         }
     }
 
@@ -147,15 +174,13 @@ abstract contract ERC721Base is IERC165, IERC721 {
     /// 0x780e9d63 is for ERC721 enumerable
     /// @param id The id of the interface.
     /// @return Whether the interface is supported.
-    function supportsInterface(bytes4 id) public pure virtual override returns (bool) {
+    function supportsInterface(
+        bytes4 id
+    ) public pure virtual override returns (bool) {
         return id == 0x01ffc9a7 || id == 0x80ac58cd || id == 0x780e9d63;
     }
 
-    function _transferFrom(
-        address from,
-        address to,
-        uint256 id
-    ) internal {
+    function _transferFrom(address from, address to, uint256 id) internal {
         _holderTokens[from].remove(id);
         _holderTokens[to].add(id);
         _owners[id] = uint256(to);
@@ -163,11 +188,7 @@ abstract contract ERC721Base is IERC165, IERC721 {
     }
 
     /// @dev See approve.
-    function _approveFor(
-        address owner,
-        address operator,
-        uint256 id
-    ) internal {
+    function _approveFor(address owner, address operator, uint256 id) internal {
         if (operator == address(0)) {
             _owners[id] = uint256(owner);
         } else {
@@ -202,7 +223,12 @@ abstract contract ERC721Base is IERC165, IERC721 {
         uint256 id,
         bytes memory data
     ) internal returns (bool) {
-        bytes4 retval = IERC721Receiver(to).onERC721Received(operator, from, id, data);
+        bytes4 retval = IERC721Receiver(to).onERC721Received(
+            operator,
+            from,
+            id,
+            data
+        );
         return (retval == ERC721_RECEIVED);
     }
 
@@ -216,7 +242,9 @@ abstract contract ERC721Base is IERC165, IERC721 {
     /// @param id The token to query.
     /// @return owner The owner of the token.
     /// @return operatorEnabled Whether or not operators are enabled for this token.
-    function _ownerAndOperatorEnabledOf(uint256 id) internal view returns (address owner, bool operatorEnabled) {
+    function _ownerAndOperatorEnabledOf(
+        uint256 id
+    ) internal view returns (address owner, bool operatorEnabled) {
         uint256 data = _owners[id];
         owner = address(data);
         operatorEnabled = (data & OPERATOR_FLAG) == OPERATOR_FLAG;

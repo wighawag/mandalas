@@ -1,29 +1,27 @@
-import {Contract, ContractReceipt} from 'ethers';
-import {ethers} from 'hardhat';
+import {Deployment} from 'rocketh/types';
+import {Abi_MandalaToken} from '../../generated/abis/MandalaToken.js';
+import {loadAndExecuteDeploymentsFromFiles} from '../../rocketh/environment.js';
+import {EthereumProvider} from 'hardhat/types/providers';
 
-export async function setupUsers<T extends {[contractName: string]: Contract}>(
-  addresses: string[],
-  contracts: T
-): Promise<({address: string} & T)[]> {
-  const users: ({address: string} & T)[] = [];
-  for (const address of addresses) {
-    users.push(await setupUser(address, contracts));
-  }
-  return users;
-}
-
-export async function setupUser<T extends {[contractName: string]: Contract}>(
-  address: string,
-  contracts: T
-): Promise<{address: string} & T> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const user: any = {address};
-  for (const key of Object.keys(contracts)) {
-    user[key] = contracts[key].connect(await ethers.getSigner(address));
-  }
-  return user as {address: string} & T;
-}
-
-export function waitFor(p: Promise<{wait: () => Promise<ContractReceipt>}>) {
-  return p.then((v) => v.wait());
+export function setupFixtures(provider: EthereumProvider) {
+	return {
+		async deployAll() {
+			const env = await loadAndExecuteDeploymentsFromFiles({
+				provider: provider,
+			});
+			const MandalaToken = env.get<Abi_MandalaToken>('MandalaToken');
+			return {
+				env,
+				MandalaToken: MandalaToken as Deployment<Abi_MandalaToken> & {
+					linkedData: {
+						initialPrice: string;
+						creatorCutPer10000th: number;
+						linearCoefficient: string;
+					};
+				},
+				namedAccounts: env.namedAccounts,
+				unnamedAccounts: env.unnamedAccounts,
+			};
+		},
+	};
 }
