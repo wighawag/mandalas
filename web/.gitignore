@@ -2,3 +2,4 @@ node_modules/
 .svelte-kit/
 build/
 static/pwa
+src/lib/deployments.ts
