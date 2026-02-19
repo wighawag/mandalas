@@ -48,6 +48,10 @@ const config = {
 			// this is to make it work on ipfs (on an unknown path)
 			relative: true,
 		},
+
+		output: {
+			bundleStrategy: 'single',
+		},
 	},
 };
 
