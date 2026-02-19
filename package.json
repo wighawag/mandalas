@@ -4,18 +4,23 @@
   "description": "Mandalas",
   "private": true,
   "devDependencies": {
-    "cross-env": "^10.1.0",
-    "rimraf": "^6.1.3",
-    "wait-on": "^9.0.4"
+    "cross-var": "^1.1.0",
+    "ldenv": "^0.3.16",
+    "zellij-launcher": "^0.0.1"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
+    "cleandep": "rm -rf node_modules && pnpm -r exec rm -rf node_modules",
+    "---------------------- FORMAT ----------------------": "",
+    "format": "pnpm -r format",
+    "format:check": "pnpm -r format:check",
     "---------------------- common lib ----------------------": "compile the common library",
     "common:dev": "pnpm run --filter ./common-lib run dev",
     "common:build": "pnpm run --filter ./common-lib run build",
     "---------------------- contracts ----------------------": "compile and deploy smart contracts",
     "contracts:local_node": "ldenv pnpm run --filter ./contracts local_node",
     "contracts:deploy": "ldenv pnpm run --filter ./contracts deploy @@MODE @@",
+    "contracts:deploy:watch": "ldenv pnpm run --filter ./contracts deploy:watch @@MODE @@",
     "contracts:fork:deploy": "ldenv pnpm run --filter ./contracts fork:deploy @@MODE @@",
     "contracts:test": "ldenv pnpm run --filter ./contracts test",
     "contracts:lint": "pnpm --filter ./contracts lint",
@@ -24,6 +29,7 @@
     "contracts:verify": "ldenv pnpm run --filter ./contracts verify @@MODE @@",
     "contracts:compile": "ldenv pnpm --filter ./contracts compile",
     "contracts:compile:watch": "ldenv pnpm --filter ./contracts compile:watch",
+    "contracts:build:watch": "ldenv pnpm --filter ./contracts typescript:watch",
     "contracts:build": "ldenv pnpm --filter ./contracts compile ~~ pnpm --filter ./contracts typescript ~~",
     "contracts:export": "pnpm --filter ./contracts export @@MODE @@",
     "---------------------- WEB ----------------------": "",
@@ -31,12 +37,14 @@
     "web:build": "ldenv pnpm --filter ./web build",
     "web:serve": "ldenv pnpm --filter ./web serve",
     "web:check": "ldenv pnpm --filter ./web check",
-    "---------------------- FORMAT ----------------------": "",
-    "format": "pnpm -r format",
-    "format:check": "pnpm -r format:check",
+    "web:check:watch": "ldenv pnpm --filter ./web check:watch",
+     "---------------------- DEPLOY ----------------------": "",
+    "build": "ldenv --git -d localhost pnpm contracts:build @@MODE ~~ pnpm web:build ~~ @@",
+    "serve": "pnpm run --filter ./web serve",
     "---------------------- START ----------------------": "",
+    "zellij": "cross-var zellij-launcher a $npm_package_name || cross-var ldenv -d localhost zellij -n dev/zellij.kdl -s $npm_package_name",
     "test": "pnpm contracts:test",
-    "stop": "pnpm run --filter ./contracts stop",
-    "start": "pnpm run --filter ./contracts start"
+    "stop": "cross-var zellij kill-session $npm_package_name",
+    "start": "pnpm zellij"
   }
 }

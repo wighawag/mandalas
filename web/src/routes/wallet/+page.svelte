@@ -86,7 +86,7 @@
 </script>
 
 <div class="w-full">
-	{#if $curve.supply}
+	{#if $curve.supply !== undefined && $curve.supply !== null}
 		<div
 			class="mx-auto flex h-full w-full justify-between text-black dark:text-white"
 		>
@@ -98,7 +98,7 @@
 			</p>
 			<p class="m-2 text-xs font-black text-yellow-400 sm:text-base">
 				Current Supply:
-				{$curve.supply ? $curve.supply.toString() : 'loading'}
+				{$curve.supply.toString()}
 			</p>
 		</div>
 	{/if}

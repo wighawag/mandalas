@@ -53,7 +53,9 @@
 			</p>
 			<p class="m-2 text-xs font-black text-yellow-400 md:text-base">
 				Current Supply:
-				{$curve.supply ? $curve.supply.toString() : 'loading'}
+				{$curve.supply !== undefined && $curve.supply !== null
+					? $curve.supply.toString()
+					: 'loading'}
 			</p>
 		</div>
 		<div

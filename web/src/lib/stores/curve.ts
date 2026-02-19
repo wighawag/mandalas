@@ -25,8 +25,7 @@ export class CurveStore extends BaseStore<Curve> {
 		if (this.publicClient) {
 			try {
 				return await this.publicClient.readContract({
-					address: contractsInfo.contracts.MandalaToken
-						.address as `0x${string}`,
+					address: contractsInfo.contracts.MandalaToken.address,
 					abi: contractsInfo.contracts.MandalaToken.abi,
 					functionName: 'totalSupply',
 				});
@@ -40,7 +39,7 @@ export class CurveStore extends BaseStore<Curve> {
 
 	private async _fetch() {
 		const supply = await this.query();
-		if (!supply) {
+		if (supply === undefined || supply === null) {
 			if (this.startTime > 0 && Date.now() - this.startTime > 2000) {
 				console.log('STUCK');
 				this.setPartial({state: 'Stuck'});

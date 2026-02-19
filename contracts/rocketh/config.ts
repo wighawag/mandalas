@@ -20,6 +20,9 @@ export const config = {
 			default: 1,
 		},
 	},
+	defaultChainProperties: {
+		expectedWorstGasPrice: parseEther('0.000001', 'gwei'),
+	},
 	data: {},
 	signerProtocols: {
 		privateKey,
@@ -37,6 +40,7 @@ import * as readExecuteExtension from '@rocketh/read-execute';
 import * as deployProxyExtension from '@rocketh/proxy';
 // this one provide a viem handle to clients and contracts
 import * as viemExtension from '@rocketh/viem';
+import {parseEther} from 'viem';
 
 // and export them as a unified object
 const extensions = {

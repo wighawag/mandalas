@@ -4,6 +4,7 @@ import {privateKeyToAccount} from 'viem/accounts';
 import contractsInfo from '../deployments';
 import type {Chain, PublicClient, Transport, WalletClient} from 'viem';
 import {randomTokens, connection} from '$lib';
+import {computeBuffer} from '$lib/utils';
 
 const initialPrice = BigInt(
 	contractsInfo.contracts.MandalaToken.linkedData.initialPrice,
@@ -128,11 +129,4 @@ export class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
 	private _reset() {
 		this.setPartial({step: 'IDLE', data: undefined});
 	}
-}
-
-// Helper function
-function computeBuffer(supply: bigint, currentPrice: bigint): bigint {
-	// This is a simplified buffer calculation
-	// The original implementation had more complex logic
-	return currentPrice / BigInt(10); // 10% buffer
 }
