@@ -1,6 +1,7 @@
 import {generateTokenURI, template19_bis} from 'mandalas-common';
 import {BaseStore} from '$lib/utils/stores';
 import {privateKeyToAccount} from 'viem/accounts';
+import type {TypedDeployments} from '$lib/core/connection/types';
 
 type NFT = {
 	id: string;
@@ -35,20 +36,25 @@ export class RandomTokenStore extends BaseStore<NFTs> {
 	private counter = 0; // keep count of subscription
 	private random = '';
 	private claimTXs: {[id: string]: Transaction} = {};
-	constructor() {
+	private key: string;
+	constructor(private deployments: TypedDeployments) {
 		super({
 			state: 'Ready',
 			error: undefined,
 			tokens: [],
 			startIndex: 0,
 		});
+		this.key = `_mandalas_generated_${deployments.chain.id}_${deployments.chain.genesisHash}_${deployments.contracts.MandalaToken.address.toLowerCase()}`;
 	}
 
 	record(id: string, hash: string, nonce: number): void {
 		this.claimTXs[id] = {hash, nonce};
+		if (typeof localStorage == 'undefined') {
+			return;
+		}
 		try {
 			localStorage.setItem(
-				'_mandalas_generated',
+				this.key,
 				JSON.stringify({
 					random: this.random,
 					start: this.$store.startIndex,
@@ -94,6 +100,9 @@ export class RandomTokenStore extends BaseStore<NFTs> {
 	}
 
 	reset(): void {
+		if (typeof localStorage == 'undefined') {
+			return;
+		}
 		localStorage.clear();
 		location.reload();
 	}
@@ -101,7 +110,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
 	generate(num: number): void {
 		let data: LocalStorageData | undefined;
 		try {
-			const fromStorage = localStorage.getItem('_mandalas_generated');
+			const fromStorage = localStorage.getItem(this.key);
 			if (fromStorage) {
 				try {
 					data = JSON.parse(fromStorage);
@@ -134,10 +143,12 @@ export class RandomTokenStore extends BaseStore<NFTs> {
 				};
 			}
 
-			try {
-				localStorage.setItem('_mandalas_generated', JSON.stringify(data));
-			} catch (e) {
-				console.error(e);
+			if (!(typeof localStorage == 'undefined')) {
+				try {
+					localStorage.setItem(this.key, JSON.stringify(data));
+				} catch (e) {
+					console.error(e);
+				}
 			}
 		}
 

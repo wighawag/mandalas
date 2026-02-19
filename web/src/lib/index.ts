@@ -83,7 +83,7 @@ export const {
 } = await createDependencies();
 
 export const curve = new CurveStore(publicClient);
-export const randomTokens = new RandomTokenStore();
+export const randomTokens = new RandomTokenStore(deployments.current);
 
 const cache: {[owner: string]: NFTOfStore} = {};
 export function nftsof(owner?: string): NFTOfStore {
