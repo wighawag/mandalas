@@ -1,5 +1,5 @@
 import {BaseStoreWithData} from '$lib/utils/stores';
-import {encodePacked, keccak256, parseEther} from 'viem';
+import {encodePacked, keccak256} from 'viem';
 import {privateKeyToAccount} from 'viem/accounts';
 import contractsInfo from '../deployments';
 import type {Chain, PublicClient, Transport, WalletClient} from 'viem';

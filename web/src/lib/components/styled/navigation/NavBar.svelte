@@ -1,4 +1,7 @@
 <script lang="ts">
+	import {isSameRoute, url} from '$lib/core/utils/web/path';
+	import {page} from '$app/state';
+
 	type LinkInfo = {href: string; title: string};
 
 	interface Props {
@@ -7,27 +10,15 @@
 	let {links}: Props = $props();
 
 	import NavLink from './NavLink.svelte';
-	import {page} from '$app/stores';
-	import {base} from '$app/paths';
-
-	// TODO use svelte kit 2
-	// console.log({base});
 
 	function isActive(href: string): boolean {
-		const currentPath = $page.url.pathname;
-		// Normalize paths - remove trailing slashes for comparison
-		const normalizedHref = href.replace(/^\/+|\/+$/g, '');
-		const normalizedCurrent = currentPath.replace(/^\/+|\/+$/g, '');
-		return (
-			normalizedCurrent === normalizedHref ||
-			normalizedCurrent.startsWith(normalizedHref + '/')
-		);
+		return isSameRoute(page.url.pathname, href);
 	}
 </script>
 
 <div
 	class="absolute z-40 -m-1 h-1 w-full"
-	style={`background: url(${base}/images/multicolor_line_x8.png);`}
+	style={`background: url(${url(`/images/multicolor_line_x8.png`)});`}
 ></div>
 
 <ul class="m-1 flex">
@@ -40,5 +31,5 @@
 
 <div
 	class="absolute z-40 -m-1 h-1 w-full"
-	style={`background: url(${base}/images/multicolor_line_x8.png);`}
+	style={`background: url(${url(`/images/multicolor_line_x8.png`)});`}
 ></div>
