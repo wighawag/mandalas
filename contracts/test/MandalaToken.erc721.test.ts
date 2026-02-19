@@ -1,5 +1,5 @@
 import {erc721, Test, TestToRun} from 'ethereum-contracts-test-suite';
-import {encodePacked, keccak256} from 'viem';
+import {checksumAddress, encodePacked, keccak256} from 'viem';
 import {generatePrivateKey, privateKeyToAccount} from 'viem/accounts';
 
 import {network} from 'hardhat';
@@ -40,17 +40,19 @@ const tests = erc721.generateTests({burn: true}, async () => {
 			args: [to as `0x${string}`, signature],
 			value: currentPrice,
 		});
+
 		return {
 			tokenId: tokenId.toString(),
 			hash: receipt.transactionHash,
 		};
 	}
+
 	return {
 		ethereum: env.network.provider,
 		contractAddress: MandalaToken.address,
-		users: env.unnamedAccounts,
+		users: env.unnamedAccounts.map((v) => checksumAddress(v)), // the tests expect checksumed addresses
 		mint,
-		deployer: env.namedAccounts.deployer,
+		deployer: checksumAddress(env.namedAccounts.deployer),
 	};
 });
 
