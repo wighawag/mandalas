@@ -1,4 +1,4 @@
-import {PUBLIC_WALLET_HOST} from '$env/static/public';
+import {PUBLIC_WALLET_HOST, PUBLIC_RPC_URL} from '$env/static/public';
 import deploymentsFromFiles from '$lib/deployments';
 import {createConnection} from '@etherplay/connect';
 import {derived, writable} from 'svelte/store';
@@ -13,7 +13,10 @@ import type {
 
 // TODO allow to specify the expected DeploymentStore type
 export async function establishRemoteConnection(): Promise<EstablishedConnection> {
-	const chainInfo = deploymentsFromFiles.chain;
+	const chainInfo = {...deploymentsFromFiles.chain};
+	if (PUBLIC_RPC_URL) {
+		(chainInfo.rpcUrls as any) = {default: {http: [PUBLIC_RPC_URL]}};
+	}
 
 	const connection = createConnection({
 		walletHost: PUBLIC_WALLET_HOST,
