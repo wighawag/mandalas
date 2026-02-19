@@ -65,7 +65,7 @@
 
 	<p class="p-6">
 		This project was created by
-		<a href="https://ronan.eth.link" target="_blank" class="underline"
+		<a href="https://ronan.eth.limo" target="_blank" class="underline"
 			>Ronan Sandford</a
 		>
 		(a.k.a
