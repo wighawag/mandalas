@@ -111,8 +111,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0
       ethereum-contracts-test-suite:
-        specifier: ^0.2.5
-        version: 0.2.5(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+        specifier: ^0.2.6
+        version: 0.2.6(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       forge-std:
         specifier: github:foundry-rs/forge-std#v1.9.4
         version: https://codeload.github.com/foundry-rs/forge-std/tar.gz/1eea5bae12ae557d589f9f0f0edae2faa47cb262
@@ -2304,6 +2304,9 @@ packages:
   bn.js@5.2.2:
     resolution: {integrity: sha512-v2YAxEmKaBLahNwE1mjp4WON6huMNeuDvagFZW+ASCuA/ku0bXR9hSMw0XpiqMoA3+rmnyck/tPRSFQkoC9Cuw==}
 
+  bn.js@5.2.3:
+    resolution: {integrity: sha512-EAcmnPkxpntVL+DS7bO1zhcZNvCkxqtkd0ZY53h06GNQ3DEkkGZ/gKgmDv6DdZQGj9BgfSPKtJJ7Dp1GPP8f7w==}
+
   boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
 
@@ -2921,8 +2924,8 @@ packages:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
 
-  ethereum-contracts-test-suite@0.2.5:
-    resolution: {integrity: sha512-Ms4N4OLbhNprcIc4PZvA/7ap4WGrvM4ZdQwE6QF79dqsH3F8Y5vgk8hKkesOn5yRSTJU5jJLYbIQYj/n44JxRw==}
+  ethereum-contracts-test-suite@0.2.6:
+    resolution: {integrity: sha512-Wncq0F1wjJw0Xacu3oMWJPcd4SNa4i64+D4MsVHotJYzdv1h/xpJfEA+8iLd+a3IllWzUFfpDhvxBRsfRDQQ7g==}
 
   ethereum-cryptography@2.2.1:
     resolution: {integrity: sha512-r/W8lkHSiTLxUxW8Rf3u4HGB0xQweG2RyETjywylKZSzLWoWAijRz8WCuOtJ6wah+avllXBqZuk29HCCvhEIRg==}
@@ -5878,7 +5881,7 @@ snapshots:
       '@ethersproject/bytes': 5.8.0
       '@ethersproject/logger': 5.8.0
       '@ethersproject/properties': 5.8.0
-      bn.js: 5.2.2
+      bn.js: 5.2.3
       elliptic: 6.6.1
       hash.js: 1.1.7
 
@@ -8030,6 +8033,8 @@ snapshots:
 
   bn.js@5.2.2: {}
 
+  bn.js@5.2.3: {}
+
   boolbase@1.0.0: {}
 
   borsh@0.7.0:
@@ -8785,7 +8790,7 @@ snapshots:
 
   etag@1.8.1: {}
 
-  ethereum-contracts-test-suite@0.2.5(bufferutil@4.1.0)(utf-8-validate@5.0.10):
+  ethereum-contracts-test-suite@0.2.6(bufferutil@4.1.0)(utf-8-validate@5.0.10):
     dependencies:
       chai: 4.5.0
       chai-ethers: 0.0.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)

@@ -35,7 +35,7 @@
 		"as-soon": "^0.1.5",
 		"cross-var": "^1.1.0",
 		"earl": "^2.0.0",
-		"ethereum-contracts-test-suite": "^0.2.5",
+		"ethereum-contracts-test-suite": "^0.2.6",
 		"forge-std": "github:foundry-rs/forge-std#v1.9.4",
 		"hardhat": "^3.1.8",
 		"hardhat-deploy": "^2.0.0",

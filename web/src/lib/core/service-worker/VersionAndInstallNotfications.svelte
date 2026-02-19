@@ -2,9 +2,12 @@
 	import {serviceWorker} from '$lib/core/config';
 	import {fly} from 'svelte/transition';
 
-	// TODO
-	export let src: string;
-	export let alt: string;
+	interface Props {
+		src: string;
+		alt: string;
+	}
+
+	let {src, alt}: Props = $props();
 
 	function skip() {
 		serviceWorker.skip();
