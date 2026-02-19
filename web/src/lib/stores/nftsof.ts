@@ -167,7 +167,7 @@ export class NFTOfStore extends BaseStore<NFTs> {
 	}
 
 	start(): NFTOfStore | void {
-		console.log('start ' + this.currentOwner);
+		// console.log('start ' + this.currentOwner);
 		if (this.$store.state !== 'Ready') {
 			this.setPartial({state: 'Loading'});
 		}
@@ -177,7 +177,7 @@ export class NFTOfStore extends BaseStore<NFTs> {
 	}
 
 	stop() {
-		console.log('stop ' + this.currentOwner);
+		// console.log('stop ' + this.currentOwner);
 		if (this.timer) {
 			clearInterval(this.timer);
 			this.timer = undefined;

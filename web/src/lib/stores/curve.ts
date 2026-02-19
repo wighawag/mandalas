@@ -80,7 +80,7 @@ export class CurveStore extends BaseStore<Curve> {
 	start(): CurveStore | void {
 		if (this.startTime === 0) {
 			this.startTime = Date.now();
-			console.log({start: this.startTime});
+			// console.log({start: this.startTime});
 		}
 		this.setPartial({state: 'Loading'});
 		this._fetch();

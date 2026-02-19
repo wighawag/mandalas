@@ -49,7 +49,7 @@
 <Dialog.Root
 	open={openWhen}
 	onOpenChange={(open) => {
-		console.log('onOpenChange', open);
+		// console.log('onOpenChange', open);
 		if (!open) {
 			onCancel?.();
 		}

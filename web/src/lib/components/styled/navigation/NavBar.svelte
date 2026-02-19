@@ -10,7 +10,8 @@
 	import {page} from '$app/stores';
 	import {base} from '$app/paths';
 
-	console.log({base});
+	// TODO use svelte kit 2
+	// console.log({base});
 
 	function isActive(href: string): boolean {
 		const currentPath = $page.url.pathname;

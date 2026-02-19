@@ -44,7 +44,7 @@ export async function createDependencies(): Promise<Dependencies> {
 	// TODO remove
 	// we trigger it
 	gasFee.subscribe((v) => {
-		console.log(`gas fee updated`, v);
+		// console.log(`gas fee updated`, v);
 	});
 	window.gasFee = gasFee;
 	// ----------------------------------------------------------------------------

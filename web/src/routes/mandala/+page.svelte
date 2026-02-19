@@ -11,7 +11,7 @@
 	onMount(() => {
 		let mandalaId =
 			typeof location !== 'undefined' ? location.hash.substr(1) : '0x00';
-		console.log({mandalaId});
+		// console.log({mandalaId});
 
 		// $: tokenURI = generatePureSVGTokenURI(mandalaId, pure_svg_template_19_bis);
 		let tokenURI = generateTokenURI(mandalaId, template19_bis);
@@ -20,7 +20,7 @@
 		image = generateBitmapDataURI(mandalaId, template19_bis);
 		// $: image = metadata.image;
 		name = metadata.name;
-		console.log({tokenURI, metadata, image, name});
+		// console.log({tokenURI, metadata, image, name});
 	});
 </script>
 

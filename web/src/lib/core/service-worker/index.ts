@@ -172,7 +172,7 @@ export function createServiceWorker() {
 			//listen to messages
 			navigator.serviceWorker.onmessage = (event) => {
 				if (event.data && event.data.type === 'notification') {
-					console.log(event);
+					// console.log(event);
 					notifications.add({
 						type: 'push-notification',
 						data: event.data.notification,

@@ -25,7 +25,7 @@
 			$connection.mechanism.address
 		) {
 			const walletAddress = $connection.mechanism.address;
-			console.log('redirect');
+			// console.log('redirect');
 			goto(url(`/wallet/`, `${walletAddress}`), {replaceState: true}).then(
 				() => {
 					addressFromURI =
