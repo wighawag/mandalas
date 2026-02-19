@@ -27,7 +27,7 @@
 <div
 	class="absolute z-40 -m-1 h-1 w-full"
 	style={`background: url(${base}/images/multicolor_line_x8.png);`}
-/>
+></div>
 
 <ul class="m-1 flex">
 	{#each links as link}
@@ -40,4 +40,4 @@
 <div
 	class="absolute z-40 -m-1 h-1 w-full"
 	style={`background: url(${base}/images/multicolor_line_x8.png);`}
-/>
+></div>
