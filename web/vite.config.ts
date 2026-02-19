@@ -6,16 +6,20 @@ import {hookup} from 'named-logs-console';
 
 hookup();
 
-const plugins = [devtoolsJson({uuid: '612d0dc7-ecc1-4ebd-8daf-7201d2a8a133'}), tailwindcss(), sveltekit()];
+const plugins = [
+	devtoolsJson({uuid: '612d0dc7-ecc1-4ebd-8daf-7201d2a8a133'}),
+	tailwindcss(),
+	sveltekit(),
+];
 
 export default defineConfig({
-  plugins,
-  build: {
-    emptyOutDir: true,
-    minify: false,
-    sourcemap: true,
-  },
-  worker: {
-    format: 'es',
-  },
+	plugins,
+	build: {
+		emptyOutDir: true,
+		minify: false,
+		sourcemap: true,
+	},
+	worker: {
+		format: 'es',
+	},
 });

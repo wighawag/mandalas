@@ -58,10 +58,10 @@
 >
 	<Dialog.Portal>
 		<Dialog.Overlay
-			class={`${overlayCoreClass} bg-black/80 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0`}
+			class={`${overlayCoreClass} data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 bg-black/80`}
 		/>
 		<Dialog.Content
-			class={`${contentCoreClass} rounded-card-lg border bg-black p-5 outline-hidden data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95`}
+			class={`${contentCoreClass} rounded-card-lg data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 border bg-black p-5 outline-hidden`}
 			interactOutsideBehavior={onCancel ? 'close' : 'ignore'}
 			{onInteractOutside}
 			escapeKeydownBehavior={onCancel ? 'close' : 'ignore'}

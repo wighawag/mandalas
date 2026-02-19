@@ -215,11 +215,9 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
                     setCharacter(
                         metadata,
                         IMAGE_DATA_POS,
-                        x *
-                            WIDTH +
+                        x * WIDTH +
                             (WIDTH - y - 1) +
-                            (x / ROW_PER_BLOCK) *
-                            2 +
+                            (x / ROW_PER_BLOCK) * 2 +
                             1,
                         value
                     ); // x mirror
@@ -229,11 +227,9 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
                     setCharacter(
                         metadata,
                         IMAGE_DATA_POS,
-                        (HEIGHT - x - 1) *
-                            WIDTH +
+                        (HEIGHT - x - 1) * WIDTH +
                             y +
-                            ((HEIGHT - x - 1) / ROW_PER_BLOCK) *
-                            2 +
+                            ((HEIGHT - x - 1) / ROW_PER_BLOCK) * 2 +
                             1,
                         value
                     ); // y mirror
@@ -243,11 +239,9 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
                     setCharacter(
                         metadata,
                         IMAGE_DATA_POS,
-                        (HEIGHT - x - 1) *
-                            WIDTH +
+                        (HEIGHT - x - 1) * WIDTH +
                             (WIDTH - y - 1) +
-                            ((HEIGHT - x - 1) / ROW_PER_BLOCK) *
-                            2 +
+                            ((HEIGHT - x - 1) / ROW_PER_BLOCK) * 2 +
                             1,
                         value
                     ); // x,y mirror
@@ -266,11 +260,9 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
                 setCharacter(
                     metadata,
                     IMAGE_DATA_POS,
-                    (HEIGHT - y - 1) *
-                        WIDTH +
+                    (HEIGHT - y - 1) * WIDTH +
                         x +
-                        ((HEIGHT - y - 1) / ROW_PER_BLOCK) *
-                        2 +
+                        ((HEIGHT - y - 1) / ROW_PER_BLOCK) * 2 +
                         1,
                     value
                 ); // y mirror
@@ -280,11 +272,9 @@ contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
                 setCharacter(
                     metadata,
                     IMAGE_DATA_POS,
-                    (HEIGHT - y - 1) *
-                        WIDTH +
+                    (HEIGHT - y - 1) * WIDTH +
                         (WIDTH - x - 1) +
-                        ((HEIGHT - y - 1) / ROW_PER_BLOCK) *
-                        2 +
+                        ((HEIGHT - y - 1) / ROW_PER_BLOCK) * 2 +
                         1,
                     value
                 ); // x,y mirror

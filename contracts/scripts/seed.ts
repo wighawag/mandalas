@@ -3,19 +3,19 @@
 // const {execute} = deployments;
 
 async function main() {
-  // const others = await getUnnamedAccounts();
-  // let n = 1;
-  // for (let i = 0; i < 3; i++) {
-  //   for (let j = 0; j < 3; j++) {
-  //     await execute('MandalaToken', {from: others[i]}, 'mint', n)
-  //     n++;
-  //   }
-  // }
+	// const others = await getUnnamedAccounts();
+	// let n = 1;
+	// for (let i = 0; i < 3; i++) {
+	//   for (let j = 0; j < 3; j++) {
+	//     await execute('MandalaToken', {from: others[i]}, 'mint', n)
+	//     n++;
+	//   }
+	// }
 }
 
 main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+	.then(() => process.exit(0))
+	.catch((error) => {
+		console.error(error);
+		process.exit(1);
+	});

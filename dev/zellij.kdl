@@ -1,0 +1,32 @@
+layout {
+	pane split_direction="vertical" {
+		
+	}
+	pane split_direction="vertical" {
+		pane name="web" command="pnpm"  {
+			args "web:dev"
+		}
+		pane name="svelte-check" command="pnpm"  {
+			args "--filter" "./web" "check:watch"
+		}
+	}
+
+	pane split_direction="vertical" {
+		// pane name="local node" command="anvil"  {
+		// 	args "--block-time" "1"
+		// }
+		pane name="local node" command="pnpm"  {
+			args "--filter" "./onchain/evm" "local_node"
+		}
+		pane name="watch and compile" command="pnpm"  {
+			args "--filter" "./onchain/evm" "compile:watch"
+		}
+		pane name="watch and deploy 2 " command="pnpm"  {
+			args "--filter" "./onchain/evm" "deploy:watch" "localhost" "--ts" "../../web/src/lib/deployments.ts"
+		}
+		pane name="watch and build typescript" command="pnpm"  {
+			args "--filter" "./onchain/evm" "typescript:watch"
+		}
+	}
+	// TODO services
+}

@@ -7,7 +7,7 @@
 
 	let clazz = $derived(
 		clsx(
-			'rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-primary-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white',
+			'bg-primary hover:bg-primary-light rounded-md px-3.5 py-2.5 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white',
 			extraClass,
 		),
 	);
