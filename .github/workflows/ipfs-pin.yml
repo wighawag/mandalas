@@ -27,6 +27,8 @@ jobs:
 
       - name: Build
         run: pnpm build mainnet
+        env:
+          PUBLIC_RPC_URL: ${{ vars.PUBLIC_RPC_URL }}
 
       # - name: Pin to IPFS via Filebase
       #   run: pnpm pin
