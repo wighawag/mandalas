@@ -70,8 +70,7 @@ runs:
     - name: Install npm dependencies
       shell: bash
       working-directory: ${{ github.action_path }}
-      run: |
-        nix develop --command npm ci
+      run: npm ci
 
     - name: Run IPFS operations
       id: upload
@@ -88,4 +87,4 @@ runs:
         INPUT_FILEBASE_SECRET_KEY: ${{ inputs.filebase-secret-key }}
       run: |
         cd ${{ github.action_path }}
-        nix develop --command node index.js
+        node index.js
