@@ -1,0 +1,51 @@
+name: Build and Pin to IPFS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build_and_pin:
+    runs-on: ubuntu-latest
+    name: Build and Pin to IPFS
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build mainnet
+
+      - name: Pin to IPFS via Filebase
+        id: ipfs
+        uses: alexanderschau/ipfs-pinning-action@v1.0.0
+        with:
+          path_to_add: 'web/build'
+          endpoint: 'https://api.filebase.io/v1/ipfs/pins'
+          access_token: ${{ secrets.FILEBASE_ACCESS_TOKEN }}
+          pin_name: 'mandalas-web'
+
+      - name: Update IPNS name
+        if: ${{ secrets.FILEBASE_IPNS_ID != '' }}
+        env:
+          FILEBASE_ACCESS_TOKEN: ${{ secrets.FILEBASE_ACCESS_TOKEN }}
+          FILEBASE_IPNS_ID: ${{ secrets.FILEBASE_IPNS_ID }}
+          CID: ${{ steps.ipfs.outputs.cid }}
+        run: |
+          curl -s -X PUT \
+            "https://api.filebase.io/v1/names/$FILEBASE_IPNS_ID" \
+            -H "Authorization: Bearer $FILEBASE_ACCESS_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"cid\": \"$CID\"}"
