@@ -121,8 +121,10 @@ export class RandomTokenStore extends BaseStore<NFTs> {
 		} catch (e) {}
 
 		if (!data) {
+			console.log(`no data`);
 			const array = new Uint8Array(32);
 			if (typeof window !== 'undefined') {
+				console.log(`generating new mandalas....`);
 				window.crypto.getRandomValues(array);
 				const random =
 					'0x' +
@@ -136,6 +138,7 @@ export class RandomTokenStore extends BaseStore<NFTs> {
 					claimTXs: {},
 				};
 			} else {
+				console.log(`hmm, we fallback on fixed`);
 				data = {
 					random: '0x01',
 					start: 0,
