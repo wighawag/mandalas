@@ -19,8 +19,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'pnpm'
+          node-version: "22"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
@@ -28,20 +28,21 @@ jobs:
       - name: Build
         run: pnpm build mainnet
 
-      - name: Pin to IPFS via Filebase
-        id: ipfs
-        uses: alexanderschau/ipfs-pinning-action@v1.0.0
-        with:
-          path_to_add: 'web/build'
-          endpoint: 'https://api.filebase.io/v1/ipfs/pins'
-          access_token: ${{ secrets.FILEBASE_ACCESS_TOKEN }}
-          pin_name: 'mandalas-web'
+      # - name: Pin to IPFS via Filebase
+      #   run: pnpm pin
+      #   env:
+      #     FILEBASE_ACCESS_TOKEN: ${{ secrets.FILEBASE_ACCESS_TOKEN }}
+      #     FILEBASE_IPNS_KEY: ${{ vars.FILEBASE_IPNS_KEY }}
 
-      - name: Update IPNS name
-        if: vars.FILEBASE_IPNS_ID != ''
-        run: |
-          curl -s -X PUT \
-            "https://api.filebase.io/v1/names/${{ vars.FILEBASE_IPNS_ID }}" \
-            -H "Authorization: Bearer ${{ secrets.FILEBASE_ACCESS_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{"cid": "${{ steps.ipfs.outputs.cid }}"}'
+      - name: IPFS publishing, pinning and IPNS update
+        id: pinata
+        uses: ./.github/actions/pinata-upload
+        with:
+          pinata-jwt: ${{ secrets.PINATA_JWT }}
+          build-location: "./public"
+          pin-alias: "${{ github.event_name == 'pull_request' && format('pull_request_{0}', github.head_ref) || 'main' }}"
+          cid-version: "1"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          ipns-name: ${{ vars.IPNS_NAME }}
+          filebase-access-key: ${{ secrets.FILEBASE_ROOT_ACCESS_KEY }}
+          filebase-secret-key: ${{ secrets.FILEBASE_ROOT_SECRET_KEY }}
