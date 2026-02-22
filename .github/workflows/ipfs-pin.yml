@@ -39,7 +39,7 @@ jobs:
         uses: ./.github/actions/pinata-upload
         with:
           pinata-jwt: ${{ secrets.PINATA_JWT }}
-          build-location: "./public"
+          build-location: "./web/build"
           pin-alias: "${{ github.event_name == 'pull_request' && format('pull_request_{0}', github.head_ref) || 'main' }}"
           cid-version: "1"
           github-token: ${{ secrets.GITHUB_TOKEN }}
