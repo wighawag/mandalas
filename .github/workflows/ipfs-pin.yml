@@ -38,14 +38,10 @@ jobs:
           pin_name: 'mandalas-web'
 
       - name: Update IPNS name
-        if: ${{ secrets.FILEBASE_IPNS_ID != '' }}
-        env:
-          FILEBASE_ACCESS_TOKEN: ${{ secrets.FILEBASE_ACCESS_TOKEN }}
-          FILEBASE_IPNS_ID: ${{ secrets.FILEBASE_IPNS_ID }}
-          CID: ${{ steps.ipfs.outputs.cid }}
+        if: vars.FILEBASE_IPNS_ID != ''
         run: |
           curl -s -X PUT \
-            "https://api.filebase.io/v1/names/$FILEBASE_IPNS_ID" \
-            -H "Authorization: Bearer $FILEBASE_ACCESS_TOKEN" \
+            "https://api.filebase.io/v1/names/${{ vars.FILEBASE_IPNS_ID }}" \
+            -H "Authorization: Bearer ${{ secrets.FILEBASE_ACCESS_TOKEN }}" \
             -H "Content-Type: application/json" \
-            -d "{\"cid\": \"$CID\"}"
+            -d '{"cid": "${{ steps.ipfs.outputs.cid }}"}'
