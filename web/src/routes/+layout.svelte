@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../global.css';
 	import NavBar from '$lib/components/styled/navigation/NavBar.svelte';
+	import NavigationProgress from '$lib/components/NavigationProgress.svelte';
 
 	import webConfig from '$lib/web-config.json';
 	import WalletOnlyConnectionFlow from '$lib/core/connection/WalletOnlyConnectionFlow.svelte';
@@ -35,6 +36,8 @@
 	<meta property="twitter:description" content={description} />
 	<meta property="twitter:image" content={previewImage} />
 </svelte:head>
+
+<NavigationProgress />
 
 <NavBar
 	links={[

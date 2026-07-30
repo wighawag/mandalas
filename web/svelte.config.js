@@ -39,6 +39,7 @@ const config = {
 		adapter: adapter({
 			assets: 'build',
 			pages: 'build',
+			fallback: '404.html', // SPA fallback - serves as 404 page on IPFS/static hosts
 		}),
 		serviceWorker: {
 			// we handle it ourselves here
@@ -50,7 +51,10 @@ const config = {
 		},
 
 		output: {
-			bundleStrategy: 'single',
+			bundleStrategy: 'split', // code-split per route so the initial
+			// bundle is small; a single large file stalls under slow /
+			// throttled connections (and 'single' is not required for IPFS
+			// since paths.relative is already true).
 		},
 	},
 };
