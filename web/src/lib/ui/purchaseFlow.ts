@@ -34,10 +34,14 @@ export type PurchaseFlow = {
 	data?: Data;
 };
 
+type ConnectionResult = {mechanism: {address: `0x${string}`}};
+
 export class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
 	// Bumped whenever the flow is reset/cancelled, so a slow step that finishes
 	// after the user walked away cannot revive a dead flow.
 	private generation = 0;
+
+
 
 	public constructor(
 		private publicClient: PublicClient<Transport, Chain>,
@@ -53,17 +57,16 @@ export class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
 	 * Resolves with the connection, or undefined when the user rejected or
 	 * abandoned the attempt.
 	 *
-	 * @etherplay/connect >= 0.1.0 rejects with a ConnectionFailure in that case.
-	 * Before 0.1.0 the promise simply never settled, which wedged this flow and
-	 * needed a workaround here; that is now the library's job.
+	 * @etherplay/connect >= 0.1.1 both rejects a failed attempt and re-initiates
+	 * on a retry, so this needs no help: earlier versions either never settled
+	 * (< 0.1.0) or parked on a step this wallet-only app has no reason to render
+	 * and then hung on the next call (0.1.0).
 	 */
-	private async _ensureConnected(): Promise<
-		{mechanism: {address: `0x${string}`}} | undefined
-	> {
+	private async _ensureConnected(): Promise<ConnectionResult | undefined> {
 		try {
 			return (await connection.ensureConnected('WalletConnected', {
 				type: 'wallet',
-			})) as {mechanism: {address: `0x${string}`}};
+			})) as ConnectionResult;
 		} catch (e) {
 			console.log('connection not established:', e);
 			return undefined;
