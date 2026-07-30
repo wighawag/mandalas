@@ -60,6 +60,15 @@ const config: HardhatUserConfig = {
 								mnemonic: process.env.MNEMONIC || undefined,
 							},
 						},
+
+						// node is used by `hardhat node`
+						node: {
+							type: 'edr-simulated',
+							chainType: 'l1',
+							accounts: {
+								mnemonic: process.env.MNEMONIC || undefined,
+							},
+						},
 					},
 				),
 			),
