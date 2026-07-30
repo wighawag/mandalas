@@ -34,15 +34,6 @@ export type PurchaseFlow = {
 	data?: Data;
 };
 
-// Steps the connection rests at while NOT connected. Arriving at one of these
-// after an attempt has started means the attempt ended without connecting -
-// which is what a rejected wallet prompt looks like from the outside.
-const DISCONNECTED_RESTING_STEPS = [
-	'Idle',
-	'MechanismToChoose',
-	'WalletToChoose',
-];
-
 export class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
 	// Bumped whenever the flow is reset/cancelled, so a slow step that finishes
 	// after the user walked away cannot revive a dead flow.
@@ -59,55 +50,23 @@ export class PurchaseFlowStore extends BaseStoreWithData<PurchaseFlow, Data> {
 	}
 
 	/**
-	 * `connection.ensureConnected()` never settles when the user rejects the
-	 * wallet prompt: it neither resolves nor rejects, so awaiting it on its own
-	 * wedges the flow forever (this is what left the un-dismissable "Confirm the
-	 * transaction..." dialog on screen). Race it against the connection store
-	 * falling back to a resting, disconnected step, which is what actually
-	 * happens on rejection:
+	 * Resolves with the connection, or undefined when the user rejected or
+	 * abandoned the attempt.
 	 *
-	 *   Idle -> WaitingForWalletConnection -> MechanismToChoose
-	 *
-	 * Returns undefined when the attempt was abandoned.
+	 * @etherplay/connect >= 0.1.0 rejects with a ConnectionFailure in that case.
+	 * Before 0.1.0 the promise simply never settled, which wedged this flow and
+	 * needed a workaround here; that is now the library's job.
 	 */
 	private async _ensureConnected(): Promise<
 		{mechanism: {address: `0x${string}`}} | undefined
 	> {
-		let unsubscribe: () => void = () => {};
-
-		const abandoned = new Promise<undefined>((resolve) => {
-			let first = true;
-			let attemptStarted = false;
-			unsubscribe = connection.subscribe((state: {step: string}) => {
-				const resting = DISCONNECTED_RESTING_STEPS.includes(state.step);
-				if (first) {
-					// svelte stores emit synchronously on subscribe; that first value
-					// is the state we are starting from, not a transition.
-					first = false;
-					attemptStarted = !resting;
-					return;
-				}
-				if (!resting) {
-					attemptStarted = true;
-					return;
-				}
-				// Resting again after an attempt, or dropped all the way back to
-				// Idle (the user dismissed the wallet picker).
-				if (attemptStarted || state.step === 'Idle') {
-					resolve(undefined);
-				}
-			});
-		});
-
 		try {
-			return await Promise.race([
-				connection.ensureConnected('WalletConnected', {
-					type: 'wallet',
-				}) as Promise<{mechanism: {address: `0x${string}`}}>,
-				abandoned,
-			]);
-		} finally {
-			unsubscribe();
+			return (await connection.ensureConnected('WalletConnected', {
+				type: 'wallet',
+			})) as {mechanism: {address: `0x${string}`}};
+		} catch (e) {
+			console.log('connection not established:', e);
+			return undefined;
 		}
 	}
 
