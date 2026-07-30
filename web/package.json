@@ -41,13 +41,13 @@
 		"prepare": "pnpm generate-pwa-icons && svelte-kit sync",
 		"generate-pwa-icons": "pwag static/icon.png src/lib/web-config.json",
 		"dev": "vite dev",
-		"build": "vite build",
+		"build": "ldenv vite build @@",
 		"preview": "vite preview",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
-		"serve": "ipfs-emulator --only -d build -p 8080",
+		"serve": "ipfs-emulator --only -d build -p 8081",
 		"pin": "ldenv tsx scripts/pin-to-ipfs.ts",
 		"pin:local": "ldenv tsx scripts/pin-to-ipfs.ts --local"
 	}
