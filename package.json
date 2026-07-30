@@ -39,12 +39,13 @@
     "web:serve": "ldenv pnpm --filter ./web serve",
     "web:check": "ldenv pnpm --filter ./web check",
     "web:check:watch": "ldenv pnpm --filter ./web check:watch",
-     "---------------------- DEPLOY ----------------------": "",
+    "---------------------- DEPLOY ----------------------": "",
     "build": "ldenv --git -d localhost pnpm common:build ~~ pnpm contracts:build @@MODE ~~ pnpm web:build @@MODE ~~ @@",
     "serve": "pnpm run --filter ./web serve",
     "---------------------- START ----------------------": "",
     "zellij": "cross-var zellij-launcher a $npm_package_name || cross-var ldenv -d localhost zellij -n dev/zellij.kdl -s $npm_package_name",
     "test": "pnpm contracts:test",
+    "test:e2e": "pnpm --filter ./web test:e2e",
     "stop": "cross-var zellij kill-session $npm_package_name",
     "start": "pnpm zellij"
   }

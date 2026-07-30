@@ -3,3 +3,6 @@ node_modules/
 build/
 static/pwa
 src/lib/deployments.ts
+# playwright
+/playwright-report/
+/test-results/
