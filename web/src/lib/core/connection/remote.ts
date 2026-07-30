@@ -22,7 +22,8 @@ export async function establishRemoteConnection(): Promise<EstablishedConnection
 		walletHost: PUBLIC_WALLET_HOST,
 		chainInfo,
 		prioritizeWalletProvider: true,
-		alwaysUseCurrentAccount: true,
+		// renamed in @etherplay/connect 0.0.50 (was `alwaysUseCurrentAccount: true`)
+		useCurrentAccount: 'always',
 		autoConnect: false,
 		requestSignatureAutomaticallyIfPossible: false,
 	});

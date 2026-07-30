@@ -3,9 +3,10 @@
   "version": "0.0.1",
   "description": "Mandalas",
   "private": true,
+  "packageManager": "pnpm@10.28.1",
   "devDependencies": {
     "cross-var": "^1.1.0",
-    "ldenv": "^0.3.16",
+    "ldenv": "^0.6.0",
     "zellij-launcher": "^0.0.1"
   },
   "scripts": {

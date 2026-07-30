@@ -5,7 +5,6 @@
 
 	import webConfig from '$lib/web-config.json';
 	import WalletOnlyConnectionFlow from '$lib/core/connection/WalletOnlyConnectionFlow.svelte';
-	import {url} from '$lib/core/utils/web/path';
 	import {connection} from '$lib';
 	import Modal from '$lib/core/ui/modal/Modal.svelte';
 	import PurchaseFlow from '$lib/ui/PurchaseFlow.svelte';
@@ -41,9 +40,9 @@
 
 <NavBar
 	links={[
-		{href: url('/'), title: 'MANDALAS'},
-		{href: url('/wallet/'), title: 'Wallet'},
-		{href: url('/about/'), title: 'About'},
+		{href: '/', title: 'MANDALAS'},
+		{href: '/wallet/', title: 'Wallet'},
+		{href: '/about/', title: 'About'},
 	]}
 />
 
