@@ -7,9 +7,17 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
+    // TS6 deprecates moduleResolution=node10 (removed in TS7). Silenced rather
+    // than migrated: changing resolution alters how this lib's own imports
+    // resolve, and its emitted output has to stay byte-compatible.
+    "ignoreDeprecations": "6.0",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
+    // TS6 requires this to be explicit. './src' is what TS previously inferred,
+    // so the emitted layout (lib/esm/index.js) is unchanged - that is the path
+    // package.json's main/module/types point at.
+    "rootDir": "./src",
     "outDir": "lib/esm"
   },
   "include": ["./src"]
