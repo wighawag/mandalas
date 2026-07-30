@@ -63,12 +63,37 @@
 
 	let txStatus = $state<'WAITING_TX' | undefined>(undefined);
 
-	// Burn function would need to be implemented with viem writeContract
+	/**
+	 * EIP-1193 code 4001, however the wallet or viem wrapped it. viem nests the
+	 * original error several levels deep (ContractFunctionExecutionError ->
+	 * TransactionExecutionError -> UserRejectedRequestError), so walk the cause
+	 * chain rather than checking one level.
+	 */
+	function isUserRejection(e: unknown): boolean {
+		let current = e as {code?: unknown; name?: unknown; cause?: unknown} | null;
+		for (let depth = 0; current && depth < 6; depth++) {
+			if (current.code === 4001 || current.name === 'UserRejectedRequestError') {
+				return true;
+			}
+			current = current.cause as typeof current;
+		}
+		return false;
+	}
+
 	async function burn({id}: {id: bigint}) {
-		const currentConnection = await connection.ensureConnected(
-			'WalletConnected',
-			{type: 'wallet'},
-		);
+		// Nothing awaits this (it is called straight from onclick), so anything
+		// thrown here would surface as an unhandled rejection with no feedback at
+		// all. Every failure path has to be handled in here.
+		const currentConnection = await connection
+			.ensureConnected('WalletConnected', {type: 'wallet'})
+			.catch((e) => {
+				console.log('connection not established:', e);
+				return undefined;
+			});
+		if (!currentConnection) {
+			return;
+		}
+
 		txStatus = 'WAITING_TX';
 		try {
 			const walletAddress = currentConnection.mechanism.address;
@@ -79,6 +104,12 @@
 				functionName: 'burn',
 				args: [id],
 			});
+		} catch (e) {
+			// Rejecting in the wallet is a choice, not an error worth shouting
+			// about; anything else is worth a log.
+			if (!isUserRejection(e)) {
+				console.error('Burn failed:', e);
+			}
 		} finally {
 			txStatus = undefined;
 		}
@@ -245,9 +276,15 @@
 	</section>
 </div>
 
-<Modal openWhen={txStatus === 'WAITING_TX'}>
+<!-- onCancel is what makes this dismissable at all: Modal falls back to
+     escapeKeydownBehavior/interactOutsideBehavior 'ignore' without it, so
+     anything that wedges here would trap the user. -->
+<Modal openWhen={txStatus === 'WAITING_TX'} onCancel={() => (txStatus = undefined)}>
 	<div class="text-center">
 		<h2>Confirm the transaction...</h2>
-		<p class="mt-2 text-sm text-gray-300"></p>
+		<p class="mt-2 text-sm text-gray-300">
+			Check your wallet. You can close this - it won't cancel a transaction you
+			already approved.
+		</p>
 	</div>
 </Modal>
