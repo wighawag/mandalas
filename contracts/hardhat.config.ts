@@ -61,13 +61,17 @@ const config: HardhatUserConfig = {
 							},
 						},
 
-						// node is used by `hardhat node`
-						node: {
+						// `local` is the network used by `hardhat --network local node`,
+						// i.e. the long-running dev chain (see `pnpm node:local`).
+						local: {
 							type: 'edr-simulated',
 							chainType: 'l1',
 							accounts: {
 								mnemonic: process.env.MNEMONIC || undefined,
 							},
+							// A reverting transaction must still be mined, otherwise the
+							// app never sees the failed receipt it needs to report the error.
+							throwOnTransactionFailures: false,
 						},
 					},
 				),

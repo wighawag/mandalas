@@ -22,7 +22,14 @@ RPC_URL="http://127.0.0.1:${RPC_PORT}"
 # contracts/.env.local may point MNEMONIC_localhost at their own (unfunded)
 # mnemonic, so pin it here: exported shell env outranks every .env file in
 # ldenv, and this keeps the run identical on every machine.
-export MNEMONIC_localhost="test test test test test test test test test test test junk"
+TEST_MNEMONIC="test test test test test test test test test test test junk"
+export MNEMONIC_localhost="$TEST_MNEMONIC"
+# The node funds the accounts it derives from MNEMONIC (see the `local` network
+# in hardhat.config.ts), while the deploy signs with MNEMONIC_localhost. Pin
+# BOTH to the same phrase, otherwise a machine with MNEMONIC set in
+# contracts/.env.local funds one set of accounts and deploys from another, and
+# the run dies with "Sender doesn't have enough funds".
+export MNEMONIC="$TEST_MNEMONIC"
 export ETH_NODE_URI_localhost="$RPC_URL"
 
 STARTED_NODE=""
@@ -50,7 +57,10 @@ if node_is_up; then
 	echo -e "${YELLOW}It must be a dev chain with the standard test accounts funded.${NC}"
 else
 	echo -e "${GREEN}Starting hardhat node on ${RPC_URL}${NC}"
-	( cd "$ROOT_DIR" && pnpm contracts:local_node >/tmp/mandalas-e2e-node.log 2>&1 ) &
+	# --port must be passed through, otherwise the node always binds 8545 while
+	# everything else follows E2E_RPC_PORT, and the run dies on EADDRINUSE when
+	# 8545 belongs to something else.
+	( cd "$ROOT_DIR" && pnpm contracts:node:local --port "$RPC_PORT" >/tmp/mandalas-e2e-node.log 2>&1 ) &
 	STARTED_NODE=$!
 	for _ in $(seq 1 40); do
 		node_is_up && break

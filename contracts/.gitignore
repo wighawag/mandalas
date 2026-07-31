@@ -20,3 +20,5 @@ artifacts
 docs
 
 dist/
+
+purgatory.db

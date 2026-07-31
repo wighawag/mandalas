@@ -23,6 +23,16 @@ export const config = {
 	defaultChainProperties: {
 		expectedWorstGasPrice: parseEther('0.000001', 'gwei'),
 	},
+	environments: {
+		// Deployments against the local dev chain mine immediately, so a deploy
+		// never waits on the node's block interval.
+		localhost: {
+			chain: 31337,
+			overrides: {
+				autoMine: true,
+			},
+		},
+	},
 	data: {},
 	signerProtocols: {
 		privateKey,
