@@ -41,13 +41,11 @@ jobs:
       # untracked. Staging keeps both facts true at once: newest build here,
       # what the world resolves there.
       #
-      # Promotion is the manual step, run when the build has been looked at:
-      #
-      #   pnpm pinnace pin --from-site mandalas-staging --as mandalas.eth \
-      #     --endpoint https://ipfs-publisher.ska.sh
-      #
-      # then set the ENS contenthash to the ipfs://<cid> the job summary printed.
-      # The previous build stays pinned meanwhile, so nothing goes dark.
+      # Promotion is the manual step, run when the build has been looked at.
+      # `promote-to` is what makes the job summary print it as a ready command
+      # (with this build's cid) next to the ENS hash to set, so neither has to be
+      # remembered. The previous build stays pinned meanwhile, so nothing goes
+      # dark between the two.
       #
       # Only on a real push: a PR build has no business moving even the staging
       # pointer. PRs still build above, which is what they are checked for.
@@ -60,5 +58,6 @@ jobs:
           site: mandalas-staging
           mode: ipfs
           dir: web/build
+          promote-to: mandalas.eth
         env:
           PINNACE_HOST_PUBLISHER_TOKEN: ${{ secrets.PINNACE_HOST_PUBLISHER_TOKEN }}

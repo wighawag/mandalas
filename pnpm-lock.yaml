@@ -18,8 +18,8 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0
       pinnace:
-        specifier: 0.14.0
-        version: 0.14.0
+        specifier: 0.15.0
+        version: 0.15.0
       set-defaults:
         specifier: ^0.0.5
         version: 0.0.5
@@ -4227,8 +4227,8 @@ packages:
     resolution: {integrity: sha512-MnUuEycAemtSaeFSjXKW/aroV7akBbY+Sv+RkyqFjgAe73F+MR0TBWKBRDkmfWq/HiFmdavfZ1G7h4SPZXaCSg==}
     engines: {node: '>=0.10.0'}
 
-  pinnace@0.14.0:
-    resolution: {integrity: sha512-xF8+zjQ1TKZN+GUsqVdkqzTo8SGPC17ks5qLVaLOtonNeCNfD6w2oBC7aVWDItrH+0p5hjS1TIItScA6GMcZYA==}
+  pinnace@0.15.0:
+    resolution: {integrity: sha512-ZYG60WaS4RIZSbuFsdIpNXA0V6Q5AlSeVcUAXVMBP8q92rW5g5OmCuxwYMgbhzwWtgaZpyUvJilLpCpUvtKlyQ==}
     hasBin: true
 
   pixelmatch@4.0.2:
@@ -10057,7 +10057,7 @@ snapshots:
 
   pinkie@2.0.4: {}
 
-  pinnace@0.14.0:
+  pinnace@0.15.0:
     dependencies:
       files-from-path: 1.1.4
       ipfs-car: 3.1.0
