@@ -19,6 +19,7 @@
 	import {Toaster} from '$lib/shadcn/ui/sonner';
 	import AcrossPages from '$lib/context/AcrossPages.svelte';
 	import DefaultHead from '$lib/metadata/DefaultHead.svelte';
+	import {url} from '$lib/core/utils/web/path';
 	import {page} from '$app/state';
 
 	let {children} = $props();
@@ -40,7 +41,12 @@
 
 <NavigationProgress />
 
-<AsyncContext getContext={createContext} splashImage="/icon.png">
+<!-- splashImage must go through url(): with `paths.relative: true` a bare
+     '/icon.png' resolves against the gateway root, not the app, so the splash
+     would 404 on IPFS. AsyncContext's own default is already wrapped; an
+     override has to do the same. Mandalas ships a png rather than the
+     template's svg. -->
+<AsyncContext getContext={createContext} splashImage={url('/icon.png')}>
 	<Navbar repoURL="https://github.com/wighawag/mandalas" />
 	<OfflineBanner />
 	<NonceCacheBanner />
