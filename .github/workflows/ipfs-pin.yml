@@ -31,21 +31,28 @@ jobs:
         env:
           PUBLIC_RPC_URL: ${{ vars.PUBLIC_RPC_URL }}
 
-      # - name: Pin to IPFS via Filebase
-      #   run: pnpm pin
-      #   env:
-      #     FILEBASE_ACCESS_TOKEN: ${{ secrets.FILEBASE_ACCESS_TOKEN }}
-      #     FILEBASE_IPNS_KEY: ${{ vars.FILEBASE_IPNS_KEY }}
-
-      - name: IPFS publishing, pinning and IPNS update
-        id: pinata
-        uses: ./.github/actions/pinata-upload
+      # Pinned on our OWN node (pinnace), not a paid pinning service. Generated
+      # by `pnpm pinnace install-ci --system github --emit steps --endpoint
+      # https://ipfs-publisher.ska.sh --site mandalas.eth --output-dir web/build
+      # --set-mode ipfs`.
+      #
+      # Only on a real push: this step writes /sites/mandalas.eth on the node, so
+      # letting a PR build run it would leave the live site's wrapper pointing at
+      # that PR (the node would warm and serve a branch). PRs still build above,
+      # which is what we want them checked for.
+      #
+      # `mode: ipfs` means every deploy has its OWN address, so the ENS
+      # contenthash is a deliberate, manual step: take the `ipfs://<cid>` the job
+      # summary prints and set it on mandalas.eth. The previous build stays
+      # pinned until it is explicitly removed, so nothing goes dark in between.
+      - name: Deploy to IPFS
+        id: deploy
+        if: github.event_name != 'pull_request'
+        uses: wighawag/pinnace/actions/deploy@main
         with:
-          pinata-jwt: ${{ secrets.PINATA_JWT }}
-          build-location: "./web/build"
-          pin-alias: "mandalas-eth-${{ github.event_name == 'pull_request' && format('pull_request_{0}', github.head_ref) || 'main' }}"
-          cid-version: "1"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          ipns-name: ${{ vars.FILEBASE_NAME_LABEL }}
-          filebase-access-key: ${{ secrets.FILEBASE_ROOT_ACCESS_KEY }}
-          filebase-secret-key: ${{ secrets.FILEBASE_ROOT_SECRET_KEY }}
+          endpoint: https://ipfs-publisher.ska.sh
+          site: mandalas.eth
+          mode: ipfs
+          dir: web/build
+        env:
+          PINNACE_HOST_PUBLISHER_TOKEN: ${{ secrets.PINNACE_HOST_PUBLISHER_TOKEN }}
