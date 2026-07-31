@@ -185,3 +185,20 @@ html {
 [data-slot='avatar-fallback'] {
 	border-radius: 0 !important;
 }
+
+/*
+ * Escape the page gutter that `scrollbar-gutter: stable both-edges` reserves on
+ * <html>, so a decorative element really does touch both viewport edges. Every
+ * normal descendant is inset by that gutter, which left the Mandalas colour
+ * rules stopping short of each edge.
+ *
+ * The inset is derived from the live difference between the viewport and the
+ * parent, so it follows whatever gutter/scrollbar width the platform uses and
+ * collapses to zero where none is reserved. Deliberately sets no width: the
+ * element must stay `width: auto` so the negative margins widen it. Adding
+ * `w-full` (width: 100%) would pin it to the parent and reintroduce the gap.
+ */
+.full-bleed {
+	margin-left: calc((100% - 100vw) / 2);
+	margin-right: calc((100% - 100vw) / 2);
+}

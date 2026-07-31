@@ -118,7 +118,7 @@
 	     axes (the CSS default) so it fills the strip's height; constraining it to
 	     repeat-x renders a single 1px line in a 4px box and looks too thin. -->
 	<div
-		class="h-1 w-full"
+		class="full-bleed h-1"
 		style={`background: url(${url('/images/multicolor_line_x8.png')});`}
 	></div>
 {/snippet}
