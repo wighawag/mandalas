@@ -31,27 +31,33 @@ jobs:
         env:
           PUBLIC_RPC_URL: ${{ vars.PUBLIC_RPC_URL }}
 
-      # Pinned on our OWN node (pinnace), not a paid pinning service. Generated
-      # by `pnpm pinnace install-ci --system github --emit steps --endpoint
-      # https://ipfs-publisher.ska.sh --site mandalas.eth --output-dir web/build
-      # --set-mode ipfs`.
+      # Pinned on our OWN node (pinnace), not a paid pinning service.
       #
-      # Only on a real push: this step writes /sites/mandalas.eth on the node, so
-      # letting a PR build run it would leave the live site's wrapper pointing at
-      # that PR (the node would warm and serve a branch). PRs still build above,
-      # which is what we want them checked for.
+      # It deploys to the STAGING id, never to `mandalas.eth`. A site wrapper on
+      # the node means "the cid this name resolves to", and in ipfs mode that cid
+      # only changes when a human moves the ENS contenthash. So CI writing the
+      # live id would make the node warm a build nobody resolves, report the live
+      # site as permanently stale, and leave the cid ENS actually points at
+      # untracked. Staging keeps both facts true at once: newest build here,
+      # what the world resolves there.
       #
-      # `mode: ipfs` means every deploy has its OWN address, so the ENS
-      # contenthash is a deliberate, manual step: take the `ipfs://<cid>` the job
-      # summary prints and set it on mandalas.eth. The previous build stays
-      # pinned until it is explicitly removed, so nothing goes dark in between.
-      - name: Deploy to IPFS
+      # Promotion is the manual step, run when the build has been looked at:
+      #
+      #   pnpm pinnace pin --from-site mandalas-staging --as mandalas.eth \
+      #     --endpoint https://ipfs-publisher.ska.sh
+      #
+      # then set the ENS contenthash to the ipfs://<cid> the job summary printed.
+      # The previous build stays pinned meanwhile, so nothing goes dark.
+      #
+      # Only on a real push: a PR build has no business moving even the staging
+      # pointer. PRs still build above, which is what they are checked for.
+      - name: Deploy to IPFS (staging)
         id: deploy
         if: github.event_name != 'pull_request'
         uses: wighawag/pinnace/actions/deploy@main
         with:
           endpoint: https://ipfs-publisher.ska.sh
-          site: mandalas.eth
+          site: mandalas-staging
           mode: ipfs
           dir: web/build
         env:
