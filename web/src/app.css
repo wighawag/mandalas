@@ -120,8 +120,32 @@
 	}
 }
 
+/*
+ * `auto`, deliberately: the template's `stable both-edges` is not used here.
+ *
+ * The Mandalas colour rules run edge to edge, and any reserved gutter shows up
+ * as a black band beside them:
+ *
+ *   both-edges  reserves a gutter on BOTH sides, so every descendant (body
+ *               included) is inset and the rules fell short at each edge.
+ *   stable      fixes the left, but still reserves the gutter permanently, so
+ *               any page that does not scroll (wallet, about) shows an empty
+ *               band on the right where the scrollbar would have been.
+ *   auto        reserves nothing; the rules span the full client width on every
+ *               page, ending exactly at the scrollbar when there is one.
+ *
+ * The cost is the layout shift `stable` exists to prevent: content moves by the
+ * scrollbar width when navigating between a scrolling and a non-scrolling page.
+ * That is the trade the original Mandalas made (it set no gutter at all), and
+ * for an app whose header is a full-bleed colour rule it is the right one.
+ *
+ * Worth knowing if you ever reintroduce a gutter: there is no CSS escape hatch.
+ * Viewport units are themselves shrunk by the reserved gutters, so the usual
+ * `width: 100vw; margin-inline: calc(50% - 50vw)` full-bleed trick evaluates to
+ * exactly zero and silently does nothing.
+ */
 html {
-	scrollbar-gutter: stable both-edges;
+	scrollbar-gutter: auto;
 }
 
 /* On touch devices (no visible scrollbar), scrollbar-gutter has no visual effect.
@@ -184,21 +208,4 @@ html {
 [data-slot='avatar-image'],
 [data-slot='avatar-fallback'] {
 	border-radius: 0 !important;
-}
-
-/*
- * Escape the page gutter that `scrollbar-gutter: stable both-edges` reserves on
- * <html>, so a decorative element really does touch both viewport edges. Every
- * normal descendant is inset by that gutter, which left the Mandalas colour
- * rules stopping short of each edge.
- *
- * The inset is derived from the live difference between the viewport and the
- * parent, so it follows whatever gutter/scrollbar width the platform uses and
- * collapses to zero where none is reserved. Deliberately sets no width: the
- * element must stay `width: auto` so the negative margins widen it. Adding
- * `w-full` (width: 100%) would pin it to the parent and reintroduce the gap.
- */
-.full-bleed {
-	margin-left: calc((100% - 100vw) / 2);
-	margin-right: calc((100% - 100vw) / 2);
 }
