@@ -4,7 +4,7 @@
 /// <reference lib="webworker" />
 /// <reference types="../../.svelte-kit/ambient.d.ts" />
 
-import {build, files, prerendered, version} from '$service-worker';
+import {build, version, prerendered, files} from '$service-worker';
 
 const ID = version; // + '-1';
 
@@ -13,6 +13,12 @@ const sw = self as unknown as ServiceWorkerGlobalScope;
 // ------------------- CONFIG ---------------------------
 const DEV = true;
 const OFFLINE_CACHE = 'all';
+// Icon/badge used for the DEFAULT push notification (when the push payload
+// carries no icon of its own). pwag regenerates /pwa/favicon-512.png from
+// src/web-config.json's `icon` on every build, so the image content is already
+// config-driven; keep the path here in ONE place so a fork that renames the
+// generated file only edits this line.
+const NOTIFICATION_ICON = '/pwa/favicon-512.png';
 // ------------------------------------------------------
 
 let ASSETS: string[] = [];
@@ -20,9 +26,10 @@ if (OFFLINE_CACHE === 'all') {
 	ASSETS = build
 		.concat(prerendered)
 		.concat(files.filter((v) => v.indexOf('pwa/') === -1));
-} // TODO support more offline option
+}
+// NOTE: could support more cache option than just 'all;
 
-let _logEnabled = true; // TODO false
+let _logEnabled = false;
 function log(...args: any[]) {
 	if (_logEnabled) {
 		console.debug(`[Service Worker #${ID}] ${args[0]}`, ...args.slice(1));
@@ -39,13 +46,9 @@ if (DEV) {
 
 const regexesOnlineOnly: string[] = [];
 
-const regexesCacheFirst = [
-	sw.location.origin,
-	// 'https://rsms.me/inter/', // TODO remove, used if using font from there
-	'cdn',
-	'.*\\.png$',
-	'.*\\.svg$',
-];
+// NOTE: we could add more caching option, fonts for example could come to a specific domain
+//  Also we might not want to cache all .pngs / .svgs
+const regexesCacheFirst = [sw.location.origin, 'cdn', '.*\\.png$', '.*\\.svg$'];
 
 const regexesCacheOnly: string[] = [];
 
@@ -161,7 +164,9 @@ async function getResponse(event: FetchEvent): Promise<Response> {
 		return response;
 	}
 
-	// TODO remove query param from matching, query param are used as config (why not use hashes then ?) const normalizedUrl = normalizeUrl(event.request.url);
+	// Note we could remove query param from matching
+	//  that is, if query param are used as config
+	//  we could then do: const normalizedUrl = normalizeUrl(event.request.url);
 	const response = await caches.match(request).then((cache) => {
 		// The order matters !
 		const patterns = [onlineFirst, onlineOnly, cacheFirst, cacheOnly];
@@ -215,7 +220,8 @@ async function getClientsStatus(): Promise<{
 	atLeastOneFocused: WindowClient | undefined;
 	atLeastOneVisibleAndFocused: WindowClient | undefined;
 }> {
-	// TODO compute last active so that if none are both "focused and visible", we know where to jump in
+	// TODO: track last-active client so that when none is both focused and visible,
+	// we can pick the best window to focus/navigate to.
 	const windowClients = await sw.clients.matchAll({
 		type: 'window',
 		includeUncontrolled: true,
@@ -284,8 +290,8 @@ async function handlePush(data?: string) {
 		title: 'Notification',
 		options: {
 			body: 'You have a new notification',
-			icon: '/icon.png', // TODO template it ?
-			badge: '/icon.png', // TODO template it ?
+			icon: NOTIFICATION_ICON,
+			badge: NOTIFICATION_ICON,
 		},
 	};
 
@@ -326,12 +332,13 @@ async function handlePush(data?: string) {
 						}
 					}
 				}
-				// TODO ?
+				// TODO: handle additional notification attributes (e.g. actions, image, vibrate).
 				// notif.actions
 				// notif.vibrate
 				// notif.timestamp
 				// notif.renotify
 			} else {
+				// Fallback for legacy notification format with root-level title/options
 				notificationTuple.title =
 					json.notification?.title || (json as any).title || 'Notification';
 				notificationTuple.options = json.notification || (json as any).options;
@@ -382,7 +389,8 @@ async function handleNotificationClick(notification: Notification) {
 
 	for (const client of windowClients) {
 		log(`${'focus' in client ? 'focus-available: ' : ''}: ${client.url}`);
-		// TODO url checks: client.url === '/' &&  ?
+		// TODO: prefer a client already on the target URL (or on '/') instead of
+		// focusing the first focusable client.
 		if ('focus' in client) {
 			if (url && 'navigate' in client) {
 				return client.focus().then(() => client.navigate(url));

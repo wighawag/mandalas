@@ -1,9 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {
-	chooseWallet,
-	installWallet,
-	walletCalls,
-} from '../fixtures/wallet';
+import {chooseWallet, installWallet, walletCalls} from '../fixtures/wallet';
 import {totalSupply} from '../fixtures/contract';
 import {useChainSnapshot} from '../fixtures/chain';
 
@@ -29,8 +25,13 @@ function trackUnhandled(page: import('@playwright/test').Page) {
 async function openFirstMandala(page: import('@playwright/test').Page) {
 	await page.goto('/');
 	await page.waitForSelector('img[alt]', {timeout: 60_000});
-	// the mandalas are generated client-side; give the first one a moment
-	await page.locator('button:has(svg)').first().click();
+	// Target the mint action by its label. A positional `button:has(svg)` used to
+	// work, but the navbar now also renders icon-only buttons, so `.first()`
+	// would pick the menu instead of a Mandala.
+	await page
+		.getByRole('button', {name: /Mint It/})
+		.first()
+		.click();
 }
 
 // NOT YET RELIABLE. The Confirm button is still present after the rejection
@@ -48,7 +49,7 @@ test.fixme('rejecting the wallet closes the flow instead of trapping the user', 
 
 	// The purchase flow must not be left sitting on a dialog the user cannot
 	// dismiss, and must not leave "Confirm" clickable while disconnected.
-	await expect(page.getByText('Confirm the transaction')).toHaveCount(0, {
+	await expect(page.getByText('Confirm in your wallet')).toHaveCount(0, {
 		timeout: 15_000,
 	});
 	await expect(page.getByRole('button', {name: 'Confirm'})).toHaveCount(0);
@@ -71,9 +72,7 @@ test('a mandala can still be minted after a rejected attempt', async ({
 	await expect(confirm).toBeVisible({timeout: 20_000});
 	await confirm.click();
 
-	await expect
-		.poll(() => totalSupply(), {timeout: 60_000})
-		.toBe(before + 1n);
+	await expect.poll(() => totalSupply(), {timeout: 60_000}).toBe(before + 1n);
 
 	expect(await walletCalls(page)).toContain('eth_sendTransaction');
 	expect(unhandled).toEqual([]);

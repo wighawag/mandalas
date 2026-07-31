@@ -1,73 +1,34 @@
 <script lang="ts">
 	import {page} from '$app/state';
+	import {Button} from '$lib/shadcn/ui/button';
 </script>
 
-<div class="error-page">
-	<h1>{page.status}</h1>
-	<h2>
-		{#if page.status === 404}
-			Page Not Found
-		{:else if page.status === 500}
-			Server Error
-		{:else if page.status === 403}
-			Access Denied
-		{:else if page.status === 401}
-			Unauthorized
-		{:else}
-			Something Went Wrong
-		{/if}
-	</h2>
-	<p>{page.error?.message || 'An unexpected error occurred'}</p>
-	<div class="actions">
-		<a href="/">Go Home</a>
-		<button onclick={() => window.location.reload()}>Try Again</button>
+<div class="flex min-h-screen items-center justify-center bg-background p-8">
+	<div class="max-w-md text-center">
+		<h1 class="m-0 text-[6rem] leading-none font-bold text-muted-foreground">
+			{page.status}
+		</h1>
+		<h2 class="mt-4 mb-2 text-2xl font-semibold text-foreground">
+			{#if page.status === 404}
+				Page Not Found
+			{:else if page.status === 500}
+				Server Error
+			{:else if page.status === 403}
+				Access Denied
+			{:else if page.status === 401}
+				Unauthorized
+			{:else}
+				Something Went Wrong
+			{/if}
+		</h2>
+		<p class="mb-8 text-muted-foreground">
+			{page.error?.message || 'An unexpected error occurred'}
+		</p>
+		<div class="flex flex-wrap justify-center gap-4">
+			<Button href="/">Go Home</Button>
+			<Button variant="outline" onclick={() => window.location.reload()}>
+				Try Again
+			</Button>
+		</div>
 	</div>
 </div>
-
-<style>
-	.error-page {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		min-height: 100dvh;
-		padding: 2rem;
-		text-align: center;
-	}
-	h1 {
-		font-size: 6rem;
-		font-weight: 700;
-		line-height: 1;
-		margin: 0;
-		opacity: 0.5;
-	}
-	h2 {
-		margin: 1rem 0 0.5rem;
-		font-size: 1.5rem;
-	}
-	p {
-		margin: 0 0 2rem;
-		opacity: 0.7;
-	}
-	.actions {
-		display: flex;
-		gap: 1rem;
-		flex-wrap: wrap;
-		justify-content: center;
-	}
-	a,
-	button {
-		padding: 0.5rem 1.5rem;
-		border-radius: 0.375rem;
-		text-decoration: none;
-		cursor: pointer;
-		border: 1px solid currentColor;
-		background: transparent;
-		color: inherit;
-		font: inherit;
-	}
-	a:hover,
-	button:hover {
-		opacity: 0.8;
-	}
-</style>

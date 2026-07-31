@@ -1,191 +1,136 @@
 <script lang="ts">
 	import {onMount} from 'svelte';
 	import {generateBitmapDataURI, template19_bis} from 'mandalas-common';
-	import {curve, nftsof, connection, walletClient} from '$lib';
-	import contractsInfo from '$lib/deployments';
-	import {get} from 'svelte/store';
+	import {getAppContext, route} from '$lib';
 	import {goto} from '$app/navigation';
 	import {url} from '$lib/core/utils/web/path';
-	import {page} from '$app/stores';
-	import Modal from '$lib/core/ui/modal/Modal.svelte';
+	import {formatBalance} from '$lib/core/utils/format/balance';
+	import {PRICE_SYMBOLS} from '$lib/view';
+	import Button from '$lib/shadcn/ui/button/button.svelte';
+	import {toast} from 'svelte-sonner';
+	import FlameIcon from '@lucide/svelte/icons/flame';
+	import {burnMandala} from './lib/burn';
+
+	const {
+		connection,
+		executor,
+		deployments,
+		balanceCheck,
+		nftsOf,
+		viewState,
+		accountCannotSend,
+	} = getAppContext();
 
 	let addressFromURI = $state<string | undefined>(undefined);
 
-	onMount(async () => {
-		// Get wallet address from URL hash
+	onMount(() => {
 		if (typeof window !== 'undefined' && window.location.hash) {
 			addressFromURI = window.location.hash.substring(1);
 		}
 	});
 
+	let currentAddress = $derived(
+		connection.isTargetStepReached($connection)
+			? $connection.account.address
+			: undefined,
+	);
+
 	$effect(() => {
-		if (
-			!addressFromURI &&
-			$connection.step === 'WalletConnected' &&
-			$connection.mechanism.address
-		) {
-			const walletAddress = $connection.mechanism.address;
-			// console.log('redirect');
-			goto(url(`/wallet/`, `${walletAddress}`), {replaceState: true}).then(
+		if (!addressFromURI && currentAddress) {
+			goto(url(`/wallet/`, `${currentAddress}`), {replaceState: true}).then(
 				() => {
 					addressFromURI =
-						$page.route && typeof location !== 'undefined'
-							? location.hash.substr(1)
+						typeof location !== 'undefined'
+							? location.hash.substring(1)
 							: undefined;
 				},
 			);
 		}
 	});
 
-	let currentAddress = $derived(
-		$connection.step === 'WalletConnected'
-			? $connection.mechanism.address
-			: undefined,
-	);
-
 	let addressToLook = $derived(addressFromURI || currentAddress);
 
 	let isWalletOwner = $derived(
-		currentAddress &&
-			addressToLook &&
+		!!currentAddress &&
+			!!addressToLook &&
 			currentAddress.toLowerCase() === addressToLook.toLowerCase(),
 	);
 
-	let nfts = $derived(nftsof(addressToLook));
+	let nfts = $derived(nftsOf(addressToLook));
 
-	let connected = $derived(
-		$connection.step === 'WalletConnected' || $connection.step === 'SignedIn',
-	);
+	let symbol = $derived($deployments.chain.nativeCurrency.symbol);
 
-	function formatPrice(price: bigint): string {
-		return (Number(price) / 1e18).toFixed(4);
-	}
-
-	let txStatus = $state<'WAITING_TX' | undefined>(undefined);
-
-	/**
-	 * EIP-1193 code 4001, however the wallet or viem wrapped it. viem nests the
-	 * original error several levels deep (ContractFunctionExecutionError ->
-	 * TransactionExecutionError -> UserRejectedRequestError), so walk the cause
-	 * chain rather than checking one level.
-	 */
-	function isUserRejection(e: unknown): boolean {
-		let current = e as {code?: unknown; name?: unknown; cause?: unknown} | null;
-		for (let depth = 0; current && depth < 6; depth++) {
-			if (current.code === 4001 || current.name === 'UserRejectedRequestError') {
-				return true;
-			}
-			current = current.cause as typeof current;
-		}
-		return false;
-	}
-
-	async function burn({id}: {id: bigint}) {
-		// Nothing awaits this (it is called straight from onclick), so anything
-		// thrown here would surface as an unhandled rejection with no feedback at
-		// all. Every failure path has to be handled in here.
-		const currentConnection = await connection
-			.ensureConnected('WalletConnected', {type: 'wallet'})
-			.catch((e) => {
-				console.log('connection not established:', e);
-				return undefined;
-			});
-		if (!currentConnection) {
-			return;
-		}
-
-		txStatus = 'WAITING_TX';
-		try {
-			const walletAddress = currentConnection.mechanism.address;
-			const MandalaToken = contractsInfo.contracts.MandalaToken;
-			await walletClient.writeContract({
-				account: walletAddress,
-				...MandalaToken,
-				functionName: 'burn',
-				args: [id],
-			});
-		} catch (e) {
-			// Rejecting in the wallet is a choice, not an error worth shouting
-			// about; anything else is worth a log.
-			if (!isUserRejection(e)) {
-				console.error('Burn failed:', e);
-			}
-		} finally {
-			txStatus = undefined;
+	async function burn(tokenID: bigint) {
+		const result = await burnMandala(
+			{connection, executor, deployments, balanceCheck},
+			tokenID,
+		);
+		if (result.status === 'submitted') {
+			toast.success('Burn submitted');
+		} else if (result.status === 'cannot-send') {
+			accountCannotSend.show();
+		} else if (result.status === 'error') {
+			toast.error(result.message);
 		}
 	}
 </script>
 
 <div class="w-full">
-	{#if $curve.supply !== undefined && $curve.supply !== null}
-		<div
-			class="mx-auto flex h-full w-full justify-between text-black dark:text-white"
-		>
+	{#if $viewState.step === 'Loaded'}
+		<div class="mx-auto flex h-full w-full justify-between">
 			<p class="m-2 text-xs font-black text-yellow-400 sm:text-base">
-				Current Price:
-				{$curve.currentPrice
-					? formatPrice($curve.currentPrice) + ' ETH'
-					: 'loading'}
+				Current Price: {formatBalance(
+					$viewState.curve.currentPrice,
+					18,
+					PRICE_SYMBOLS,
+				)}
+				{symbol}
 			</p>
 			<p class="m-2 text-xs font-black text-yellow-400 sm:text-base">
-				Current Supply:
-				{$curve.supply.toString()}
+				Current Supply: {$viewState.curve.supply}
 			</p>
 		</div>
 	{/if}
 
-	{#if !addressToLook && !connected}
-		<div
-			class="mx-auto h-full w-full flex-col text-center text-black dark:text-white"
-		>
+	{#if !addressToLook}
+		<div class="mx-auto h-full w-full flex-col text-center">
 			<p class="mt-4 text-xs font-black text-yellow-400 sm:text-base">
-				Please Connect to your wallet see the tokens
+				Connect your wallet to see your Mandalas
 			</p>
-			<button
-				class="m-2 border border-yellow-500 p-1 text-xs font-black text-yellow-400 md:text-base"
-				onclick={() => connection.connect({type: 'wallet'})}
-			>
-				Connect
-			</button>
+			<Button class="m-2" onclick={() => connection.connect()}>Connect</Button>
 		</div>
 	{:else if currentAddress && !isWalletOwner}
-		<div
-			class="mx-auto h-full w-full flex-col text-center text-black dark:text-white"
-		>
-			<div
-				class="mx-auto flex h-full w-full justify-between text-black dark:text-white"
-			>
-				<!-- TODO reload or reactivate s-->
-				<a
-					href={`#/`.concat(currentAddress)}
-					class="m-2 border border-yellow-500 p-1 text-xs font-black text-yellow-400 md:text-base"
-				>
-					Show My Mandalas
-				</a>
-			</div>
+		<div class="mx-auto flex h-full w-full justify-between">
+			<a href={`#/`.concat(currentAddress)} class="m-2">
+				<Button variant="outline" size="sm">Show My Mandalas</Button>
+			</a>
 		</div>
 	{/if}
 
 	{#if $nfts.state === 'Ready'}
 		{#if $nfts.tokens.length > 0}
 			<div
-				class="mx-auto flex h-full w-full flex-col items-center justify-center text-black dark:text-white"
+				class="mx-auto flex h-full w-full flex-col items-center justify-center"
 			>
-				<p class="p-6">
+				<p class="p-6 text-center">
 					{#if isWalletOwner}
 						Here are your Mandalas. You can burn them to get 95% of the current
-						price. Each time a mandala is burnt, the price decrease. Note that
-						once burnt that same Mandala cannot be re-created.
-					{:else}Here are the Mandalas for wallet {addressToLook}.{/if}
+						price. Each time a Mandala is burnt the price decreases. Note that
+						once burnt, that same Mandala cannot be re-created.
+					{:else}
+						Here are the Mandalas for wallet {addressToLook}.
+					{/if}
 				</p>
 			</div>
 		{:else if addressToLook}
 			<div
-				class="mx-auto flex h-full w-full flex-col items-center justify-center text-black dark:text-white"
+				class="mx-auto flex h-full w-full flex-col items-center justify-center"
 			>
 				{#if isWalletOwner}
 					<p class="p-4">You do not have any Mandala yet.</p>
-					<p>get your first one <a href="/" class="underline">here</a></p>
+					<p>
+						Get your first one <a href={route('/')} class="underline">here</a>.
+					</p>
 				{:else}
 					<p class="p-4">No Mandala for {addressToLook}</p>
 				{/if}
@@ -194,33 +139,23 @@
 	{/if}
 
 	<section
-		class="mx-auto flex h-full w-full flex-col items-center justify-center px-10 py-8 text-black md:w-3/4 dark:text-white"
+		class="mx-auto flex h-full w-full flex-col items-center justify-center px-10 py-8 md:w-3/4"
 	>
 		{#if !$nfts}
 			<div>Getting Tokens...</div>
 		{:else if $nfts.state === 'Idle'}
 			<div>Tokens not loaded</div>
 		{:else if $nfts.error}
-			<div>Error: {$nfts.error}</div>
+			<div class="text-destructive">Error: {$nfts.error}</div>
 		{:else if $nfts.tokens.length === 0 && $nfts.state === 'Loading'}
 			<div>Loading Your Tokens...</div>
 		{:else}
 			<ul
 				class="grid grid-cols-2 sm:grid-cols-3 sm:space-y-0 sm:gap-x-12 sm:gap-y-20 lg:grid-cols-4 lg:gap-x-16"
 			>
-				{#each $nfts.tokens as nft, index}
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
+				{#each $nfts.tokens as nft (nft.id.toString())}
 					<li>
-						<!-- svelte-ignore a11y_click_events_have_key_events -->
-						<div
-							id={nft.id.toString()}
-							onclick={() => {
-								if (isWalletOwner) {
-									burn(nft);
-								}
-							}}
-							class="space-y-4 p-8"
-						>
+						<div id={nft.id.toString()} class="space-y-4 p-8">
 							<div class="aspect-w-3 aspect-h-2">
 								{#if nft.error}
 									Error: {nft.error}
@@ -235,37 +170,18 @@
 										)}
 									/>
 								{:else}
-									<p class="">{nft.name}</p>
+									<p>{nft.name}</p>
 								{/if}
 							</div>
-							{#if nft.image && isWalletOwner}
-								<div class={$nfts.burning[nft.id.toString()] ? 'hidden' : ''}>
-									<div class="mt-2 flex">
-										<div class="flex w-0 flex-1">
-											<button
-												class="relative inline-flex w-0 flex-1 items-center
-                        justify-center rounded-br-lg border border-transparent pb-4 text-sm
-                        font-medium text-gray-700 hover:text-gray-500
-                        dark:text-gray-300"
-											>
-												<svg
-													class="h-6 w-6"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke="currentColor"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"
-													/>
-												</svg>
-												<span class="ml-3">Burn It</span>
-											</button>
-										</div>
-									</div>
+							{#if nft.image && isWalletOwner && !$nfts.burning[nft.id.toString()]}
+								<div class="mt-2 flex">
+									<button
+										onclick={() => burn(nft.id)}
+										class="relative inline-flex w-0 flex-1 items-center justify-center rounded-br-lg border border-transparent pb-4 text-sm font-medium text-muted-foreground hover:text-foreground"
+									>
+										<FlameIcon class="h-6 w-6" />
+										<span class="ml-3">Burn It</span>
+									</button>
 								</div>
 							{/if}
 						</div>
@@ -275,16 +191,3 @@
 		{/if}
 	</section>
 </div>
-
-<!-- onCancel is what makes this dismissable at all: Modal falls back to
-     escapeKeydownBehavior/interactOutsideBehavior 'ignore' without it, so
-     anything that wedges here would trap the user. -->
-<Modal openWhen={txStatus === 'WAITING_TX'} onCancel={() => (txStatus = undefined)}>
-	<div class="text-center">
-		<h2>Confirm the transaction...</h2>
-		<p class="mt-2 text-sm text-gray-300">
-			Check your wallet. You can close this - it won't cancel a transaction you
-			already approved.
-		</p>
-	</div>
-</Modal>

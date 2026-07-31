@@ -95,7 +95,7 @@ export class Blockie {
 		// console.log(this);
 	}
 
-	//TODO Image Texture
+	// TODO: blockies could apply an image texture here.
 	draw(
 		ctx: CanvasRenderingContext2D,
 		x: number,

@@ -1,0 +1,10 @@
+{
+	"name": "Mandalas",
+	"title": "Mandalas",
+	"description": "Mandalas are unique procedurally generated bitmap NFTs on ethereum. The first to use tokenURI to remove the need for any client-code",
+	"canonicalURL": "https://mandalas.eth.limo",
+	"ENSName": "mandalas.eth",
+	"themeColor": "#000000",
+	"appleStatusBarStyle": "black-translucent",
+	"icon": "static/icon.png"
+}

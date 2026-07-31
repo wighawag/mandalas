@@ -30,7 +30,11 @@ function getFiles(
 	});
 }
 
-async function getCid(buildPath: string, accessToken: string, useLocalIpfs = false): Promise<string> {
+async function getCid(
+	buildPath: string,
+	accessToken: string,
+	useLocalIpfs = false,
+): Promise<string> {
 	const absoluteBuildPath = resolve(buildPath);
 	console.log(`Uploading ${absoluteBuildPath}...`);
 
@@ -48,9 +52,13 @@ async function getCid(buildPath: string, accessToken: string, useLocalIpfs = fal
 		// Upload using curl with multipart form data for each file
 		// Try using the format that IPFS API expects: file=@path;filename=relPath
 		// Use double quotes around the entire form value
-		const fileArgs = files.map((f) => `-F "file=@${f.fullPath};filename=${f.relPath}"`).join(' ');
+		const fileArgs = files
+			.map((f) => `-F "file=@${f.fullPath};filename=${f.relPath}"`)
+			.join(' ');
 		const rpcUrl = useLocalIpfs ? LOCAL_IPFS_RPC : FILEBASE_IPFS_RPC;
-		const authHeader = useLocalIpfs ? '' : `-H "Authorization: Bearer ${accessToken}"`;
+		const authHeader = useLocalIpfs
+			? ''
+			: `-H "Authorization: Bearer ${accessToken}"`;
 		const command = `curl -s -X POST ${authHeader} ${fileArgs} "${rpcUrl}/api/v0/add?wrap-with-directory=true&cid-version=1&pin=true"`;
 		console.log(`executing: ${command}`);
 		const result = execSync(command, {encoding: 'utf-8'});
@@ -101,12 +109,18 @@ async function updateIpns(
 	console.log('Published to IPNS:', parsed);
 }
 
-export async function pinToIpfs(options: Options & {useLocalIpfs?: boolean}): Promise<void> {
+export async function pinToIpfs(
+	options: Options & {useLocalIpfs?: boolean},
+): Promise<void> {
 	const buildPath = resolve(options.buildPath ?? './build');
 	const rpcUrl = options.useLocalIpfs ? 'local IPFS' : 'Filebase RPC';
 	console.log(`Uploading ${buildPath} to IPFS via ${rpcUrl}...`);
 
-	const cid = await getCid(buildPath, options.accessToken, options.useLocalIpfs);
+	const cid = await getCid(
+		buildPath,
+		options.accessToken,
+		options.useLocalIpfs,
+	);
 	console.log(`Directory CID: ${cid}`);
 
 	if (!options.useLocalIpfs) {

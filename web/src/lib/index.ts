@@ -1,95 +1,71 @@
-import {get} from 'svelte/store';
-import {establishRemoteConnection} from './core/connection';
-import {createBalanceStore} from './core/connection/balance';
-import {createGasFeeStore} from './core/connection/gasFee';
-import {PurchaseFlowStore} from './ui/purchaseFlow';
-import type {Dependencies} from './types.js';
-import {CurveStore} from './stores/curve';
-import {RandomTokenStore} from './stores/randomTokens';
-import {NFTOfStore} from './stores/nftsof';
+import {createRouteHandler} from './core/utils/web/path';
+import {
+	getHashParamsFromLocation,
+	getParamsFromLocation,
+} from './core/utils/web/url';
 
-export async function createDependencies(): Promise<Dependencies> {
-	const window = globalThis as any;
+import {createServiceWorker} from '$lib/core/service-worker';
+import {createNotificationsService} from './core/notifications';
+import {createContext} from 'svelte';
+import type {Context} from './context/types';
+import {env} from '$env/dynamic/public';
 
-	// ----------------------------------------------------------------------------
-	// CONNECTION
-	// ----------------------------------------------------------------------------
+export const hashParams = getHashParamsFromLocation();
 
-	const {signer, connection, walletClient, publicClient, account, deployments} =
-		await establishRemoteConnection();
+const {params: paramFromLocation} = getParamsFromLocation();
+export const {isParentRoute, isSameRoute, route, params} = createRouteHandler(
+	paramFromLocation,
+	{
+		globalQueryParams: [
+			'dev',
+			'transactions',
+			'debug',
+			'debugLevel',
+			'traceLevel',
+			'debugLabel',
+			'eruda',
+			'tx-observer',
+			'burner',
+		] as const,
+		// Dynamic routes that need hash-based URLs on path-based IPFS gateways
+		dynamicRoutes: [
+			{
+				pattern: /^(\/explorer\/tx\/)(0x[a-fA-F0-9]+)\/?$/,
+				basePath: '/explorer/tx/',
+			},
+			{
+				pattern: /^(\/explorer\/address\/)(0x[a-fA-F0-9]+)\/?$/,
+				basePath: '/explorer/address/',
+			},
+		],
+	},
+);
 
-	window.connection = connection;
-	window.walletClient = walletClient;
-	window.publicClient = publicClient;
-	window.deployments = deployments;
+export const dev = params.dev || import.meta.env.DEV;
 
-	// ----------------------------------------------------------------------------
+// Runtime override for the burner wallet (see context/burner.ts). Preserved
+// across navigation because `burner` is a global query param above.
+export {parseBurnerParam} from './context/burner';
+import {parseBurnerParam as _parseBurnerParam} from './context/burner';
+export const burnerOverride = _parseBurnerParam(params.burner);
 
-	// ----------------------------------------------------------------------------
-	// BALANCE AND COSTS
-	// ----------------------------------------------------------------------------
+export const notifications = createNotificationsService();
+export const serviceWorker = createServiceWorker(notifications);
 
-	const balance = createBalanceStore({publicClient, signer});
-	window.balance = balance;
+const [getAppContextFunction, setAppContext] = createContext<() => Context>();
 
-	// ----------------------------------------------------------------------------
+const getAppContext = () => getAppContextFunction()();
+export {getAppContext, setAppContext};
 
-	// TODO use deployment store ?
-	const gasFee = createGasFeeStore({
-		publicClient: publicClient as any, // TODO fix publicClient type
-		deployments: deployments.current,
+// Dev/debug: attaching to globalThis for console access
+(globalThis as any).env = env;
+// Dev/debug: attaching to globalThis for console access
+(globalThis as any).vite_env = import.meta.env;
+
+// HMR cleanup: Remove service worker listeners when module is hot-replaced in dev
+// This prevents listener accumulation during development
+if (import.meta.hot) {
+	import.meta.hot.dispose(() => {
+		serviceWorker.cleanup();
 	});
-	window.gasFee = gasFee;
-
-	// TODO remove
-	// we trigger it
-	gasFee.subscribe((v) => {
-		// console.log(`gas fee updated`, v);
-	});
-	window.gasFee = gasFee;
-	// ----------------------------------------------------------------------------
-
-	const purchaseFlow = new PurchaseFlowStore(publicClient, walletClient);
-	window.purchaseFlow = purchaseFlow;
-
-	return {
-		gasFee,
-		balance,
-		connection,
-		walletClient,
-		publicClient,
-		account,
-		deployments,
-		purchaseFlow,
-	};
-}
-
-(globalThis as any).get = get;
-
-// const [getUserContextFunction, setUserContext] = createContext<() => Dependencies>();
-
-// const getUserContext = () => getUserContextFunction()();
-// export {getUserContext, setUserContext};
-
-export const {
-	gasFee,
-	balance,
-	connection,
-	walletClient,
-	publicClient,
-	account,
-	deployments,
-	purchaseFlow,
-} = await createDependencies();
-
-export const curve = new CurveStore(publicClient);
-export const randomTokens = new RandomTokenStore(deployments.current);
-
-const cache: {[owner: string]: NFTOfStore} = {};
-export function nftsof(owner?: string): NFTOfStore {
-	const fromCache = cache[owner || ''];
-	if (fromCache) {
-		return fromCache;
-	}
-	return (cache[owner || ''] = new NFTOfStore(publicClient, owner));
 }

@@ -31,5 +31,7 @@ export function totalSupply(): Promise<bigint> {
 export function balanceOf(
 	address: string = TEST_ACCOUNT.address,
 ): Promise<bigint> {
-	return call(SELECTOR.balanceOf + address.replace(/^0x/, '').padStart(64, '0'));
+	return call(
+		SELECTOR.balanceOf + address.replace(/^0x/, '').padStart(64, '0'),
+	);
 }

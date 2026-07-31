@@ -1,8 +1,19 @@
-node_modules/
-.svelte-kit/
-build/
+node_modules
+
+# Output
+/.svelte-kit
+/build
+
+# pwag
 static/pwa
+
+# Env
+*.local
+
 src/lib/deployments.ts
-# playwright
-/playwright-report/
-/test-results/
+
+.yalc
+yalc.lock
+# Playwright
+test-results
+playwright-report/

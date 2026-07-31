@@ -1,4 +1,21 @@
-node_modules/
-.svelte-kit/
-build/
+############################################
+# .gitignore
+#############################################
+node_modules
+
+# Output
+/.svelte-kit
+/build
+
+# pwag
 static/pwa
+src/app.html
+
+# Env
+*.local
+############################################
+
+pnpm-lock.yaml
+src/lib/shadcn/
+
+# Note .prettierignore is being ignored by vscode prettier plugin, see https://github.com/prettier/prettier-vscode/issues/3465

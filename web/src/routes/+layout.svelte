@@ -1,60 +1,71 @@
 <script lang="ts">
-	import '../global.css';
-	import NavBar from '$lib/components/styled/navigation/NavBar.svelte';
+	import '../app.css';
+
+	import {serviceWorker, notifications, route} from '$lib';
+	import {provideRoute, provideENS} from '$lib/core/capabilities';
+	import NotificationOverlay from '$lib/core/notifications/NotificationOverlay.svelte';
+	import Notifications from '$lib/core/notifications/Notifications.svelte';
+	import VersionAndInstallNotfications from '$lib/core/service-worker/VersionAndInstallNotfications.svelte';
 	import NavigationProgress from '$lib/components/NavigationProgress.svelte';
 
-	import webConfig from '$lib/web-config.json';
-	import WalletOnlyConnectionFlow from '$lib/core/connection/WalletOnlyConnectionFlow.svelte';
-	import {connection} from '$lib';
-	import Modal from '$lib/core/ui/modal/Modal.svelte';
-	import PurchaseFlow from '$lib/ui/PurchaseFlow.svelte';
-
-	const title =
-		'Mandalas - Mandalas are unique prodecurally generated bitmap NFTs on ethereum. The first to use tokenURI to remove the need for any client-code';
-	const description = webConfig.description;
-	const host = webConfig.url.endsWith('/')
-		? webConfig.url
-		: webConfig.url + '/';
-	const previewImage = host + 'preview.png';
+	import {createContext} from '$lib/context/index.js';
+	import AsyncContext from '$lib/context/AsyncContext.svelte';
+	import Navbar from '$lib/ui/navbar/navbar.svelte';
+	import RpcHealthBanner from '$lib/ui/rpc-health/RpcHealthBanner.svelte';
+	import NonceCacheBanner from '$lib/ui/nonce-cache/NonceCacheBanner.svelte';
+	import OfflineBanner from '$lib/ui/offline/OfflineBanner.svelte';
+	import PurchaseFlow from '$lib/ui/purchase/PurchaseFlow.svelte';
+	import {createENSService} from '$lib/core/ens';
+	import {Toaster} from '$lib/shadcn/ui/sonner';
+	import AcrossPages from '$lib/context/AcrossPages.svelte';
+	import DefaultHead from '$lib/metadata/DefaultHead.svelte';
+	import {page} from '$app/state';
 
 	let {children} = $props();
+
+	// Provide ambient capabilities to core UI components.
+	provideRoute(route);
+	provideENS(createENSService());
+
+	// The RPC-health / no-RPC banner is relevant on pages that read onchain data.
+	// The standalone mandala renderer does not (it is pure client-side generation
+	// from the id in the hash), so it is excluded. `page.route.id` is base-path
+	// independent (works under IPFS/relative paths).
+	let showRpcBanner = $derived(
+		page.route.id !== '/mandala' && page.route.id !== '/about',
+	);
 </script>
 
-<svelte:head>
-	<title>{title}</title>
-	<meta name="title" content={title} />
-	<meta name="description" content={description} />
-	<meta property="og:type" content="website" />
-	<meta property="og:url" content={host} />
-	<meta property="og:title" content={title} />
-	<meta property="og:description" content={description} />
-	<meta property="og:image" content={previewImage} />
-	<meta property="twitter:card" content="summary_large_image" />
-	<meta property="twitter:url" content={host} />
-	<meta property="twitter:title" content={title} />
-	<meta property="twitter:description" content={description} />
-	<meta property="twitter:image" content={previewImage} />
-</svelte:head>
+<DefaultHead />
 
 <NavigationProgress />
 
-<NavBar
-	links={[
-		{href: '/', title: 'MANDALAS'},
-		{href: '/wallet/', title: 'Wallet'},
-		{href: '/about/', title: 'About'},
-	]}
+<AsyncContext getContext={createContext} splashImage="/icon.png">
+	<Navbar repoURL="https://github.com/wighawag/mandalas" />
+	<OfflineBanner />
+	<NonceCacheBanner />
+	{#if showRpcBanner}
+		<RpcHealthBanner />
+	{/if}
+
+	{@render children()}
+
+	<PurchaseFlow />
+	<AcrossPages />
+</AsyncContext>
+
+<Toaster position="bottom-right" richColors closeButton />
+
+<VersionAndInstallNotfications
+	{serviceWorker}
+	classes={{
+		root: 'bg-background bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,var(--color-muted)_10px,var(--color-muted)_20px)]',
+	}}
 />
 
-<PurchaseFlow />
+<NotificationOverlay>
+	<Notifications {notifications} />
+</NotificationOverlay>
 
-<WalletOnlyConnectionFlow {connection} />
-
-<!-- <Modal openWhen={true} onCancel={() => connection.back('Idle')}>
-  {#snippet title()}
-    Waiting for Wallet Connection...
-  {/snippet}
-  Please Accept Connection Request...
-</Modal> -->
-
-{@render children?.()}
+<div id="--layer-drawer"></div>
+<div id="--layer-modals"></div>

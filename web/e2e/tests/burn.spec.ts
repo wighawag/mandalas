@@ -31,7 +31,11 @@ function trackUnhandled(page: Page) {
 async function mintOne(page: Page) {
 	await page.goto('/');
 	await page.waitForSelector('img[alt]', {timeout: 60_000});
-	await page.locator('button:has(svg)').first().click();
+	// By label, not position: the navbar also has icon-only buttons now.
+	await page
+		.getByRole('button', {name: /Mint It/})
+		.first()
+		.click();
 	await chooseWallet(page);
 	const confirm = page.getByRole('button', {name: 'Confirm'});
 	await expect(confirm).toBeVisible({timeout: 20_000});
@@ -68,7 +72,6 @@ function burnButton(page: Page) {
 	return page.getByRole('button', {name: /Burn It/}).first();
 }
 
-
 // NOT YET RELIABLE. Landed as fixme rather than left out, because the harness
 // around them works and the diagnosis is written down.
 //
@@ -99,22 +102,24 @@ test.fixme('declining the burn transaction is silent, not an unhandled error', a
 
 	// The user declined: nothing should burn, nothing should be thrown at the
 	// window, and declining is a choice rather than an error to shout about.
-	await expect
-		.poll(() => totalSupply(), {timeout: 15_000})
-		.toBe(supply);
+	await expect.poll(() => totalSupply(), {timeout: 15_000}).toBe(supply);
 	expect(unhandled).toEqual([]);
 	expect(consoleErrors).toEqual([]);
 
 	// and the confirmation dialog must not be left on screen
-	await expect(page.getByText('Confirm the transaction')).toHaveCount(0);
+	await expect(page.getByText('Confirm in your wallet')).toHaveCount(0);
 });
 
 // See the note above: same isolation blocker. Also observed the burn click
 // not reaching the handler in this context, which needs its own look.
-test.fixme('accepting the burn transaction burns the mandala', async ({page}) => {
+test.fixme('accepting the burn transaction burns the mandala', async ({
+	page,
+}) => {
 	const unhandled = trackUnhandled(page);
 	const logs: string[] = [];
-	page.on('console', (m) => logs.push(`[${m.type()}] ${m.text().slice(0, 200)}`));
+	page.on('console', (m) =>
+		logs.push(`[${m.type()}] ${m.text().slice(0, 200)}`),
+	);
 	await installWallet(page);
 
 	await mintOne(page);
@@ -124,9 +129,7 @@ test.fixme('accepting the burn transaction burns the mandala', async ({page}) =>
 	await burnButton(page).click();
 
 	try {
-		await expect
-			.poll(() => totalSupply(), {timeout: 60_000})
-			.toBe(supply - 1n);
+		await expect.poll(() => totalSupply(), {timeout: 60_000}).toBe(supply - 1n);
 	} finally {
 		console.log('--- wallet calls:', JSON.stringify(await walletCalls(page)));
 		console.log('--- page errors:', unhandled);

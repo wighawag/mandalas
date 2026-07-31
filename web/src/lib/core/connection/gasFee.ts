@@ -1,6 +1,11 @@
-import {writable, type Readable} from 'svelte/store';
 import type {GetFeeHistoryReturnType, PublicClient} from 'viem';
-import type {TypedDeployments} from './types';
+import type {Readable} from 'svelte/store';
+import {
+	createPollingStore,
+	type PollingStore,
+	type PollingValue,
+	type PollingStatus,
+} from './polling-store';
 
 export type GasPrice = {maxFeePerGas: bigint; maxPriorityFeePerGas: bigint};
 export type EstimateGasPriceResult = GasPrice[];
@@ -9,60 +14,52 @@ export type GasPriceEstimates = {
 	slow: GasPrice;
 	average: GasPrice;
 	fast: GasPrice;
+	baseFeePerGas: bigint;
 	higherThanExpected: boolean;
 };
 
-export type LoadedGasFee = {
-	step: 'Loaded';
-} & GasPriceEstimates;
-export type GasFee = {error?: {message: string; cause?: any}} & (
-	| {
-			step: 'Idle';
-	  }
-	| {
-			step: 'Loading';
-	  }
-	| LoadedGasFee
-);
+export type GasFeeValue = PollingValue<GasPriceEstimates>;
+export type GasFeeStatus = PollingStatus;
+export type GasFeeStore = PollingStore<GasPriceEstimates>;
 
-export type GasFeeStore = Readable<GasFee> & {
-	update(): void;
-	value: LoadedGasFee | undefined;
-};
+// Helper type for when loaded
+export type LoadedGasFee = Extract<GasFeeValue, {step: 'Loaded'}>;
 
-function defaultState() {
-	return {
-		step: 'Idle',
-	} as const;
+/**
+ * Effective gas price to display: base fee plus the average priority tip.
+ * Pure helper so components don't inline the fee arithmetic.
+ */
+export function effectiveGasPrice(estimates: GasPriceEstimates): bigint {
+	return estimates.baseFeePerGas + estimates.average.maxPriorityFeePerGas;
 }
 
 function avg(arr: bigint[]) {
+	if (arr.length === 0) return 0n;
 	const sum = arr.reduce((a: bigint, v: bigint) => a + v);
 	return sum / BigInt(arr.length);
 }
 
 export function createGasFeeStore(
-	params: {publicClient: PublicClient; deployments: TypedDeployments},
-	options?: {fetchInterval?: number},
+	params: {
+		publicClient: PublicClient;
+		/**
+		 * Optional gate: gas fetching only runs while this source is truthy. Used
+		 * to avoid polling (and surfacing RPC errors) when the app has no RPC of
+		 * its own and the wallet is not connected yet. When omitted, gas is
+		 * fetched unconditionally (an app RPC is available).
+		 */
+		fetchGate?: Readable<boolean>;
+	},
+	options?: {fetchInterval?: number; expectedWorstGasPrice?: bigint},
 ): GasFeeStore {
-	let feeHistoryNotSupported: boolean | undefined;
-	const {publicClient, deployments} = params;
-	const fetchInterval = options?.fetchInterval || 10 * 60 * 1000; // 10 minute
-
-	let $state: GasFee = defaultState();
-
-	const _store = writable<GasFee>($state, start);
-	function set(state: GasFee) {
-		$state = state;
-		_store.set($state);
-		return $state;
-	}
+	let feeHistorySupport: 'unknown' | 'supported' | 'unsupported' = 'unknown';
+	const {publicClient} = params;
 
 	async function fetchGasPriceEstimates(): Promise<GasPriceEstimates> {
 		const blockCount = 20;
 		const rewardPercentiles = [10, 50, 80];
 
-		if (!feeHistoryNotSupported) {
+		if (feeHistorySupport === 'unknown' || feeHistorySupport === 'supported') {
 			try {
 				const feeHistory: GetFeeHistoryReturnType =
 					await publicClient.getFeeHistory({
@@ -74,6 +71,17 @@ export function createGasFeeStore(
 
 				let blockNum = Number(feeHistory.oldestBlock);
 				const lastBlock = blockNum + reward.length;
+
+				if (feeHistory.baseFeePerGas.length < reward.length) {
+					throw new Error(
+						`feeHistory.baseFeePerGas has less values than feeHistory.reward`,
+					);
+				}
+				if (feeHistory.gasUsedRatio.length < reward.length) {
+					throw new Error(
+						`feeHistory.gasUsedRatio has less values than feeHistory.reward`,
+					);
+				}
 				let index = 0;
 				const blocksHistory: {
 					number: number;
@@ -109,22 +117,24 @@ export function createGasFeeStore(
 						maxPriorityFeePerGas: percentilePriorityFeeAverages[i],
 					});
 				}
+				feeHistorySupport = 'supported';
 				return {
 					slow: result[0],
 					average: result[1],
 					fast: result[2],
-					higherThanExpected:
-						result[2].maxFeePerGas >
-						BigInt(deployments.chain.properties.expectedWorstGasPrice),
+					baseFeePerGas,
+					higherThanExpected: options?.expectedWorstGasPrice
+						? result[2].maxFeePerGas > options?.expectedWorstGasPrice
+						: false,
 				};
 			} catch (err: any) {
-				if (feeHistoryNotSupported === undefined) {
+				if (feeHistorySupport === 'unknown') {
 					if (
-						('details' in err &&
-							err.details.indexOf('unknown method eth_feeHistory') != -1) ||
-						err.details.indexOf('Unknown method eth_feeHistory') != -1
+						'details' in err &&
+						(err.details.indexOf('unknown method eth_feeHistory') != -1 ||
+							err.details.indexOf('Unknown method eth_feeHistory') != -1)
 					) {
-						feeHistoryNotSupported = true;
+						feeHistorySupport = 'unsupported';
 					} else {
 						throw err;
 					}
@@ -134,7 +144,7 @@ export function createGasFeeStore(
 			}
 		}
 
-		if (feeHistoryNotSupported) {
+		if (feeHistorySupport === 'unsupported') {
 			const gasPrice = await publicClient.getGasPrice();
 			return {
 				slow: {
@@ -149,86 +159,29 @@ export function createGasFeeStore(
 					maxFeePerGas: gasPrice,
 					maxPriorityFeePerGas: gasPrice,
 				},
-				higherThanExpected:
-					gasPrice > BigInt(deployments.chain.properties.expectedWorstGasPrice),
+				baseFeePerGas: gasPrice,
+				higherThanExpected: options?.expectedWorstGasPrice
+					? gasPrice > options?.expectedWorstGasPrice
+					: false,
 			};
 		}
 
 		throw new Error(`could not fallback on getGasPrice`);
 	}
 
-	async function fetchState(): Promise<boolean> {
-		if ($state.step !== 'Loaded') {
-			set({
-				step: 'Loading',
-			});
-		}
-
-		let gasPriceEstimates: GasPriceEstimates;
-		try {
-			gasPriceEstimates = await fetchGasPriceEstimates();
-		} catch (err: any) {
-			console.error(`failed to fetch fee history`, err);
-			set({
-				step: 'Loading',
-				error: {message: `failed to fetch fee history`, cause: err},
-			});
-			return false;
-		}
-
-		set({
-			step: 'Loaded',
-			...gasPriceEstimates,
-		});
-
-		return true;
-	}
-
-	async function fetchContinuously() {
-		if (timeout) {
-			clearTimeout(timeout);
-			timeout = undefined;
-		}
-
-		let interval = fetchInterval;
-		try {
-			const success = await fetchState();
-			if (!success) {
-				interval = 500;
+	return createPollingStore(
+		async () => {
+			try {
+				return await fetchGasPriceEstimates();
+			} catch (err) {
+				console.error(`failed to fetch fee history`, err);
+				throw err;
 			}
-		} finally {
-			if (!timeout) {
-				timeout = setTimeout(fetchContinuously, interval);
-			}
-		}
-	}
-
-	let timeout: NodeJS.Timeout | undefined;
-	function start() {
-		fetchContinuously();
-
-		return stop;
-	}
-
-	async function update() {
-		await fetchContinuously();
-		return $state;
-	}
-
-	function stop() {
-		set(defaultState());
-
-		if (timeout) {
-			clearTimeout(timeout);
-			timeout = undefined;
-		}
-	}
-
-	return {
-		subscribe: _store.subscribe,
-		update,
-		get value() {
-			return $state.step === 'Loaded' ? $state : undefined;
 		},
-	};
+		{
+			// default: 10 minutes
+			fetchInterval: options?.fetchInterval ?? 10 * 60 * 1000,
+			...(params.fetchGate ? {source: {store: params.fetchGate}} : {}),
+		},
+	);
 }
