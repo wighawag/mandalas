@@ -1,7 +1,7 @@
 import {expect} from 'earl';
 import {describe, it} from 'node:test';
 import {network} from 'hardhat';
-import {setupFixtures} from './utils/index.js';
+import {burnPayout, setupFixtures} from './utils/index.js';
 import {generatePrivateKey, privateKeyToAccount} from 'viem/accounts';
 import {encodePacked, keccak256, hexToBytes} from 'viem';
 import {generateTokenURI, template19_bis} from 'mandalas-common';
@@ -26,7 +26,60 @@ async function randomMintSignature(
 	};
 }
 
+/** Gas actually paid for a transaction. */
+function txCostOf(receipt: {
+	effectiveGasPrice: bigint | number | string;
+	gasUsed: bigint | number | string;
+}): bigint {
+	return BigInt(receipt.effectiveGasPrice) * BigInt(receipt.gasUsed);
+}
+
 describe('MandalaToken Specific', function () {
+	/**
+	 * The economic invariant, asserted WITHOUT restating the curve.
+	 *
+	 * The two burn tests below compare against burnPayout(), which mirrors the
+	 * contract's own formula - useful, but it cannot catch an error in that
+	 * formula, only a drift from it. This one is independent: whatever the curve
+	 * does, a mint immediately followed by a burn must cost the holder exactly
+	 * the creator's cut and must leave the reserve empty. If the reserve ever
+	 * pays out more than the matching mint deposited, the contract would drain
+	 * and the last holders could not burn at all.
+	 */
+	it('a mint/burn round trip costs exactly the creator cut and leaves no reserve', async function () {
+		const {env, MandalaToken, namedAccounts, unnamedAccounts} =
+			await networkHelpers.loadFixture(deployAll);
+		const buyer = unnamedAccounts[0];
+		const creator = namedAccounts.deployer;
+		const balanceOf = (address: `0x${string}`) =>
+			env.viem.publicClient.getBalance({address});
+
+		const price = await env.read(MandalaToken, {functionName: 'currentPrice'});
+		const {tokenId, signature} = await randomMintSignature(buyer);
+
+		const buyerBefore = await balanceOf(buyer);
+		const creatorBefore = await balanceOf(creator);
+
+		const mintReceipt = await env.execute(MandalaToken, {
+			account: buyer,
+			functionName: 'mint',
+			args: [buyer, signature],
+			value: price,
+		});
+		const burnReceipt = await env.execute(MandalaToken, {
+			account: buyer,
+			functionName: 'burn',
+			args: [tokenId],
+		});
+
+		const gas = txCostOf(mintReceipt) + txCostOf(burnReceipt);
+		const buyerNetLoss = buyerBefore - (await balanceOf(buyer)) - gas;
+		const creatorGain = (await balanceOf(creator)) - creatorBefore;
+
+		expect(buyerNetLoss).toEqual(creatorGain);
+		expect(await balanceOf(MandalaToken.address)).toEqual(0n);
+	});
+
 	it('name succeed', async function () {
 		const {env, MandalaToken} = await networkHelpers.loadFixture(deployAll);
 		const name = await env.read(MandalaToken, {functionName: 'name'});
@@ -135,12 +188,11 @@ describe('MandalaToken Specific', function () {
 		const balanceAfter = await env.viem.publicClient.getBalance({
 			address: unnamedAccounts[1],
 		});
+		// Burning PAYS the caller, so the payout is added. One token exists at this
+		// point, so the burn brings supply back to 0 and refunds the reserve share
+		// of the price at supply 0.
 		const expectedBalance =
-			balanceBefore -
-			(txCost +
-				(currentPrice *
-					(10000n - BigInt(MandalaToken.linkedData.creatorCutPer10000th))) /
-					10000n);
+			balanceBefore - txCost + burnPayout(MandalaToken.linkedData, 1n);
 		expect(balanceAfter).toEqual(expectedBalance);
 	});
 
@@ -267,13 +319,7 @@ describe('MandalaToken Specific', function () {
 		const supply = await env.read(MandalaToken, {
 			functionName: 'totalSupply',
 		});
-		// const newCurrentPrice = await MandalaToken.currentPrice();
-		const burnPrice =
-			BigInt(MandalaToken.linkedData.initialPrice) +
-			((supply - 1n) *
-				BigInt(MandalaToken.linkedData.linearCoefficient) *
-				(10000n - BigInt(MandalaToken.linkedData.creatorCutPer10000th))) /
-				10000n;
+		const burnPrice = burnPayout(MandalaToken.linkedData, supply);
 
 		const receipt = await env.execute(MandalaToken, {
 			account: unnamedAccounts[1],
