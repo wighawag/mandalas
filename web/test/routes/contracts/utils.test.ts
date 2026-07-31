@@ -1,5 +1,4 @@
 import {describe, it, expect} from 'vitest';
-import deployments from '$lib/deployments';
 import type {AbiParameter} from 'viem';
 import {
 	convertInputValues,
@@ -383,8 +382,43 @@ describe('getFunctionSignature', () => {
 		).toBe('submit((address,uint256)[])');
 	});
 
-	it('yields unique keys for every function of a real ERC721 abi', () => {
-		const abi = deployments.contracts.MandalaToken.abi;
+	it('yields unique keys across an abi that overloads a name', () => {
+		// A trimmed ERC721. The two safeTransferFrom overloads are exactly what
+		// crashed the contracts page, and they need no deployment to reproduce.
+		const addr = {name: 'from', type: 'address'} as const;
+		const to = {name: 'to', type: 'address'} as const;
+		const id = {name: 'tokenId', type: 'uint256'} as const;
+		const abi = [
+			{
+				type: 'function',
+				name: 'ownerOf',
+				stateMutability: 'view',
+				inputs: [id],
+				outputs: [{name: '', type: 'address'}],
+			},
+			{
+				type: 'function',
+				name: 'transferFrom',
+				stateMutability: 'nonpayable',
+				inputs: [addr, to, id],
+				outputs: [],
+			},
+			{
+				type: 'function',
+				name: 'safeTransferFrom',
+				stateMutability: 'nonpayable',
+				inputs: [addr, to, id],
+				outputs: [],
+			},
+			{
+				type: 'function',
+				name: 'safeTransferFrom',
+				stateMutability: 'nonpayable',
+				inputs: [addr, to, id, {name: 'data', type: 'bytes'}],
+				outputs: [],
+			},
+		] as const;
+
 		const fns = getContractFunctions(abi as never);
 		const signatures = fns.map(getFunctionSignature);
 		expect(new Set(signatures).size).toBe(signatures.length);
