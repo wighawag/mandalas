@@ -17,6 +17,13 @@ WEB_DIR="$ROOT_DIR/web"
 
 RPC_PORT="${E2E_RPC_PORT:-8545}"
 RPC_URL="http://127.0.0.1:${RPC_PORT}"
+# EXPORTED, not just local: the node, the deploy and the app build follow these,
+# and so must the test process (e2e/fixtures/wallet.ts reads E2E_RPC_URL, and it
+# defaults to 8545). Without the export, E2E_RPC_PORT=<other> moves everything
+# EXCEPT the tests, which then snapshot/revert and read from whatever owns 8545 -
+# i.e. exactly the node the override was meant to step aside from.
+export E2E_RPC_PORT="$RPC_PORT"
+export E2E_RPC_URL="$RPC_URL"
 
 # The deploy account must be funded on the node. A developer's
 # contracts/.env.local may point MNEMONIC_localhost at their own (unfunded)
@@ -30,7 +37,11 @@ export MNEMONIC_localhost="$TEST_MNEMONIC"
 # contracts/.env.local funds one set of accounts and deploys from another, and
 # the run dies with "Sender doesn't have enough funds".
 export MNEMONIC="$TEST_MNEMONIC"
+# Point the deploy/export at that chain, and build the app against it. Exported
+# shell env outranks every .env file in ldenv, so this beats the 8545 baked into
+# web/.env.localhost without editing it.
 export ETH_NODE_URI_localhost="$RPC_URL"
+export PUBLIC_NODE_URL="$RPC_URL"
 
 STARTED_NODE=""
 

@@ -9,7 +9,8 @@
 	import NavigationProgress from '$lib/components/NavigationProgress.svelte';
 
 	import {createContext} from '$lib/context/index.js';
-	import AsyncContext from '$lib/context/AsyncContext.svelte';
+	import Context from '$lib/context/Context.svelte';
+	import InitError from '$lib/context/InitError.svelte';
 	import Navbar from '$lib/ui/navbar/navbar.svelte';
 	import RpcHealthBanner from '$lib/ui/rpc-health/RpcHealthBanner.svelte';
 	import NonceCacheBanner from '$lib/ui/nonce-cache/NonceCacheBanner.svelte';
@@ -19,13 +20,26 @@
 	import {Toaster} from '$lib/shadcn/ui/sonner';
 	import AcrossPages from '$lib/context/AcrossPages.svelte';
 	import DefaultHead from '$lib/metadata/DefaultHead.svelte';
-	import {url} from '$lib/core/utils/web/path';
 	import {page} from '$app/state';
 
 	let {children} = $props();
 
+	// Built once, synchronously, on the server as well as in the browser: every
+	// service idles when browser APIs are absent, so the page (and its metadata)
+	// prerenders instead of waiting behind a splash. Readiness arrives through
+	// the stores. See ADR-0002.
+	const context = createContext();
+
+	// Set when the app cannot run at all. Env-derived reasons are known at
+	// construction (so the error also prerenders); the `?burner=true` one is
+	// raised from start(), which swaps the app out for the error screen.
+	const {fatal} = context.context;
+
 	// Provide ambient capabilities to core UI components.
 	provideRoute(route);
+	// Mandalas always ships an ENS RPC (see web/.env), so ENS is provided
+	// unconditionally rather than gated on PUBLIC_ENS_NODE_URL as the template
+	// does: the app shows ENS names wherever an address appears.
 	provideENS(createENSService());
 
 	// The RPC-health / no-RPC banner is relevant on pages that read onchain data.
@@ -41,24 +55,23 @@
 
 <NavigationProgress />
 
-<!-- splashImage must go through url(): with `paths.relative: true` a bare
-     '/icon.png' resolves against the gateway root, not the app, so the splash
-     would 404 on IPFS. AsyncContext's own default is already wrapped; an
-     override has to do the same. Mandalas ships a png rather than the
-     template's svg. -->
-<AsyncContext getContext={createContext} splashImage={url('/icon.png')}>
-	<Navbar repoURL="https://github.com/wighawag/mandalas" />
-	<OfflineBanner />
-	<NonceCacheBanner />
-	{#if showRpcBanner}
-		<RpcHealthBanner />
-	{/if}
+{#if $fatal}
+	<InitError message={$fatal} />
+{:else}
+	<Context {context}>
+		<Navbar repoURL="https://github.com/wighawag/mandalas" />
+		<OfflineBanner />
+		<NonceCacheBanner />
+		{#if showRpcBanner}
+			<RpcHealthBanner />
+		{/if}
 
-	{@render children()}
+		{@render children()}
 
-	<PurchaseFlow />
-	<AcrossPages />
-</AsyncContext>
+		<PurchaseFlow />
+		<AcrossPages />
+	</Context>
+{/if}
 
 <Toaster position="bottom-right" richColors closeButton />
 

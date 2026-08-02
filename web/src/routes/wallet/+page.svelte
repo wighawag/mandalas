@@ -57,6 +57,8 @@
 	);
 
 	let nfts = $derived(nftsOf(addressToLook));
+	// Loading / error live on the polling store's status, next to the value.
+	let nftsStatus = $derived(nfts.status);
 
 	let symbol = $derived($deployments.chain.nativeCurrency.symbol);
 
@@ -107,7 +109,7 @@
 		</div>
 	{/if}
 
-	{#if $nfts.state === 'Ready'}
+	{#if $nfts.step === 'Loaded'}
 		{#if $nfts.tokens.length > 0}
 			<div
 				class="mx-auto flex h-full w-full flex-col items-center justify-center"
@@ -141,14 +143,14 @@
 	<section
 		class="mx-auto flex h-full w-full flex-col items-center justify-center px-10 py-8 md:w-3/4"
 	>
-		{#if !$nfts}
-			<div>Getting Tokens...</div>
-		{:else if $nfts.state === 'Idle'}
-			<div>Tokens not loaded</div>
-		{:else if $nfts.error}
-			<div class="text-destructive">Error: {$nfts.error}</div>
-		{:else if $nfts.tokens.length === 0 && $nfts.state === 'Loading'}
-			<div>Loading Your Tokens...</div>
+		{#if $nftsStatus.error && $nfts.step !== 'Loaded'}
+			<div class="text-destructive">Error: {$nftsStatus.error.message}</div>
+		{:else if $nfts.step !== 'Loaded'}
+			{#if $nftsStatus.loading}
+				<div>Loading Your Tokens...</div>
+			{:else}
+				<div>Tokens not loaded</div>
+			{/if}
 		{:else}
 			<ul
 				class="grid grid-cols-2 sm:grid-cols-3 sm:space-y-0 sm:gap-x-12 sm:gap-y-20 lg:grid-cols-4 lg:gap-x-16"
@@ -161,7 +163,7 @@
 									Error: {nft.error}
 								{:else if nft.image}
 									<img
-										style={`image-rendering: pixelated; ${$nfts.burning[nft.id.toString()] ? 'filter: grayscale(100%);' : ''}`}
+										style="image-rendering: pixelated;"
 										class="h-full w-full object-contain"
 										alt={nft.name}
 										src={generateBitmapDataURI(
@@ -173,7 +175,7 @@
 									<p>{nft.name}</p>
 								{/if}
 							</div>
-							{#if nft.image && isWalletOwner && !$nfts.burning[nft.id.toString()]}
+							{#if nft.image && isWalletOwner}
 								<div class="mt-2 flex">
 									<button
 										onclick={() => burn(nft.id)}

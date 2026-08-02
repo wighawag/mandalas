@@ -29,8 +29,17 @@ function activate<T>(store: {subscribe: (r: (v: T) => void) => () => void}) {
 }
 
 describe('createOnchainState (adapter)', () => {
-	beforeEach(() => vi.useFakeTimers());
-	afterEach(() => vi.useRealTimers());
+	// Polling stores only poll in a browser (ADR-0002), and this project is Node
+	// with no DOM, so declare the global the guard looks for. The off-browser
+	// behaviour itself is covered in polling-store.test.ts.
+	beforeEach(() => {
+		vi.useFakeTimers();
+		vi.stubGlobal('window', {});
+	});
+	afterEach(() => {
+		vi.useRealTimers();
+		vi.unstubAllGlobals();
+	});
 
 	it('reads totalSupply and derives the current price from the curve', async () => {
 		const readContract = vi.fn(async () => 4n);
