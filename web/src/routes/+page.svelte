@@ -11,11 +11,14 @@
 
 	const BATCH = 32;
 
-	randomTokens.generate(BATCH);
-
 	let symbol = 'ETH';
 
 	onMount(() => {
+		// Generated on mount, not at script level: this page prerenders now, and
+		// generating during prerender bakes 32 mandalas into the HTML that the
+		// browser immediately replaces with 32 different ones.
+		randomTokens.generate(BATCH);
+
 		function onScroll() {
 			if (
 				window.innerHeight + window.scrollY >=
