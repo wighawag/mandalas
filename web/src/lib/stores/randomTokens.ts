@@ -21,6 +21,16 @@ type NFTs = {
 	startIndex: number;
 };
 
+// Mandala generation is pure CPU work on the main thread. Generating a whole
+// batch in one go blocks the browser long enough that it never paints the
+// "generating" state. We slice the work and yield between slices so the UI
+// stays responsive and the mandalas show up progressively.
+const GENERATION_CHUNK_SIZE = 4;
+
+function yieldToBrowser(): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
 type Transaction = {
 	hash: string;
 	nonce: number;
@@ -37,9 +47,10 @@ export class RandomTokenStore extends BaseStore<NFTs> {
 	private random = '';
 	private claimTXs: {[id: string]: Transaction} = {};
 	private key: string;
+	private runId = 0;
 	constructor(private deployments: TypedDeployments) {
 		super({
-			state: 'Ready',
+			state: 'Idle',
 			error: undefined,
 			tokens: [],
 			startIndex: 0,
@@ -73,41 +84,90 @@ export class RandomTokenStore extends BaseStore<NFTs> {
 		this.setPartial({tokens: this.$store.tokens});
 	}
 
-	loadMore(num: number): void {
-		const from = this.$store.startIndex + this.$store.tokens.length;
-		const tokens = [];
-		for (let i = 0; i < num; i++) {
-			const randomBigInt = BigInt(this.random) + BigInt(from + i);
-			// Convert to 32-byte hex string
-			const privateKey = '0x' + randomBigInt.toString(16).padStart(64, '0');
-			const wallet = privateKeyToAccount(privateKey as `0x${string}`);
-			const id = wallet.address;
-			const tokenURI = generateTokenURI(id, template19_bis);
-			const jsonStart = tokenURI.indexOf(',') + 1;
-			const jsonStr = tokenURI.slice(jsonStart);
-			const json = JSON.parse(jsonStr);
-			tokens.push({
-				id,
-				tokenURI,
-				privateKey: privateKey, // Store the original private key
-				name: json.name,
-				description: json.description,
-				image: json.image,
-				minted: !!this.claimTXs[id],
-			});
+	private generateToken(index: number): NFT {
+		const randomBigInt = BigInt(this.random) + BigInt(index);
+		// Convert to 32-byte hex string
+		const privateKey = '0x' + randomBigInt.toString(16).padStart(64, '0');
+		const wallet = privateKeyToAccount(privateKey as `0x${string}`);
+		const id = wallet.address;
+		const tokenURI = generateTokenURI(id, template19_bis);
+		const jsonStart = tokenURI.indexOf(',') + 1;
+		const jsonStr = tokenURI.slice(jsonStart);
+		const json = JSON.parse(jsonStr);
+		return {
+			id,
+			tokenURI,
+			privateKey: privateKey, // Store the original private key
+			name: json.name,
+			description: json.description,
+			image: json.image,
+			minted: !!this.claimTXs[id],
+		};
+	}
+
+	/**
+	 * Generate `num` mandalas starting at `from`, appending them chunk by chunk
+	 * so the browser can paint between chunks. Returns false if a newer run
+	 * superseded this one (reset/regenerate), in which case the caller must not
+	 * touch the store anymore.
+	 */
+	private async generateFrom(
+		from: number,
+		num: number,
+		runId: number,
+	): Promise<boolean> {
+		for (let i = 0; i < num; i += GENERATION_CHUNK_SIZE) {
+			const chunk: NFT[] = [];
+			const end = Math.min(i + GENERATION_CHUNK_SIZE, num);
+			for (let j = i; j < end; j++) {
+				chunk.push(this.generateToken(from + j));
+			}
+			if (runId !== this.runId) {
+				return false;
+			}
+			this.setPartial({tokens: this.$store.tokens.concat(chunk)});
+			await yieldToBrowser();
+			if (runId !== this.runId) {
+				return false;
+			}
 		}
-		this.setPartial({tokens: this.$store.tokens.concat(tokens)});
+		return true;
+	}
+
+	async loadMore(num: number): Promise<void> {
+		// Ignore while a batch is still being generated: the scroll handler fires
+		// repeatedly and would otherwise pile up overlapping generations.
+		if (this.$store.state !== 'Ready' || this.$store.error) {
+			return;
+		}
+		const runId = ++this.runId;
+		const from = this.$store.startIndex + this.$store.tokens.length;
+		this.setPartial({state: 'Loading'});
+		try {
+			if (!(await this.generateFrom(from, num, runId))) {
+				return;
+			}
+			this.setPartial({state: 'Ready'});
+		} catch (e) {
+			if (runId !== this.runId) {
+				return;
+			}
+			console.error(e);
+			this.setPartial({state: 'Ready', error: e});
+		}
 	}
 
 	reset(): void {
 		if (typeof localStorage == 'undefined') {
 			return;
 		}
+		// invalidate any in-flight generation before the page goes away
+		this.runId++;
 		localStorage.clear();
 		location.reload();
 	}
 
-	generate(num: number): void {
+	private loadSeed(): LocalStorageData {
 		let data: LocalStorageData | undefined;
 		try {
 			const fromStorage = localStorage.getItem(this.key);
@@ -155,33 +215,34 @@ export class RandomTokenStore extends BaseStore<NFTs> {
 			}
 		}
 
-		this.claimTXs = data.claimTXs;
+		return data;
+	}
 
-		this.random = data.random;
-		const tokens = [];
-
-		for (let i = data.start; i < data.start + num; i++) {
-			const randomBigInt = BigInt(data.random) + BigInt(i);
-			// Convert to 32-byte hex string
-			const privateKey = '0x' + randomBigInt.toString(16).padStart(64, '0');
-			const wallet = privateKeyToAccount(privateKey as `0x${string}`);
-			const id = wallet.address;
-			const tokenURI = generateTokenURI(id, template19_bis);
-			const jsonStart = tokenURI.indexOf(',') + 1;
-			const jsonStr = tokenURI.slice(jsonStart);
-			const json = JSON.parse(jsonStr);
-			tokens.push({
-				id,
-				tokenURI,
-				privateKey: privateKey, // Store the original private key
-				name: json.name,
-				description: json.description,
-				image: json.image,
-				minted: !!data.claimTXs[id],
-			});
+	async generate(num: number): Promise<void> {
+		const runId = ++this.runId;
+		this.setPartial({state: 'Loading', error: undefined, tokens: []});
+		// let the browser paint the "generating" state before we hog the main thread
+		await yieldToBrowser();
+		if (runId !== this.runId) {
+			return;
 		}
+		try {
+			const data = this.loadSeed();
+			this.claimTXs = data.claimTXs;
+			this.random = data.random;
+			this.setPartial({startIndex: data.start});
 
-		this.setPartial({startIndex: data.start, tokens});
+			if (!(await this.generateFrom(data.start, num, runId))) {
+				return;
+			}
+			this.setPartial({state: 'Ready'});
+		} catch (e) {
+			if (runId !== this.runId) {
+				return;
+			}
+			console.error(e);
+			this.setPartial({state: 'Ready', error: e});
+		}
 	}
 
 	subscribe(

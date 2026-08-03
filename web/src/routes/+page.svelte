@@ -2,8 +2,10 @@
 	import {onMount} from 'svelte';
 	import {getAppContext} from '$lib';
 	import {formatBalance} from '$lib/core/utils/format/balance';
+	import {formatError} from '$lib/core/utils/format/error';
 	import {PRICE_SYMBOLS} from '$lib/view';
 	import Button from '$lib/shadcn/ui/button/button.svelte';
+	import {Spinner} from '$lib/shadcn/ui/spinner/index.js';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 
 	const {purchaseFlow, randomTokens, viewState, canReadChain, connection} =
@@ -17,14 +19,14 @@
 		// Generated on mount, not at script level: this page prerenders now, and
 		// generating during prerender bakes 32 mandalas into the HTML that the
 		// browser immediately replaces with 32 different ones.
-		randomTokens.generate(BATCH);
+		void randomTokens.generate(BATCH);
 
 		function onScroll() {
 			if (
 				window.innerHeight + window.scrollY >=
 				document.body.offsetHeight - window.innerHeight / 3
 			) {
-				randomTokens.loadMore(BATCH);
+				void randomTokens.loadMore(BATCH);
 			}
 		}
 		window.addEventListener('scroll', onScroll);
@@ -89,16 +91,23 @@
 	</div>
 
 	<section
-		class="mx-auto flex h-full w-full items-center justify-center px-4 py-8"
+		class="mx-auto flex h-full w-full flex-col items-center justify-center px-4 py-8"
 	>
-		{#if !$randomTokens}
-			<div>Generating Mandalas...</div>
-		{:else if $randomTokens.state === 'Idle'}
-			<div>Mandalas not loaded</div>
-		{:else if $randomTokens.error}
-			<div class="text-destructive">Error: {$randomTokens.error}</div>
-		{:else if $randomTokens.tokens.length === 0 && $randomTokens.state === 'Loading'}
-			<div>Loading Mandalas...</div>
+		{#if $randomTokens.error}
+			<div class="text-destructive">
+				Error: {formatError($randomTokens.error)}
+			</div>
+		{:else if $randomTokens.tokens.length === 0}
+			<!-- Generation is CPU work on the main thread: until the first tokens
+			     land we are still working, not failing. -->
+			{#if $randomTokens.state === 'Ready'}
+				<div class="text-destructive">Error: No Mandala could be generated</div>
+			{:else}
+				<div class="flex items-center gap-2">
+					<Spinner />
+					<span>Generating Mandalas...</span>
+				</div>
+			{/if}
 		{:else}
 			<ul
 				class="grid grid-cols-2 sm:grid-cols-4 sm:space-y-0 sm:gap-x-6 sm:gap-y-12 lg:grid-cols-6 lg:gap-x-8"
@@ -136,10 +145,14 @@
 							{/if}
 						</div>
 					</li>
-				{:else}
-					<div>Error: No Mandala could be generated</div>
 				{/each}
 			</ul>
+			{#if $randomTokens.state === 'Loading'}
+				<div class="flex items-center gap-2 py-4">
+					<Spinner />
+					<span>Generating more Mandalas...</span>
+				</div>
+			{/if}
 		{/if}
 	</section>
 </div>
