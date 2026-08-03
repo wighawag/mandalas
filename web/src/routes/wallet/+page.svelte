@@ -112,29 +112,35 @@
 	{#if $nfts.step === 'Loaded'}
 		{#if $nfts.tokens.length > 0}
 			<div
-				class="mx-auto flex h-full w-full flex-col items-center justify-center"
+				class="mx-auto w-full max-w-prose px-6 py-6 text-center text-sm leading-relaxed md:text-base"
 			>
-				<p class="p-6 text-center">
-					{#if isWalletOwner}
+				{#if isWalletOwner}
+					<p>
 						Here are your Mandalas. You can burn them to get 95% of the current
 						price. Each time a Mandala is burnt the price decreases. Note that
 						once burnt, that same Mandala cannot be re-created.
-					{:else}
-						Here are the Mandalas for wallet {addressToLook}.
-					{/if}
-				</p>
+					</p>
+				{:else}
+					<!-- A 42-character address is unbreakable enough to overflow a
+					     narrow viewport; monospace + break-all keeps it contained. -->
+					<p>
+						Here are the Mandalas for wallet
+						<span class="font-mono break-all">{addressToLook}</span>.
+					</p>
+				{/if}
 			</div>
 		{:else if addressToLook}
 			<div
-				class="mx-auto flex h-full w-full flex-col items-center justify-center"
+				class="prose-mandala mx-auto w-full max-w-prose space-y-2 px-6 py-6 text-center text-sm leading-relaxed md:text-base"
 			>
 				{#if isWalletOwner}
-					<p class="p-4">You do not have any Mandala yet.</p>
-					<p>
-						Get your first one <a href={route('/')} class="underline">here</a>.
-					</p>
+					<p>You do not have any Mandala yet.</p>
+					<p>Get your first one <a href={route('/')}>here</a>.</p>
 				{:else}
-					<p class="p-4">No Mandala for {addressToLook}</p>
+					<p>
+						No Mandala for
+						<span class="font-mono break-all">{addressToLook}</span>
+					</p>
 				{/if}
 			</div>
 		{/if}

@@ -209,3 +209,32 @@ html {
 [data-slot='avatar-fallback'] {
 	border-radius: 0 !important;
 }
+
+/*
+ * Running text (the About page today, any long-form block tomorrow).
+ *
+ * Body copy here used to be centred and full-bleed, and both hurt reading:
+ * centring leaves every line a ragged left edge so the eye has to hunt for the
+ * start of the next one, and an unconstrained column lets a line run well past
+ * the ~65-75 characters the eye can track in one sweep. Measure and rhythm are
+ * plain utilities at the call site (`max-w-prose`, `space-y-*`); this class
+ * carries only what a utility cannot express, the link treatment for anchors
+ * embedded in a sentence.
+ *
+ * A bare `underline` (the previous treatment) makes a link findable only once
+ * you are already looking at it. Colouring it the wordmark's yellow makes it
+ * scannable, and the offset underline stops the rule from cutting through
+ * descenders. Yellow is safe unconditionally because the app is dark-only
+ * (see app.html), so the poor yellow-on-white contrast never arises.
+ */
+.prose-mandala a {
+	@apply rounded-xs text-yellow-400 underline decoration-yellow-400/40 underline-offset-4 transition-colors;
+}
+
+.prose-mandala a:hover {
+	@apply text-yellow-300 decoration-yellow-300;
+}
+
+.prose-mandala a:focus-visible {
+	@apply outline-2 outline-offset-2 outline-yellow-400;
+}

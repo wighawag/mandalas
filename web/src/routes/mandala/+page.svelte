@@ -25,7 +25,7 @@
 </script>
 
 <section
-	class="mx-auto flex h-full flex-col items-center justify-center px-10 py-8 text-black md:w-3/4 dark:text-white"
+	class="mx-auto flex h-full flex-col items-center justify-center px-10 py-8 text-foreground md:w-3/4"
 >
 	<div class="space-y-4 p-8">
 		<img

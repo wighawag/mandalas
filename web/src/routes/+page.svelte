@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {onMount} from 'svelte';
-	import {getAppContext} from '$lib';
+	import {getAppContext, route} from '$lib';
 	import {formatBalance} from '$lib/core/utils/format/balance';
 	import {formatError} from '$lib/core/utils/format/error';
 	import {PRICE_SYMBOLS} from '$lib/view';
@@ -76,17 +76,18 @@
 		</div>
 	{/if}
 
+	<!-- Short hero copy, so centring reads fine here; the measure cap is what
+	     matters, otherwise the second sentence runs the full width of a desktop
+	     monitor above a grid that is itself gridded and calm. -->
 	<div
-		class="mx-auto flex h-full w-full flex-col items-center justify-center text-center text-xs md:text-base"
+		class="prose-mandala mx-auto flex w-full max-w-prose flex-col items-center gap-2 px-4 py-4 text-center text-sm leading-relaxed md:text-base"
 	>
-		<p class="px-4 pt-4">
-			There are millions of Mandalas, all unique. Pick the one you like :)
-		</p>
-		<p class="px-4 pb-1">
+		<p>There are millions of Mandalas, all unique. Pick the one you like :)</p>
+		<p>
 			Their price runs on a bonding curve. So as more people collect them, the
 			more expensive they get. And you can burn them to get most of the price
 			back. More details
-			<a href="about" class="underline">here</a>.
+			<a href={route('/about/')}>here</a>.
 		</p>
 	</div>
 
