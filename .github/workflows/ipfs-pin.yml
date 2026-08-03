@@ -29,7 +29,9 @@ jobs:
       - name: Build
         run: pnpm build mainnet
         env:
-          PUBLIC_RPC_URL: ${{ vars.PUBLIC_RPC_URL }}
+          PUBLIC_NODE_URL: ${{ vars.PUBLIC_NODE_URL }}
+          PUBLIC_ENS_NODE_URL: ${{ vars.PUBLIC_ENS_NODE_URL }}
+          PUBLIC_FAUCET_LINK: ${{ vars.PUBLIC_FAUCET_LINK }}
 
       # Pinned on our OWN node (pinnace), not a paid pinning service.
       #
