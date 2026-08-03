@@ -2,13 +2,56 @@
 	import {onMount} from 'svelte';
 	import {getAppContext, route} from '$lib';
 	import {formatError} from '$lib/core/utils/format/error';
+	import {truncateHex} from '$lib/core/utils/format';
+	import {createCopyToClipboard} from '$lib/core/ui/clipboard/copy-to-clipboard';
 	import CurveBar from '$lib/ui/curve/CurveBar.svelte';
 	import Button from '$lib/shadcn/ui/button/button.svelte';
 	import {Spinner} from '$lib/shadcn/ui/spinner/index.js';
+	import CheckIcon from '@lucide/svelte/icons/check';
+	import CopyIcon from '@lucide/svelte/icons/copy';
 	import DownloadIcon from '@lucide/svelte/icons/download';
+	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 
 	const {purchaseFlow, randomTokens, canReadChain, connection} =
 		getAppContext();
+
+	// Per-card "copied?" flag. `createCopyToClipboard` returns a store, but
+	// Svelte 5 only auto-subscribes to stores declared at the component's top
+	// level; using `$store` inside the each-block is a compile error, and
+	// subscribing imperatively from a reactive context is a runtime
+	// `state_unsafe_mutation`. So we delay both the subscribe and the state
+	// write until the user actually clicks Copy on a card. The first click
+	// creates the store, subscribes, and starts mirroring its boolean into
+	// the per-id $state; the template then re-renders for that card.
+	const copyById = new Map<string, ReturnType<typeof createCopyToClipboard>>();
+	let copied = $state<Record<string, boolean>>({});
+
+	function copyStoreFor(id: string) {
+		let s = copyById.get(id);
+		if (!s) {
+			s = createCopyToClipboard();
+			copyById.set(id, s);
+			// We never unsubscribe: the page is single-shot and the closure
+			// just holds a single id-keyed assignment, so the only "leak" is
+			// the timer inside the store itself (already managed by
+			// createCopyToClipboard).
+			s.subscribe((v) => (copied = {...copied, [id]: v}));
+		}
+		return s;
+	}
+
+	async function copyId(id: string) {
+		// Click handler, not a reactive context: safe to (lazily) create the
+		// store and write $state here.
+		await copyStoreFor(id).copy(id);
+	}
+
+	async function openMandala(id: string) {
+		const url = route('/mandala/', id);
+		if (typeof window !== 'undefined') {
+			window.location.href = url;
+		}
+	}
 
 	const BATCH = 32;
 
@@ -85,11 +128,11 @@
 			{/if}
 		{:else}
 			<ul
-				class="grid grid-cols-2 sm:grid-cols-4 sm:space-y-0 sm:gap-x-6 sm:gap-y-12 lg:grid-cols-6 lg:gap-x-8"
+				class="grid grid-cols-2 gap-x-4 gap-y-8 p-4 sm:grid-cols-3 sm:gap-x-4 md:grid-cols-4 md:gap-x-6 md:gap-y-12 xl:grid-cols-6 xl:gap-x-8"
 			>
 				{#each $randomTokens.tokens as nft (nft.id)}
 					<li>
-						<div id={nft.id} class="p-8">
+						<div id={nft.id} class="p-4 sm:p-6">
 							<div class="aspect-w-3 aspect-h-2">
 								{#if nft.error}
 									Error: {nft.error}
@@ -107,6 +150,32 @@
 									<p>{nft.name}</p>
 								{/if}
 							</div>
+							{#if nft.image}
+								<div class="mt-2 flex items-center justify-end gap-1">
+									<button
+										type="button"
+										title={`Open ${truncateHex(nft.id, {start: 4, end: 4})} on its own page`}
+										aria-label="Open this Mandala on its own page"
+										onclick={() => openMandala(nft.id)}
+										class="inline-flex size-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+									>
+										<ExternalLinkIcon class="size-4" />
+									</button>
+									<button
+										type="button"
+										title={`Copy id ${truncateHex(nft.id, {start: 4, end: 4})}`}
+										aria-label="Copy token id"
+										onclick={() => copyId(nft.id)}
+										class="inline-flex size-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+									>
+										{#if copied[nft.id]}
+											<CheckIcon class="size-4 text-green-500" />
+										{:else}
+											<CopyIcon class="size-4" />
+										{/if}
+									</button>
+								</div>
+							{/if}
 							{#if nft.image && !nft.minted}
 								<div class="mt-2 flex">
 									<button
