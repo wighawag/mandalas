@@ -6,5 +6,9 @@
 	"ENSName": "mandalas.eth",
 	"themeColor": "#000000",
 	"appleStatusBarStyle": "black-translucent",
-	"icon": "static/icon.png"
+	"icon": "static/icon.svg",
+	"maskable": {
+		"logoScale": 0.88,
+		"background": "#06050c"
+	}
 }
