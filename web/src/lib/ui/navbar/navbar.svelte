@@ -5,6 +5,7 @@
 	import {Spinner} from '$lib/shadcn/ui/spinner/index.js';
 	import * as Drawer from '$lib/shadcn/ui/drawer/index.js';
 	import * as Collapsible from '$lib/shadcn/ui/collapsible/index.js';
+	import * as Popover from '$lib/shadcn/ui/popover/index.js';
 	import Address from '../../core/ui/ethereum/Address.svelte';
 	import Badge from '$lib/shadcn/ui/badge/badge.svelte';
 	import {formatBalance} from '$lib/core/utils/format/balance';
@@ -19,6 +20,7 @@
 	import {page} from '$app/state';
 	import GitIcon from '$lib/icons/GitIcon.svelte';
 	import {url} from '$lib/core/utils/web/path';
+	import {NAV_LINKS, foldedMenuLabel, isActivePath} from '$lib/navigation';
 
 	let {
 		repoURL,
@@ -27,6 +29,61 @@
 		repoURL?: string;
 		communityURL?: string;
 	} = $props();
+
+	/**
+	 * Whether the left-hand side fits beside the wallet is MEASURED, not pinned
+	 * to a breakpoint, because both sides of the bar move: the right-hand side is
+	 * a Connect button, or a balance and an avatar, or an avatar on its own, and
+	 * it changes the moment somebody connects. At 320px the unfolded left side is
+	 * 273px wide and the wallet another 124px, so the wallet was simply pushed off
+	 * the right edge, which is the bug this measurement exists to prevent.
+	 *
+	 * Where it does not fit, the bar keeps the site name and folds the rest (the
+	 * pages, and the repo/community links) into one menu, whose label says which
+	 * page you are on. Navigation stays on the LEFT, where it belongs: the button
+	 * beside it is the wallet, and it becomes an account avatar once you connect,
+	 * which is the wrong place to hide pages.
+	 */
+	let moreOpen = $state(false);
+
+	let navElement = $state<HTMLElement | undefined>(undefined);
+	/** The hidden copy of the whole left-hand side, which is what gets measured. */
+	let measuringElement = $state<HTMLElement | undefined>(undefined);
+	let accountElement = $state<HTMLElement | undefined>(undefined);
+
+	/**
+	 * Starts as "it fits", because that is right on a desktop, which is where a
+	 * prerendered page is most often first painted; the measurement corrects it
+	 * before the browser paints anything on a phone.
+	 */
+	let showsEveryLink = $state(true);
+
+	/** Room for the gap between the two halves, and a little either way. */
+	const BREATHING_ROOM = 24;
+
+	function measureLinks() {
+		if (!navElement || !measuringElement || !accountElement) {
+			return;
+		}
+		const available =
+			navElement.clientWidth - accountElement.offsetWidth - BREATHING_ROOM;
+		showsEveryLink = measuringElement.scrollWidth <= available;
+	}
+
+	$effect(() => {
+		if (!navElement || !accountElement) {
+			return;
+		}
+		measureLinks();
+		// The bar resizes with the window; the account side also resizes on its own
+		// when a wallet connects and a balance appears where a button was.
+		const observer = new ResizeObserver(measureLinks);
+		observer.observe(navElement);
+		observer.observe(accountElement);
+		// Link widths change when the webfont lands, which is after the first paint.
+		void document.fonts?.ready.then(measureLinks);
+		return () => observer.disconnect();
+	});
 
 	const {
 		connection,
@@ -101,12 +158,12 @@
 	}
 
 	function isActive(path: string): boolean {
-		const currentPath = String(page.url.pathname);
-		if (path === '/') {
-			return currentPath === '/';
-		}
-		return currentPath.startsWith(path);
+		return isActivePath(path, String(page.url.pathname));
 	}
+
+	let menuLabel = $derived(
+		foldedMenuLabel(NAV_LINKS, String(page.url.pathname)),
+	);
 </script>
 
 <!-- The multicolor rules bracketing the bar are the Mandalas signature, drawn
@@ -130,13 +187,43 @@
 	{@render colorStrip()}
 	<!--navbar padding handled by scrollbar-gutter on desktop, needs-gutter-padding class adds padding on touch devices, see app.css-->
 	<nav
+		bind:this={navElement}
 		class="needs-gutter-padding flex h-[var(--nav-height)] w-full items-center justify-between bg-background py-4 shadow-md"
 	>
-		<div class="m-1 flex h-full items-center space-x-4">
+		<!-- The left-hand side laid out in full, but not shown, so the width it WOULD
+		     take can be measured whatever the bar is currently showing. Without it the
+		     decision would feed on its own output: fold, become narrower, decide it
+		     fits, unfold, overflow, fold again. -->
+		<div
+			bind:this={measuringElement}
+			aria-hidden="true"
+			class="pointer-events-none invisible absolute top-0 left-0 m-1 flex items-center space-x-4 whitespace-nowrap"
+		>
 			<span class="inline-flex items-baseline gap-4">
+				<span class="px-2 py-1 text-sm font-black tracking-wider">MANDALAS</span
+				>
+				{#each NAV_LINKS as link (link.href)}
+					<span class="px-2 py-1 text-sm font-semibold">{link.title}</span>
+				{/each}
+			</span>
+			<span class="flex items-center space-x-2">
+				{#if repoURL}<span class="block h-5 w-5"></span>{/if}
+				{#if communityURL}<span class="block h-5 w-5"></span>{/if}
+			</span>
+		</div>
+
+		<!-- `min-w-0` lets this side shrink and `overflow-hidden` keeps whatever is
+		     left of it inside its own box, so the wallet on the right can never be
+		     pushed off the edge of a narrow screen. -->
+		<div
+			class="m-1 flex h-full min-w-0 flex-1 items-center space-x-4 overflow-hidden"
+		>
+			<span class="inline-flex items-baseline gap-4">
+				<!-- The site's name is the one thing that never folds: it is the brand,
+				     and it is the way home. -->
 				<a
 					href={route('/')}
-					class="rounded px-2 py-1 text-sm font-black tracking-wider transition-colors {isActive(
+					class="rounded px-2 py-1 text-sm font-black tracking-wider whitespace-nowrap transition-colors {isActive(
 						'/',
 					)
 						? 'bg-primary/20 text-primary'
@@ -144,52 +231,110 @@
 				>
 					MANDALAS
 				</a>
-				<a
-					href={route('/wallet/')}
-					class="rounded px-2 py-1 text-sm transition-colors {isActive(
-						'/wallet',
-					)
-						? 'bg-primary/20 font-semibold text-primary'
-						: 'text-muted-foreground hover:text-foreground hover:underline'}"
-				>
-					Wallet
-				</a>
-				<a
-					href={route('/about/')}
-					class="rounded px-2 py-1 text-sm transition-colors {isActive('/about')
-						? 'bg-primary/20 font-semibold text-primary'
-						: 'text-muted-foreground hover:text-foreground hover:underline'}"
-				>
-					About
-				</a>
+				{#if showsEveryLink}
+					{#each NAV_LINKS as link (link.href)}
+						<a
+							href={route(link.href)}
+							class="rounded px-2 py-1 text-sm whitespace-nowrap transition-colors {isActive(
+								link.href,
+							)
+								? 'bg-primary/20 font-semibold text-primary'
+								: 'text-muted-foreground hover:text-foreground hover:underline'}"
+						>
+							{link.title}
+						</a>
+					{/each}
+				{/if}
 			</span>
-			<div class="flex items-center space-x-2">
-				{#if repoURL}
-					<a
-						href={repoURL}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="text-muted-foreground hover:text-foreground"
-						aria-label="GitHub"
+			{#if showsEveryLink}
+				<div class="flex items-center space-x-2">
+					{#if repoURL}
+						<a
+							href={repoURL}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-muted-foreground hover:text-foreground"
+							aria-label="GitHub"
+						>
+							<GitIcon class="h-5 w-5 fill-white" />
+						</a>
+					{/if}
+					{#if communityURL}
+						<a
+							href={communityURL}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-muted-foreground hover:text-foreground"
+							aria-label="Discord"
+						>
+							<MessageCircleIcon class="h-5 w-5" />
+						</a>
+					{/if}
+				</div>
+			{:else}
+				<!-- Folded: one menu holding every page but home, and the outside links.
+				     Its label is the page you are on, so the bar still says where you are
+				     with the room it has; on home it says `More`, because the lit
+				     MANDALAS beside it has already said it. -->
+				<Popover.Root bind:open={moreOpen}>
+					<Popover.Trigger
+						class="inline-flex shrink-0 items-center gap-1 rounded px-2 py-1 text-sm whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground"
+						aria-label="More pages"
 					>
-						<GitIcon class="h-5 w-5 fill-white" />
-					</a>
-				{/if}
-				{#if communityURL}
-					<a
-						href={communityURL}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="text-muted-foreground hover:text-foreground"
-						aria-label="Discord"
-					>
-						<MessageCircleIcon class="h-5 w-5" />
-					</a>
-				{/if}
-			</div>
+						{menuLabel}
+						<ChevronDownIcon
+							class="h-3 w-3 transition-transform {moreOpen
+								? 'rotate-180'
+								: ''}"
+						/>
+					</Popover.Trigger>
+					<Popover.Content align="start" sideOffset={8} class="w-44 p-1">
+						{#each NAV_LINKS as link (link.href)}
+							<a
+								href={route(link.href)}
+								class="block rounded px-3 py-2 text-sm transition-colors {isActive(
+									link.href,
+								)
+									? 'bg-primary/20 font-semibold text-primary'
+									: 'text-muted-foreground hover:text-foreground'}"
+								onclick={() => (moreOpen = false)}
+							>
+								{link.title}
+							</a>
+						{/each}
+						{#if repoURL}
+							<a
+								href={repoURL}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="flex items-center gap-2 rounded px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+								onclick={() => (moreOpen = false)}
+							>
+								<GitIcon class="h-4 w-4 fill-current" />
+								Code
+							</a>
+						{/if}
+						{#if communityURL}
+							<a
+								href={communityURL}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="flex items-center gap-2 rounded px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+								onclick={() => (moreOpen = false)}
+							>
+								<MessageCircleIcon class="h-4 w-4" />
+								Community
+							</a>
+						{/if}
+					</Popover.Content>
+				</Popover.Root>
+			{/if}
 		</div>
 
-		<div class="relative flex h-full items-center space-x-2">
+		<div
+			bind:this={accountElement}
+			class="relative flex h-full shrink-0 items-center space-x-2"
+		>
 			<!-- Connect Button / Connected Address -->
 			{#if ($connection.step === 'Idle' && $connection.loading) || ($connection.step != 'Idle' && !connection.isTargetStepReached($connection))}
 				<Button disabled class="m-1 flex h-8 items-center justify-center p-0">
