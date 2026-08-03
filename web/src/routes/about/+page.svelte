@@ -17,7 +17,7 @@
 		<h1
 			class="text-3xl font-black tracking-wider text-yellow-400 uppercase lg:text-4xl"
 		>
-			About
+			mandalas.eth
 		</h1>
 		<p class="mt-3 text-lg text-muted-foreground lg:text-xl">
 			Procedurally generated, eight-fold symmetric bitmaps, drawn entirely
