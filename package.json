@@ -17,7 +17,8 @@
       "esbuild"
     ],
     "overrides": {
-      "utf-8-validate": "-"
+      "utf-8-validate": "-",
+      "cookie@<0.7.0": "^0.7.0"
     }
   },
   "scripts": {
