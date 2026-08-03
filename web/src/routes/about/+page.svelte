@@ -8,18 +8,11 @@
 
 <DefaultHead title="About" />
 
-<!-- Left-aligned and measure-constrained on purpose: this is the only page on
-     the site that is read rather than scanned. See `.prose-mandala` in app.css
-     for why the previous centred, full-bleed treatment was dropped.
-
-     The measure is in `ch`, so it is tied to this element's own font-size: the
-     type scale below is what widens the column on a large screen, and the cap
-     only steps 65ch -> 72ch on top. Widening by max-width alone would have
-     bought width at the cost of the measure, which is the one thing the cap
-     exists to protect. Line-height lives here once rather than on every <p>. -->
-<article
-	class="prose-mandala mx-auto w-full max-w-prose px-6 py-10 text-base leading-relaxed text-foreground lg:max-w-[72ch] lg:px-8 lg:py-14 lg:text-lg xl:text-xl"
->
+<!-- Left-aligned rather than centred: this is the only page on the site that is
+     read rather than scanned. Measure, type scale and line-height all come from
+     .prose-mandala (app.css), shared with the home and wallet copy so the three
+     read as one voice; only the vertical rhythm is page-specific. -->
+<article class="prose-mandala py-10 text-foreground lg:py-14">
 	<header>
 		<h1
 			class="text-3xl font-black tracking-wider text-yellow-400 uppercase lg:text-4xl"

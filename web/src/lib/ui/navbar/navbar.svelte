@@ -117,9 +117,12 @@
 	<!-- The source bitmap is 128x1, i.e. ONE pixel tall. It must tile on both
 	     axes (the CSS default) so it fills the strip's height; constraining it to
 	     repeat-x renders a single 1px line in a 4px box and looks too thin. -->
+	<!-- Height comes from --strip-height (app.css) rather than a utility, so the
+	     bar's own height stays derivable and anything sticking below the header
+	     can offset by --header-height without the two drifting apart. -->
 	<div
-		class="h-1 w-full"
-		style={`background: url(${url('/images/multicolor_line_x8.png')});`}
+		class="w-full"
+		style={`height: var(--strip-height); background: url(${url('/images/multicolor_line_x8.png')});`}
 	></div>
 {/snippet}
 
@@ -127,7 +130,7 @@
 	{@render colorStrip()}
 	<!--navbar padding handled by scrollbar-gutter on desktop, needs-gutter-padding class adds padding on touch devices, see app.css-->
 	<nav
-		class="needs-gutter-padding flex h-12 w-full items-center justify-between bg-background py-4 shadow-md"
+		class="needs-gutter-padding flex h-[var(--nav-height)] w-full items-center justify-between bg-background py-4 shadow-md"
 	>
 		<div class="m-1 flex h-full items-center space-x-4">
 			<span class="inline-flex items-baseline gap-4">

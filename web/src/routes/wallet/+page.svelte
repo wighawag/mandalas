@@ -4,8 +4,7 @@
 	import {getAppContext, route} from '$lib';
 	import {goto} from '$app/navigation';
 	import {url} from '$lib/core/utils/web/path';
-	import {formatBalance} from '$lib/core/utils/format/balance';
-	import {PRICE_SYMBOLS} from '$lib/view';
+	import CurveBar from '$lib/ui/curve/CurveBar.svelte';
 	import Button from '$lib/shadcn/ui/button/button.svelte';
 	import {toast} from 'svelte-sonner';
 	import FlameIcon from '@lucide/svelte/icons/flame';
@@ -17,7 +16,6 @@
 		deployments,
 		balanceCheck,
 		nftsOf,
-		viewState,
 		accountCannotSend,
 	} = getAppContext();
 
@@ -60,8 +58,6 @@
 	// Loading / error live on the polling store's status, next to the value.
 	let nftsStatus = $derived(nfts.status);
 
-	let symbol = $derived($deployments.chain.nativeCurrency.symbol);
-
 	async function burn(tokenID: bigint) {
 		const result = await burnMandala(
 			{connection, executor, deployments, balanceCheck},
@@ -78,21 +74,7 @@
 </script>
 
 <div class="w-full">
-	{#if $viewState.step === 'Loaded'}
-		<div class="mx-auto flex h-full w-full justify-between">
-			<p class="m-2 text-xs font-black text-yellow-400 sm:text-base">
-				Current Price: {formatBalance(
-					$viewState.curve.currentPrice,
-					18,
-					PRICE_SYMBOLS,
-				)}
-				{symbol}
-			</p>
-			<p class="m-2 text-xs font-black text-yellow-400 sm:text-base">
-				Current Supply: {$viewState.curve.supply}
-			</p>
-		</div>
-	{/if}
+	<CurveBar />
 
 	{#if !addressToLook}
 		<div class="mx-auto h-full w-full flex-col text-center">
@@ -111,9 +93,7 @@
 
 	{#if $nfts.step === 'Loaded'}
 		{#if $nfts.tokens.length > 0}
-			<div
-				class="mx-auto w-full max-w-prose px-6 py-6 text-center text-sm leading-relaxed md:text-base"
-			>
+			<div class="prose-mandala py-6 text-center">
 				{#if isWalletOwner}
 					<p>
 						Here are your Mandalas. You can burn them to get 95% of the current
@@ -130,9 +110,7 @@
 				{/if}
 			</div>
 		{:else if addressToLook}
-			<div
-				class="prose-mandala mx-auto w-full max-w-prose space-y-2 px-6 py-6 text-center text-sm leading-relaxed md:text-base"
-			>
+			<div class="prose-mandala space-y-2 py-6 text-center">
 				{#if isWalletOwner}
 					<p>You do not have any Mandala yet.</p>
 					<p>Get your first one <a href={route('/')}>here</a>.</p>

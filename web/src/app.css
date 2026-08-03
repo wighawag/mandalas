@@ -148,6 +148,19 @@ html {
 	scrollbar-gutter: auto;
 }
 
+/*
+ * The sticky header's own height, so anything that has to stick BELOW it can
+ * offset itself without hardcoding a number that silently goes stale (CSS has
+ * no way to stack sticky elements automatically). navbar.svelte draws its parts
+ * from these same variables, so the header and the offset cannot drift apart:
+ * change a height here and both move together.
+ */
+:root {
+	--strip-height: 0.25rem; /* one multicolor rule, above and below the nav */
+	--nav-height: 3rem;
+	--header-height: calc(var(--nav-height) + 2 * var(--strip-height));
+}
+
 /* On touch devices (no visible scrollbar), scrollbar-gutter has no visual effect.
    Add explicit padding to compensate for the missing gutter space. */
 @media (pointer: coarse) {
@@ -211,16 +224,29 @@ html {
 }
 
 /*
- * Running text (the About page today, any long-form block tomorrow).
+ * Running text, wherever it appears: the About page, the home blurb, the wallet
+ * blurbs. One class owns the whole reading treatment, because these blocks had
+ * drifted apart, About reading a full step larger and wider than the copy on
+ * home and wallet, which made the same voice look like two different sites.
+ * Repeating the measure and type scale as a utility string at three call sites
+ * is what let them drift, so they live here instead; call sites keep only what
+ * genuinely differs (alignment, vertical padding, colour).
  *
- * Body copy here used to be centred and full-bleed, and both hurt reading:
- * centring leaves every line a ragged left edge so the eye has to hunt for the
- * start of the next one, and an unconstrained column lets a line run well past
- * the ~65-75 characters the eye can track in one sweep. Measure and rhythm are
- * plain utilities at the call site (`max-w-prose`, `space-y-*`); this class
- * carries only what a utility cannot express, the link treatment for anchors
- * embedded in a sentence.
+ * Body copy used to be centred and full-bleed, and both hurt reading: centring
+ * leaves every line a ragged left edge so the eye has to hunt for the start of
+ * the next one, and an unconstrained column lets a line run well past the
+ * ~65-75 characters the eye can track in one sweep.
  *
+ * The measure is in `ch`, i.e. relative to this element's own font-size, so the
+ * type scale below is what widens the column on a large screen; the cap only
+ * steps 65ch -> 72ch on top. Widening by max-width alone would buy width at the
+ * cost of the measure, which is the one thing the cap exists to protect.
+ */
+.prose-mandala {
+	@apply mx-auto w-full max-w-prose px-6 text-base leading-relaxed lg:max-w-[72ch] lg:px-8 lg:text-lg xl:text-xl;
+}
+
+/*
  * A bare `underline` (the previous treatment) makes a link findable only once
  * you are already looking at it. Colouring it the wordmark's yellow makes it
  * scannable, and the offset underline stops the rule from cutting through
