@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
-   viewBox="0 0 1280 640"
-   width="1280"
-   height="640"
-   font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+   width="169.33299mm"
+   height="169.33299mm"
+   viewBox="0 0 169.33299 169.33299"
    version="1.1"
-   id="svg267"
-   sodipodi:docname="preview.svg"
-   xml:space="preserve"
+   id="svg1"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
-   inkscape:export-filename="preview.png"
+   sodipodi:docname="icon.svg"
+   inkscape:export-filename="icon.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
-     id="namedview267"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
      pagecolor="#ffffff"
      bordercolor="#000000"
      borderopacity="0.25"
@@ -24,2007 +25,2257 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="0.909375"
-     inkscape:cx="743.3677"
-     inkscape:cy="320"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.78751403"
+     inkscape:cx="317.45466"
+     inkscape:cy="501.57837"
      inkscape:window-width="1920"
      inkscape:window-height="1095"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg267" /><defs
-     id="defs262"><radialGradient
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <radialGradient
        id="bg"
-       cx="50%"
-       cy="50%"
-       r="80%"><stop
+       cx="452.54834"
+       cy="452.54834"
+       r="724.07733"
+       gradientTransform="matrix(0.18708831,0,0,0.18708831,-65.616671,15.875008)"
+       fx="452.54834"
+       fy="452.54834"
+       gradientUnits="userSpaceOnUse">
+      <stop
          offset="0%"
          stop-color="#14111e"
-         id="stop1" /><stop
+         id="stop1" />
+      <stop
          offset="60%"
          stop-color="#0a0813"
-         id="stop2" /><stop
+         id="stop2" />
+      <stop
          offset="100%"
          stop-color="#050409"
-         id="stop3" /></radialGradient><linearGradient
-       id="accent"
-       x1="0"
-       y1="961.33241"
-       x2="18.973666"
-       y2="980.30607"
-       gradientTransform="scale(3.1622777,0.31622777)"
-       gradientUnits="userSpaceOnUse"><stop
-         offset="0%"
-         stop-color="#30d1d1"
-         id="stop4" /><stop
-         offset="50%"
-         stop-color="#4817a3"
-         id="stop5" /><stop
-         offset="100%"
-         stop-color="#b96ad8"
-         id="stop6" /></linearGradient><linearGradient
-       id="wordmark"
-       x1="2.616969"
-       y1="548.25324"
-       x2="188.51607"
-       y2="548.25324"
-       gradientTransform="scale(2.6509676,0.37722075)"
-       gradientUnits="userSpaceOnUse"><stop
-         offset="0%"
-         stop-color="#ffffff"
-         id="stop7" /><stop
-         offset="100%"
-         stop-color="#cfd2ff"
-         id="stop8" /></linearGradient><radialGradient
-       id="glow"
-       cx="50%"
-       cy="50%"
-       r="50%"><stop
-         offset="0%"
-         stop-color="#7b3df0"
-         stop-opacity="0.55"
-         id="stop9" /><stop
-         offset="100%"
-         stop-color="#7b3df0"
-         stop-opacity="0"
-         id="stop10" /></radialGradient><pattern
+         id="stop3" />
+    </radialGradient>
+    <pattern
        id="grid"
        width="32"
        height="32"
-       patternUnits="userSpaceOnUse"><path
+       patternUnits="userSpaceOnUse">
+      <path
          d="M32 0 L0 0 0 32"
          fill="none"
          stroke="#ffffff"
          stroke-opacity="0.025"
          stroke-width="1"
-         id="path10" /></pattern><pattern
+         id="path10" />
+    </pattern>
+    <radialGradient
+       id="glow"
+       cx="334"
+       cy="329"
+       r="340"
+       fx="334"
+       fy="329"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.26458333,0,0,0.26458333,-66.62459,15.875009)">
+      <stop
+         offset="0%"
+         stop-color="#7b3df0"
+         stop-opacity="0.55"
+         id="stop9" />
+      <stop
+         offset="100%"
+         stop-color="#7b3df0"
+         stop-opacity="0"
+         id="stop10" />
+    </radialGradient>
+    <linearGradient
+       id="wordmark"
+       x1="2.6169691"
+       y1="548.25323"
+       x2="188.51607"
+       y2="548.25323"
+       gradientTransform="scale(2.6509676,0.37722075)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#ffffff"
+         id="stop7" />
+      <stop
+         offset="100%"
+         stop-color="#cfd2ff"
+         id="stop8" />
+    </linearGradient>
+    <pattern
        id="multicolorStrip"
        width="256"
        height="16"
-       patternUnits="userSpaceOnUse"><rect
+       patternUnits="userSpaceOnUse">
+      <rect
          x="0"
          y="0"
          width="16"
          height="16"
          fill="#f6fe63"
-         id="rect1" /><rect
+         id="rect1" />
+      <rect
          x="16"
          y="0"
          width="16"
          height="16"
          fill="#fec425"
-         id="rect2" /><rect
+         id="rect2" />
+      <rect
          x="32"
          y="0"
          width="16"
          height="16"
          fill="#f37734"
-         id="rect3" /><rect
+         id="rect3" />
+      <rect
          x="48"
          y="0"
          width="16"
          height="16"
          fill="#d01141"
-         id="rect4" /><rect
+         id="rect4" />
+      <rect
          x="64"
          y="0"
          width="16"
          height="16"
          fill="#6d1b32"
-         id="rect5" /><rect
+         id="rect5" />
+      <rect
          x="80"
          y="0"
          width="16"
          height="16"
          fill="#c4754a"
-         id="rect6" /><rect
+         id="rect6" />
+      <rect
          x="96"
          y="0"
          width="16"
          height="16"
          fill="#e8caa9"
-         id="rect7" /><rect
+         id="rect7" />
+      <rect
          x="112"
          y="0"
          width="16"
          height="16"
          fill="#6ef043"
-         id="rect8" /><rect
+         id="rect8" />
+      <rect
          x="128"
          y="0"
          width="16"
          height="16"
          fill="#07bf75"
-         id="rect9" /><rect
+         id="rect9" />
+      <rect
          x="144"
          y="0"
          width="16"
          height="16"
          fill="#005c99"
-         id="rect10" /><rect
+         id="rect10" />
+      <rect
          x="160"
          y="0"
          width="16"
          height="16"
          fill="#0784aa"
-         id="rect11" /><rect
+         id="rect11" />
+      <rect
          x="176"
          y="0"
          width="16"
          height="16"
          fill="#30d1d1"
-         id="rect12" /><rect
+         id="rect12" />
+      <rect
          x="192"
          y="0"
          width="16"
          height="16"
          fill="#4817a3"
-         id="rect13" /><rect
+         id="rect13" />
+      <rect
          x="208"
          y="0"
          width="16"
          height="16"
          fill="#8034be"
-         id="rect14" /><rect
+         id="rect14" />
+      <rect
          x="224"
          y="0"
          width="16"
          height="16"
          fill="#b96ad8"
-         id="rect15" /><rect
+         id="rect15" />
+      <rect
          x="240"
          y="0"
          width="16"
          height="16"
          fill="#f6fe63"
-         id="rect16" /></pattern><symbol
-       id="mandala"
-       viewBox="0 0 570 570"
-       overflow="visible"><rect
+         id="rect16" />
+    </pattern>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(65.616671,-15.875008)">
+    <rect
+       width="169.33299"
+       height="169.33299"
+       fill="url(#bg)"
+       id="rect270"
+       x="-65.616669"
+       y="15.87501"
+       style="display:inline;fill:url(#bg);stroke-width:0.187088" />
+    <ellipse
+       cx="21.746243"
+       cy="102.92294"
+       fill="url(#glow)"
+       id="circle264"
+       style="display:inline;fill:url(#glow);stroke-width:0.264583"
+       rx="89.958"
+       ry="89.958336" />
+    <g
+       id="use264"
+       transform="matrix(0.21517666,0,0,0.21517666,-42.602969,39.973913)">
+      <rect
          x="240"
          y="0"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect17" /><rect
+         id="rect273" />
+      <rect
          x="270"
          y="0"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect18" /><rect
+         id="rect274" />
+      <rect
          x="300"
          y="0"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect19" /><rect
+         id="rect275" />
+      <rect
          x="90"
          y="30"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect20" /><rect
+         id="rect276" />
+      <rect
          x="120"
          y="30"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect21" /><rect
+         id="rect277" />
+      <rect
          x="240"
          y="30"
          width="30"
          height="30"
          fill="#07bf75"
          shape-rendering="crispEdges"
-         id="rect22" /><rect
+         id="rect278" />
+      <rect
          x="270"
          y="30"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect23" /><rect
+         id="rect279" />
+      <rect
          x="300"
          y="30"
          width="30"
          height="30"
          fill="#07bf75"
          shape-rendering="crispEdges"
-         id="rect24" /><rect
+         id="rect280" />
+      <rect
          x="420"
          y="30"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect25" /><rect
+         id="rect281" />
+      <rect
          x="450"
          y="30"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect26" /><rect
+         id="rect282" />
+      <rect
          x="90"
          y="60"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect27" /><rect
+         id="rect283" />
+      <rect
          x="120"
          y="60"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect28" /><rect
+         id="rect284" />
+      <rect
          x="180"
          y="60"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect29" /><rect
+         id="rect285" />
+      <rect
          x="210"
          y="60"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect30" /><rect
+         id="rect286" />
+      <rect
          x="240"
          y="60"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect31" /><rect
+         id="rect287" />
+      <rect
          x="270"
          y="60"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect32" /><rect
+         id="rect288" />
+      <rect
          x="300"
          y="60"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect33" /><rect
+         id="rect289" />
+      <rect
          x="330"
          y="60"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect34" /><rect
+         id="rect290" />
+      <rect
          x="360"
          y="60"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect35" /><rect
+         id="rect291" />
+      <rect
          x="420"
          y="60"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect36" /><rect
+         id="rect292" />
+      <rect
          x="450"
          y="60"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect37" /><rect
+         id="rect293" />
+      <rect
          x="30"
          y="90"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect38" /><rect
+         id="rect294" />
+      <rect
          x="60"
          y="90"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect39" /><rect
+         id="rect295" />
+      <rect
          x="90"
          y="90"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect40" /><rect
+         id="rect296" />
+      <rect
          x="120"
          y="90"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect41" /><rect
+         id="rect297" />
+      <rect
          x="150"
          y="90"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect42" /><rect
+         id="rect298" />
+      <rect
          x="180"
          y="90"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect43" /><rect
+         id="rect299" />
+      <rect
          x="210"
          y="90"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect44" /><rect
+         id="rect300" />
+      <rect
          x="240"
          y="90"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect45" /><rect
+         id="rect301" />
+      <rect
          x="270"
          y="90"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect46" /><rect
+         id="rect302" />
+      <rect
          x="300"
          y="90"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect47" /><rect
+         id="rect303" />
+      <rect
          x="330"
          y="90"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect48" /><rect
+         id="rect304" />
+      <rect
          x="360"
          y="90"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect49" /><rect
+         id="rect305" />
+      <rect
          x="390"
          y="90"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect50" /><rect
+         id="rect306" />
+      <rect
          x="420"
          y="90"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect51" /><rect
+         id="rect307" />
+      <rect
          x="450"
          y="90"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect52" /><rect
+         id="rect308" />
+      <rect
          x="480"
          y="90"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect53" /><rect
+         id="rect309" />
+      <rect
          x="510"
          y="90"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect54" /><rect
+         id="rect310" />
+      <rect
          x="30"
          y="120"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect55" /><rect
+         id="rect311" />
+      <rect
          x="60"
          y="120"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect56" /><rect
+         id="rect312" />
+      <rect
          x="90"
          y="120"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect57" /><rect
+         id="rect313" />
+      <rect
          x="120"
          y="120"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect58" /><rect
+         id="rect314" />
+      <rect
          x="150"
          y="120"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect59" /><rect
+         id="rect315" />
+      <rect
          x="180"
          y="120"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect60" /><rect
+         id="rect316" />
+      <rect
          x="210"
          y="120"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect61" /><rect
+         id="rect317" />
+      <rect
          x="240"
          y="120"
          width="30"
          height="30"
          fill="#6ef043"
          shape-rendering="crispEdges"
-         id="rect62" /><rect
+         id="rect318" />
+      <rect
          x="270"
          y="120"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect63" /><rect
+         id="rect319" />
+      <rect
          x="300"
          y="120"
          width="30"
          height="30"
          fill="#6ef043"
          shape-rendering="crispEdges"
-         id="rect64" /><rect
+         id="rect320" />
+      <rect
          x="330"
          y="120"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect65" /><rect
+         id="rect321" />
+      <rect
          x="360"
          y="120"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect66" /><rect
+         id="rect322" />
+      <rect
          x="390"
          y="120"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect67" /><rect
+         id="rect323" />
+      <rect
          x="420"
          y="120"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect68" /><rect
+         id="rect324" />
+      <rect
          x="450"
          y="120"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect69" /><rect
+         id="rect325" />
+      <rect
          x="480"
          y="120"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect70" /><rect
+         id="rect326" />
+      <rect
          x="510"
          y="120"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect71" /><rect
+         id="rect327" />
+      <rect
          x="90"
          y="150"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect72" /><rect
+         id="rect328" />
+      <rect
          x="120"
          y="150"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect73" /><rect
+         id="rect329" />
+      <rect
          x="150"
          y="150"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect74" /><rect
+         id="rect330" />
+      <rect
          x="180"
          y="150"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect75" /><rect
+         id="rect331" />
+      <rect
          x="210"
          y="150"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect76" /><rect
+         id="rect332" />
+      <rect
          x="240"
          y="150"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect77" /><rect
+         id="rect333" />
+      <rect
          x="270"
          y="150"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect78" /><rect
+         id="rect334" />
+      <rect
          x="300"
          y="150"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect79" /><rect
+         id="rect335" />
+      <rect
          x="330"
          y="150"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect80" /><rect
+         id="rect336" />
+      <rect
          x="360"
          y="150"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect81" /><rect
+         id="rect337" />
+      <rect
          x="390"
          y="150"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect82" /><rect
+         id="rect338" />
+      <rect
          x="420"
          y="150"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect83" /><rect
+         id="rect339" />
+      <rect
          x="450"
          y="150"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect84" /><rect
+         id="rect340" />
+      <rect
          x="60"
          y="180"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect85" /><rect
+         id="rect341" />
+      <rect
          x="90"
          y="180"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect86" /><rect
+         id="rect342" />
+      <rect
          x="120"
          y="180"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect87" /><rect
+         id="rect343" />
+      <rect
          x="150"
          y="180"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect88" /><rect
+         id="rect344" />
+      <rect
          x="180"
          y="180"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect89" /><rect
+         id="rect345" />
+      <rect
          x="210"
          y="180"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect90" /><rect
+         id="rect346" />
+      <rect
          x="240"
          y="180"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect91" /><rect
+         id="rect347" />
+      <rect
          x="270"
          y="180"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect92" /><rect
+         id="rect348" />
+      <rect
          x="300"
          y="180"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect93" /><rect
+         id="rect349" />
+      <rect
          x="330"
          y="180"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect94" /><rect
+         id="rect350" />
+      <rect
          x="360"
          y="180"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect95" /><rect
+         id="rect351" />
+      <rect
          x="390"
          y="180"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect96" /><rect
+         id="rect352" />
+      <rect
          x="420"
          y="180"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect97" /><rect
+         id="rect353" />
+      <rect
          x="450"
          y="180"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect98" /><rect
+         id="rect354" />
+      <rect
          x="480"
          y="180"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect99" /><rect
+         id="rect355" />
+      <rect
          x="60"
          y="210"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect100" /><rect
+         id="rect356" />
+      <rect
          x="90"
          y="210"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect101" /><rect
+         id="rect357" />
+      <rect
          x="120"
          y="210"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect102" /><rect
+         id="rect358" />
+      <rect
          x="150"
          y="210"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect103" /><rect
+         id="rect359" />
+      <rect
          x="180"
          y="210"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect104" /><rect
+         id="rect360" />
+      <rect
          x="210"
          y="210"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect105" /><rect
+         id="rect361" />
+      <rect
          x="240"
          y="210"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect106" /><rect
+         id="rect362" />
+      <rect
          x="270"
          y="210"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect107" /><rect
+         id="rect363" />
+      <rect
          x="300"
          y="210"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect108" /><rect
+         id="rect364" />
+      <rect
          x="330"
          y="210"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect109" /><rect
+         id="rect365" />
+      <rect
          x="360"
          y="210"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect110" /><rect
+         id="rect366" />
+      <rect
          x="390"
          y="210"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect111" /><rect
+         id="rect367" />
+      <rect
          x="420"
          y="210"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect112" /><rect
+         id="rect368" />
+      <rect
          x="450"
          y="210"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect113" /><rect
+         id="rect369" />
+      <rect
          x="480"
          y="210"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect114" /><rect
+         id="rect370" />
+      <rect
          x="0"
          y="240"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect115" /><rect
+         id="rect371" />
+      <rect
          x="30"
          y="240"
          width="30"
          height="30"
          fill="#07bf75"
          shape-rendering="crispEdges"
-         id="rect116" /><rect
+         id="rect372" />
+      <rect
          x="60"
          y="240"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect117" /><rect
+         id="rect373" />
+      <rect
          x="90"
          y="240"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect118" /><rect
+         id="rect374" />
+      <rect
          x="120"
          y="240"
          width="30"
          height="30"
          fill="#6ef043"
          shape-rendering="crispEdges"
-         id="rect119" /><rect
+         id="rect375" />
+      <rect
          x="150"
          y="240"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect120" /><rect
+         id="rect376" />
+      <rect
          x="180"
          y="240"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect121" /><rect
+         id="rect377" />
+      <rect
          x="210"
          y="240"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect122" /><rect
+         id="rect378" />
+      <rect
          x="240"
          y="240"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect123" /><rect
+         id="rect379" />
+      <rect
          x="270"
          y="240"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect124" /><rect
+         id="rect380" />
+      <rect
          x="300"
          y="240"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect125" /><rect
+         id="rect381" />
+      <rect
          x="330"
          y="240"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect126" /><rect
+         id="rect382" />
+      <rect
          x="360"
          y="240"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect127" /><rect
+         id="rect383" />
+      <rect
          x="390"
          y="240"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect128" /><rect
+         id="rect384" />
+      <rect
          x="420"
          y="240"
          width="30"
          height="30"
          fill="#6ef043"
          shape-rendering="crispEdges"
-         id="rect129" /><rect
+         id="rect385" />
+      <rect
          x="450"
          y="240"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect130" /><rect
+         id="rect386" />
+      <rect
          x="480"
          y="240"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect131" /><rect
+         id="rect387" />
+      <rect
          x="510"
          y="240"
          width="30"
          height="30"
          fill="#07bf75"
          shape-rendering="crispEdges"
-         id="rect132" /><rect
+         id="rect388" />
+      <rect
          x="540"
          y="240"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect133" /><rect
+         id="rect389" />
+      <rect
          x="0"
          y="270"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect134" /><rect
+         id="rect390" />
+      <rect
          x="30"
          y="270"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect135" /><rect
+         id="rect391" />
+      <rect
          x="60"
          y="270"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect136" /><rect
+         id="rect392" />
+      <rect
          x="90"
          y="270"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect137" /><rect
+         id="rect393" />
+      <rect
          x="120"
          y="270"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect138" /><rect
+         id="rect394" />
+      <rect
          x="150"
          y="270"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect139" /><rect
+         id="rect395" />
+      <rect
          x="180"
          y="270"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect140" /><rect
+         id="rect396" />
+      <rect
          x="210"
          y="270"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect141" /><rect
+         id="rect397" />
+      <rect
          x="240"
          y="270"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect142" /><rect
+         id="rect398" />
+      <rect
          x="270"
          y="270"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect143" /><rect
+         id="rect399" />
+      <rect
          x="300"
          y="270"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect144" /><rect
+         id="rect400" />
+      <rect
          x="330"
          y="270"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect145" /><rect
+         id="rect401" />
+      <rect
          x="360"
          y="270"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect146" /><rect
+         id="rect402" />
+      <rect
          x="390"
          y="270"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect147" /><rect
+         id="rect403" />
+      <rect
          x="420"
          y="270"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect148" /><rect
+         id="rect404" />
+      <rect
          x="450"
          y="270"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect149" /><rect
+         id="rect405" />
+      <rect
          x="480"
          y="270"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect150" /><rect
+         id="rect406" />
+      <rect
          x="510"
          y="270"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect151" /><rect
+         id="rect407" />
+      <rect
          x="540"
          y="270"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect152" /><rect
+         id="rect408" />
+      <rect
          x="0"
          y="300"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect153" /><rect
+         id="rect409" />
+      <rect
          x="30"
          y="300"
          width="30"
          height="30"
          fill="#07bf75"
          shape-rendering="crispEdges"
-         id="rect154" /><rect
+         id="rect410" />
+      <rect
          x="60"
          y="300"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect155" /><rect
+         id="rect411" />
+      <rect
          x="90"
          y="300"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect156" /><rect
+         id="rect412" />
+      <rect
          x="120"
          y="300"
          width="30"
          height="30"
          fill="#6ef043"
          shape-rendering="crispEdges"
-         id="rect157" /><rect
+         id="rect413" />
+      <rect
          x="150"
          y="300"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect158" /><rect
+         id="rect414" />
+      <rect
          x="180"
          y="300"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect159" /><rect
+         id="rect415" />
+      <rect
          x="210"
          y="300"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect160" /><rect
+         id="rect416" />
+      <rect
          x="240"
          y="300"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect161" /><rect
+         id="rect417" />
+      <rect
          x="270"
          y="300"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect162" /><rect
+         id="rect418" />
+      <rect
          x="300"
          y="300"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect163" /><rect
+         id="rect419" />
+      <rect
          x="330"
          y="300"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect164" /><rect
+         id="rect420" />
+      <rect
          x="360"
          y="300"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect165" /><rect
+         id="rect421" />
+      <rect
          x="390"
          y="300"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect166" /><rect
+         id="rect422" />
+      <rect
          x="420"
          y="300"
          width="30"
          height="30"
          fill="#6ef043"
          shape-rendering="crispEdges"
-         id="rect167" /><rect
+         id="rect423" />
+      <rect
          x="450"
          y="300"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect168" /><rect
+         id="rect424" />
+      <rect
          x="480"
          y="300"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect169" /><rect
+         id="rect425" />
+      <rect
          x="510"
          y="300"
          width="30"
          height="30"
          fill="#07bf75"
          shape-rendering="crispEdges"
-         id="rect170" /><rect
+         id="rect426" />
+      <rect
          x="540"
          y="300"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect171" /><rect
+         id="rect427" />
+      <rect
          x="60"
          y="330"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect172" /><rect
+         id="rect428" />
+      <rect
          x="90"
          y="330"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect173" /><rect
+         id="rect429" />
+      <rect
          x="120"
          y="330"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect174" /><rect
+         id="rect430" />
+      <rect
          x="150"
          y="330"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect175" /><rect
+         id="rect431" />
+      <rect
          x="180"
          y="330"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect176" /><rect
+         id="rect432" />
+      <rect
          x="210"
          y="330"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect177" /><rect
+         id="rect433" />
+      <rect
          x="240"
          y="330"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect178" /><rect
+         id="rect434" />
+      <rect
          x="270"
          y="330"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect179" /><rect
+         id="rect435" />
+      <rect
          x="300"
          y="330"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect180" /><rect
+         id="rect436" />
+      <rect
          x="330"
          y="330"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect181" /><rect
+         id="rect437" />
+      <rect
          x="360"
          y="330"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect182" /><rect
+         id="rect438" />
+      <rect
          x="390"
          y="330"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect183" /><rect
+         id="rect439" />
+      <rect
          x="420"
          y="330"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect184" /><rect
+         id="rect440" />
+      <rect
          x="450"
          y="330"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect185" /><rect
+         id="rect441" />
+      <rect
          x="480"
          y="330"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect186" /><rect
+         id="rect442" />
+      <rect
          x="60"
          y="360"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect187" /><rect
+         id="rect443" />
+      <rect
          x="90"
          y="360"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect188" /><rect
+         id="rect444" />
+      <rect
          x="120"
          y="360"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect189" /><rect
+         id="rect445" />
+      <rect
          x="150"
          y="360"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect190" /><rect
+         id="rect446" />
+      <rect
          x="180"
          y="360"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect191" /><rect
+         id="rect447" />
+      <rect
          x="210"
          y="360"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect192" /><rect
+         id="rect448" />
+      <rect
          x="240"
          y="360"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect193" /><rect
+         id="rect449" />
+      <rect
          x="270"
          y="360"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect194" /><rect
+         id="rect450" />
+      <rect
          x="300"
          y="360"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect195" /><rect
+         id="rect451" />
+      <rect
          x="330"
          y="360"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect196" /><rect
+         id="rect452" />
+      <rect
          x="360"
          y="360"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect197" /><rect
+         id="rect453" />
+      <rect
          x="390"
          y="360"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect198" /><rect
+         id="rect454" />
+      <rect
          x="420"
          y="360"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect199" /><rect
+         id="rect455" />
+      <rect
          x="450"
          y="360"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect200" /><rect
+         id="rect456" />
+      <rect
          x="480"
          y="360"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect201" /><rect
+         id="rect457" />
+      <rect
          x="90"
          y="390"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect202" /><rect
+         id="rect458" />
+      <rect
          x="120"
          y="390"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect203" /><rect
+         id="rect459" />
+      <rect
          x="150"
          y="390"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect204" /><rect
+         id="rect460" />
+      <rect
          x="180"
          y="390"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect205" /><rect
+         id="rect461" />
+      <rect
          x="210"
          y="390"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect206" /><rect
+         id="rect462" />
+      <rect
          x="240"
          y="390"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect207" /><rect
+         id="rect463" />
+      <rect
          x="270"
          y="390"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect208" /><rect
+         id="rect464" />
+      <rect
          x="300"
          y="390"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect209" /><rect
+         id="rect465" />
+      <rect
          x="330"
          y="390"
          width="30"
          height="30"
          fill="#d01141"
          shape-rendering="crispEdges"
-         id="rect210" /><rect
+         id="rect466" />
+      <rect
          x="360"
          y="390"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect211" /><rect
+         id="rect467" />
+      <rect
          x="390"
          y="390"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect212" /><rect
+         id="rect468" />
+      <rect
          x="420"
          y="390"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect213" /><rect
+         id="rect469" />
+      <rect
          x="450"
          y="390"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect214" /><rect
+         id="rect470" />
+      <rect
          x="30"
          y="420"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect215" /><rect
+         id="rect471" />
+      <rect
          x="60"
          y="420"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect216" /><rect
+         id="rect472" />
+      <rect
          x="90"
          y="420"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect217" /><rect
+         id="rect473" />
+      <rect
          x="120"
          y="420"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect218" /><rect
+         id="rect474" />
+      <rect
          x="150"
          y="420"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect219" /><rect
+         id="rect475" />
+      <rect
          x="180"
          y="420"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect220" /><rect
+         id="rect476" />
+      <rect
          x="210"
          y="420"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect221" /><rect
+         id="rect477" />
+      <rect
          x="240"
          y="420"
          width="30"
          height="30"
          fill="#6ef043"
          shape-rendering="crispEdges"
-         id="rect222" /><rect
+         id="rect478" />
+      <rect
          x="270"
          y="420"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect223" /><rect
+         id="rect479" />
+      <rect
          x="300"
          y="420"
          width="30"
          height="30"
          fill="#6ef043"
          shape-rendering="crispEdges"
-         id="rect224" /><rect
+         id="rect480" />
+      <rect
          x="330"
          y="420"
          width="30"
          height="30"
          fill="#450a2c"
          shape-rendering="crispEdges"
-         id="rect225" /><rect
+         id="rect481" />
+      <rect
          x="360"
          y="420"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect226" /><rect
+         id="rect482" />
+      <rect
          x="390"
          y="420"
          width="30"
          height="30"
          fill="#f37734"
          shape-rendering="crispEdges"
-         id="rect227" /><rect
+         id="rect483" />
+      <rect
          x="420"
          y="420"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect228" /><rect
+         id="rect484" />
+      <rect
          x="450"
          y="420"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect229" /><rect
+         id="rect485" />
+      <rect
          x="480"
          y="420"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect230" /><rect
+         id="rect486" />
+      <rect
          x="510"
          y="420"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect231" /><rect
+         id="rect487" />
+      <rect
          x="30"
          y="450"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect232" /><rect
+         id="rect488" />
+      <rect
          x="60"
          y="450"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect233" /><rect
+         id="rect489" />
+      <rect
          x="90"
          y="450"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect234" /><rect
+         id="rect490" />
+      <rect
          x="120"
          y="450"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect235" /><rect
+         id="rect491" />
+      <rect
          x="150"
          y="450"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect236" /><rect
+         id="rect492" />
+      <rect
          x="180"
          y="450"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect237" /><rect
+         id="rect493" />
+      <rect
          x="210"
          y="450"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect238" /><rect
+         id="rect494" />
+      <rect
          x="240"
          y="450"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect239" /><rect
+         id="rect495" />
+      <rect
          x="270"
          y="450"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect240" /><rect
+         id="rect496" />
+      <rect
          x="300"
          y="450"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect241" /><rect
+         id="rect497" />
+      <rect
          x="330"
          y="450"
          width="30"
          height="30"
          fill="#e8caa9"
          shape-rendering="crispEdges"
-         id="rect242" /><rect
+         id="rect498" />
+      <rect
          x="360"
          y="450"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect243" /><rect
+         id="rect499" />
+      <rect
          x="390"
          y="450"
          width="30"
          height="30"
          fill="#005c99"
          shape-rendering="crispEdges"
-         id="rect244" /><rect
+         id="rect500" />
+      <rect
          x="420"
          y="450"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect245" /><rect
+         id="rect501" />
+      <rect
          x="450"
          y="450"
          width="30"
          height="30"
          fill="#8034be"
          shape-rendering="crispEdges"
-         id="rect246" /><rect
+         id="rect502" />
+      <rect
          x="480"
          y="450"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect247" /><rect
+         id="rect503" />
+      <rect
          x="510"
          y="450"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect248" /><rect
+         id="rect504" />
+      <rect
          x="90"
          y="480"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect249" /><rect
+         id="rect505" />
+      <rect
          x="120"
          y="480"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect250" /><rect
+         id="rect506" />
+      <rect
          x="180"
          y="480"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect251" /><rect
+         id="rect507" />
+      <rect
          x="210"
          y="480"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect252" /><rect
+         id="rect508" />
+      <rect
          x="240"
          y="480"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect253" /><rect
+         id="rect509" />
+      <rect
          x="270"
          y="480"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect254" /><rect
+         id="rect510" />
+      <rect
          x="300"
          y="480"
          width="30"
          height="30"
          fill="#fec425"
          shape-rendering="crispEdges"
-         id="rect255" /><rect
+         id="rect511" />
+      <rect
          x="330"
          y="480"
          width="30"
          height="30"
          fill="#0784aa"
          shape-rendering="crispEdges"
-         id="rect256" /><rect
+         id="rect512" />
+      <rect
          x="360"
          y="480"
          width="30"
          height="30"
          fill="#b96ad8"
          shape-rendering="crispEdges"
-         id="rect257" /><rect
+         id="rect513" />
+      <rect
          x="420"
          y="480"
          width="30"
          height="30"
          fill="#30d1d1"
          shape-rendering="crispEdges"
-         id="rect258" /><rect
+         id="rect514" />
+      <rect
          x="450"
          y="480"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect259" /><rect
+         id="rect515" />
+      <rect
          x="90"
          y="510"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect260" /><rect
+         id="rect516" />
+      <rect
          x="120"
          y="510"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect261" /><rect
+         id="rect517" />
+      <rect
          x="240"
          y="510"
          width="30"
          height="30"
          fill="#07bf75"
          shape-rendering="crispEdges"
-         id="rect262" /><rect
+         id="rect518" />
+      <rect
          x="270"
          y="510"
          width="30"
          height="30"
          fill="#4817a3"
          shape-rendering="crispEdges"
-         id="rect263" /><rect
+         id="rect519" />
+      <rect
          x="300"
          y="510"
          width="30"
          height="30"
          fill="#07bf75"
          shape-rendering="crispEdges"
-         id="rect264" /><rect
+         id="rect520" />
+      <rect
          x="420"
          y="510"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect265" /><rect
+         id="rect521" />
+      <rect
          x="450"
          y="510"
          width="30"
          height="30"
          fill="#f6fe63"
          shape-rendering="crispEdges"
-         id="rect266" /><rect
+         id="rect522" />
+      <rect
          x="240"
          y="540"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect267" /><rect
+         id="rect523" />
+      <rect
          x="270"
          y="540"
          width="30"
          height="30"
          fill="#6d1b32"
          shape-rendering="crispEdges"
-         id="rect268" /><rect
+         id="rect524" />
+      <rect
          x="300"
          y="540"
          width="30"
          height="30"
          fill="#c4754a"
          shape-rendering="crispEdges"
-         id="rect269" /></symbol></defs><rect
-     width="1280"
-     height="640"
-     fill="url(#bg)"
-     id="rect270" /><rect
-     width="1280"
-     height="640"
-     fill="url(#grid)"
-     id="rect271" /><circle
-     cx="334"
-     cy="329"
-     r="340"
-     fill="url(#glow)"
-     id="circle264" /><use
-     href="#mandala"
-     x="60"
-     y="35"
-     width="570"
-     height="570"
-     id="use264"
-     transform="matrix(0.81326612,0,0,0.81326612,41.994411,62.61816)" /><g
-     transform="translate(622.85758,-22.108447)"
-     id="g267"><text
-       x="0"
-       y="276"
-       font-size="96px"
-       font-weight="800"
-       letter-spacing="-2"
-       fill="url(#wordmark)"
-       id="text264"
-       style="fill:url(#wordmark)">MANDALAS</text><rect
-       x="0"
-       y="304"
-       width="512"
-       height="16"
-       fill="url(#multicolorStrip)"
-       id="rect272" /><text
-       x="0"
-       y="356"
-       font-size="26px"
-       font-weight="500"
-       fill="#a4a7c7"
-       id="text265">Procedurally generated, eight-fold symmetric</text><text
-       x="0"
-       y="390"
-       font-size="26px"
-       font-weight="500"
-       fill="#a4a7c7"
-       id="text266">bitmaps, drawn entirely on-chain.</text><text
-       x="0"
-       y="488"
-       font-size="18px"
-       font-weight="600"
-       fill="#5fb0c8"
-       letter-spacing="2.4"
-       font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
-       id="text267">0xDaCa87395f3b1Bbc46F3FA187e996E03a5dCc985</text></g></svg>
+         id="rect525" />
+    </g>
+  </g>
+</svg>
