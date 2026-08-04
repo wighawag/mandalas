@@ -4,11 +4,53 @@
 	import {getAppContext, route} from '$lib';
 	import {goto} from '$app/navigation';
 	import {url} from '$lib/core/utils/web/path';
+	import {createCopyToClipboard} from '$lib/core/ui/clipboard/copy-to-clipboard';
 	import CurveBar from '$lib/ui/curve/CurveBar.svelte';
 	import Button from '$lib/shadcn/ui/button/button.svelte';
 	import {toast} from 'svelte-sonner';
 	import FlameIcon from '@lucide/svelte/icons/flame';
+	import CheckIcon from '@lucide/svelte/icons/check';
+	import CopyIcon from '@lucide/svelte/icons/copy';
+	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 	import {burnMandala} from './lib/burn';
+
+	// Per-card "copied?" flag. `createCopyToClipboard` returns a store, but
+	// Svelte 5 only auto-subscribes to stores declared at the component's top
+	// level; using `$store` inside the each-block is a compile error, and
+	// subscribing imperatively from a reactive context is a runtime
+	// `state_unsafe_mutation`. So we delay both the subscribe and the state
+	// write until the user actually clicks Copy on a card. The first click
+	// creates the store, subscribes, and starts mirroring its boolean into
+	// the per-id $state; the template then re-renders for that card.
+	const copyById = new Map<string, ReturnType<typeof createCopyToClipboard>>();
+	let copied = $state<Record<string, boolean>>({});
+
+	function copyStoreFor(id: string) {
+		let s = copyById.get(id);
+		if (!s) {
+			s = createCopyToClipboard();
+			copyById.set(id, s);
+			// We never unsubscribe: the page is single-shot and the closure
+			// just holds a single id-keyed assignment, so the only "leak" is
+			// the timer inside the store itself (already managed by
+			// createCopyToClipboard).
+			s.subscribe((v) => (copied = {...copied, [id]: v}));
+		}
+		return s;
+	}
+
+	async function copyId(id: string) {
+		// Click handler, not a reactive context: safe to (lazily) create the
+		// store and write $state here.
+		await copyStoreFor(id).copy(id);
+	}
+
+	function openMandala(id: string) {
+		const mandalaUrl = route('/mandala/', id);
+		if (typeof window !== 'undefined') {
+			window.location.href = mandalaUrl;
+		}
+	}
 
 	const {
 		connection,
@@ -159,6 +201,32 @@
 									<p>{nft.name}</p>
 								{/if}
 							</div>
+							{#if nft.image}
+								<div class="mt-2 flex items-center justify-end gap-1">
+									<button
+										type="button"
+										title={`Open ${nft.id.toString()} on its own page`}
+										aria-label="Open this Mandala on its own page"
+										onclick={() => openMandala(nft.id.toString())}
+										class="inline-flex size-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+									>
+										<ExternalLinkIcon class="size-4" />
+									</button>
+									<button
+										type="button"
+										title={`Copy id ${nft.id.toString()}`}
+										aria-label="Copy token id"
+										onclick={() => copyId(nft.id.toString())}
+										class="inline-flex size-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+									>
+										{#if copied[nft.id.toString()]}
+											<CheckIcon class="size-4 text-green-500" />
+										{:else}
+											<CopyIcon class="size-4" />
+										{/if}
+									</button>
+								</div>
+							{/if}
 							{#if nft.image && isWalletOwner}
 								<div class="mt-2 flex">
 									<button
