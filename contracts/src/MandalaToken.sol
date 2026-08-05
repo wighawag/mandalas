@@ -7,7 +7,7 @@ pragma experimental ABIEncoderV2;
 import "./ERC721Base.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol";
 import "@openzeppelin/contracts/cryptography/ECDSA.sol";
-import "@rocketh/proxy/solc_0_7/ERC1967/Proxied.sol";
+import "hardhat-deploy/v1/solc_0_7/proxy/Proxied.sol";
 
 contract MandalaToken is ERC721Base, IERC721Metadata, Proxied {
     using EnumerableSet for EnumerableSet.UintSet;
