@@ -49,7 +49,8 @@ export type PurchaseFlowStore = Readable<PurchaseFlowState> & {
 export type PurchaseFlowDeps = Pick<
 	Context,
 	| 'connection'
-	| 'executor'
+	| 'accountExecutor'
+	| 'accountBalance'
 	| 'deployments'
 	| 'balanceCheck'
 	| 'onchainState'
@@ -89,7 +90,8 @@ export function computeBuffer(
 export function createPurchaseFlow(deps: PurchaseFlowDeps): PurchaseFlowStore {
 	const {
 		connection,
-		executor,
+		accountExecutor,
+		accountBalance,
 		deployments,
 		balanceCheck,
 		onchainState,
@@ -176,7 +178,7 @@ export function createPurchaseFlow(deps: PurchaseFlowDeps): PurchaseFlowStore {
 				await connection.ensureConnected();
 				if (superseded(g)) return;
 
-				const $executor = get(executor);
+				const $executor = get(accountExecutor);
 				if ($executor.status !== 'ready') {
 					// 'cannot-send' surfaces its own notice via the context store.
 					reset();
@@ -211,10 +213,17 @@ export function createPurchaseFlow(deps: PurchaseFlowDeps): PurchaseFlowStore {
 								computeBuffer(supply, currentPrice, curveParams()),
 						},
 					},
-					// The gas store polls every 10 minutes; a stale fee ceiling gets the
-					// send rejected outright ("maxFeePerGas too low for the next block").
-					// Re-read right before signing so the quote matches the chain.
-					{forceUpdate: true},
+					{
+						// Measured against the account that will actually pay, named so
+						// the check and the sender can never disagree.
+						balance: accountBalance,
+						sender: $executor.address,
+						// The gas store polls every 10 minutes; a stale fee ceiling gets
+						// the send rejected outright ("maxFeePerGas too low for the next
+						// block"). Re-read right before signing so the quote matches the
+						// chain.
+						forceUpdate: true,
+					},
 				);
 				if (superseded(g)) return;
 

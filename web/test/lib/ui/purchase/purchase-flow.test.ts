@@ -78,7 +78,7 @@ function makeFlow(overrides: Record<string, unknown> = {}) {
 
 	const deps = {
 		connection: {ensureConnected: vi.fn(async () => undefined)},
-		executor: readable({
+		accountExecutor: readable({
 			status: 'ready',
 			address: '0x1111111111111111111111111111111111111111',
 			account: '0x1111111111111111111111111111111111111111',
@@ -96,6 +96,12 @@ function makeFlow(overrides: Record<string, unknown> = {}) {
 				},
 			},
 		}),
+		accountBalance: Object.assign(
+			readable({step: 'Loaded', value: 10n ** 18n}),
+			{
+				update: vi.fn(async () => {}),
+			},
+		),
 		balanceCheck: {ensureCanAfford: vi.fn(async (o: any) => o.contract)},
 		onchainState: Object.assign(
 			readable({step: 'Loaded', supply: 0n, currentPrice: INITIAL_PRICE}),
@@ -134,7 +140,7 @@ describe('purchase flow claim recording', () => {
 
 	it('does not report anything when the mint never gets sent', async () => {
 		const {flow, minted} = makeFlow({
-			executor: readable({status: 'cannot-send'}),
+			accountExecutor: readable({status: 'cannot-send'}),
 		});
 
 		await flow.mint(TARGET);
@@ -165,7 +171,7 @@ describe('purchase flow claim recording', () => {
 		const pending = new Promise<'0xdeadbeef'>((r) => (release = r));
 		const writeContract = vi.fn(() => pending);
 		const {flow, minted} = makeFlow({
-			executor: readable({
+			accountExecutor: readable({
 				status: 'ready',
 				address: '0x1111111111111111111111111111111111111111',
 				account: '0x1111111111111111111111111111111111111111',

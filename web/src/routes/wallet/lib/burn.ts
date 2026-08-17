@@ -8,6 +8,7 @@ import {
 	txErrorSummary,
 } from '$lib/core/transaction/tx-error-summary';
 import type {Context} from '$lib/context/types';
+import {connectionRefusal} from '$lib/core/connection/refusal';
 
 export type BurnResult =
 	| {status: 'submitted'}
@@ -17,7 +18,11 @@ export type BurnResult =
 
 export type BurnDeps = Pick<
 	Context,
-	'connection' | 'executor' | 'deployments' | 'balanceCheck'
+	| 'connection'
+	| 'accountExecutor'
+	| 'deployments'
+	| 'balanceCheck'
+	| 'accountBalance'
 >;
 
 /**
@@ -36,14 +41,21 @@ export async function burnMandala(
 	deps: BurnDeps,
 	tokenID: bigint,
 ): Promise<BurnResult> {
-	const {connection, executor, deployments, balanceCheck} = deps;
+	const {
+		connection,
+		accountExecutor,
+		deployments,
+		balanceCheck,
+		accountBalance,
+	} = deps;
 
 	try {
 		await connection.ensureConnected();
 
-		const $executor = get(executor);
-		if ($executor.status === 'cannot-send') return {status: 'cannot-send'};
-		if ($executor.status !== 'ready') return {status: 'cancelled'};
+		const $accountExecutor = get(accountExecutor);
+		if ($accountExecutor.status === 'cannot-send')
+			return {status: 'cannot-send'};
+		if ($accountExecutor.status !== 'ready') return {status: 'cancelled'};
 
 		const $deployments = get(deployments);
 
@@ -54,15 +66,21 @@ export async function burnMandala(
 					abi: $deployments.contracts.MandalaToken.abi,
 					functionName: 'burn',
 					args: [tokenID],
-					account: $executor.account,
+					account: $accountExecutor.account,
 				},
 			},
-			// The gas store polls every 10 minutes; a stale fee ceiling gets the send
-			// rejected outright. Re-read right before signing.
-			{forceUpdate: true},
+			{
+				// Measured against the account that will actually pay, named so the
+				// check and the sender can never disagree.
+				balance: accountBalance,
+				sender: $accountExecutor.address,
+				// The gas store polls every 10 minutes; a stale fee ceiling gets the
+				// send rejected outright. Re-read right before signing.
+				forceUpdate: true,
+			},
 		);
 
-		await $executor.client.writeContract(contractRequest);
+		await $accountExecutor.client.writeContract(contractRequest);
 		return {status: 'submitted'};
 	} catch (error) {
 		if (
@@ -71,6 +89,15 @@ export async function burnMandala(
 		) {
 			return {status: 'cancelled'};
 		}
+
+		// Nor is any other way the connection came back empty an error to report
+		// here. Every one of them already rests on the connection, where
+		// core/connection/ConnectionFlow renders it in the app's own words, and that
+		// component is mounted for the life of the app so it cannot be missed.
+		// Falling through said all of them the same way, as "Transaction failed:
+		// Connection cancelled", about a transaction that was never built, on top of
+		// the modal that had just explained it properly.
+		if (connectionRefusal(error)) return {status: 'cancelled'};
 		console.error('Failed to burn Mandala:', error);
 		return {
 			status: 'error',

@@ -1,6 +1,6 @@
 import {Deployment} from 'rocketh/types';
-import {Abi_MandalaToken} from '../../generated/abis/MandalaToken.js';
-import {loadAndExecuteDeploymentsFromFiles} from '../../rocketh/environment.js';
+import {Abi_MandalaToken} from '../../../generated/abis/MandalaToken.js';
+import {loadAndExecuteDeploymentsFromFiles} from '../../../rocketh/environment.js';
 import {EthereumProvider} from 'hardhat/types/providers';
 
 /** The bonding-curve parameters, as stored on the deployment. */

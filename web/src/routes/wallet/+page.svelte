@@ -54,9 +54,10 @@
 
 	const {
 		connection,
-		executor,
+		accountExecutor,
 		deployments,
 		balanceCheck,
+		accountBalance,
 		nftsOf,
 		accountCannotSend,
 	} = getAppContext();
@@ -102,7 +103,13 @@
 
 	async function burn(tokenID: bigint) {
 		const result = await burnMandala(
-			{connection, executor, deployments, balanceCheck},
+			{
+				connection,
+				accountExecutor,
+				deployments,
+				balanceCheck,
+				accountBalance,
+			},
 			tokenID,
 		);
 		if (result.status === 'submitted') {
