@@ -40,8 +40,14 @@
 		if (!next) purchaseFlow.cancel();
 	}}
 >
-	<Dialog.Portal to="#--layer-modals" />
-	<Dialog.Content class="sm:max-w-md">
+	<!-- The target has to reach Content, which supplies its own portal (see
+	     shadcn's dialog-content.svelte). A bare `<Dialog.Portal to="..." />`
+	     sibling has no children and does nothing, so this dialog was going to
+	     document.body while every other modal moved into #--layer-modals - which
+	     put it ABOVE the wallet picker its own Confirm button raises, since
+	     stacking between equal z-indexes is decided by DOM order. See
+	     core/ui/modal/modal.svelte and the ordering note in context/AcrossPages. -->
+	<Dialog.Content portalProps={{to: '#--layer-modals'}} class="sm:max-w-md">
 		{#if $purchaseFlow.step === 'LOADING_CURRENT_PRICE'}
 			<Dialog.Header>
 				<Dialog.Title>Checking the current price...</Dialog.Title>
