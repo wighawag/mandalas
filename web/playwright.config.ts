@@ -5,6 +5,13 @@ const PORT = Number(process.env.E2E_PORT || 4173);
 
 export default defineConfig({
 	testDir: './e2e/tests',
+	// BOTH suffixes, explicitly. This repo's own tests are `*.spec.ts`, which
+	// Playwright's default testMatch happens to cover, but the service worker
+	// gateway suite inherited from the template is `*.e2e.ts` (the convention
+	// upstream and in jolly-roger/bleeps) and the default silently does NOT match
+	// it. Without this the inherited test is present, collected by nothing, and
+	// reports green while never running.
+	testMatch: ['**/*.spec.ts', '**/*.e2e.ts'],
 	// These drive real transactions against a shared local node, so they are
 	// not safe to interleave: they assert on totalSupply, which every test
 	// moves.
@@ -26,7 +33,7 @@ export default defineConfig({
 	// (e2e/tests/service-worker-gateway.e2e.ts) navigates to. Ports come from
 	// e2e/ports.ts so they cannot collide with PORT above.
 	webServer: [
-	{
+		{
 			// Serves the build produced by scripts/run-e2e-tests.sh with the same
 			// emulator `pnpm serve` uses, so the tests exercise the app the way it is
 			// actually delivered (IPFS-style, relative paths). `vite preview` aborts
