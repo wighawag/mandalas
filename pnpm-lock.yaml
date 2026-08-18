@@ -187,7 +187,7 @@ importers:
         specifier: ^3.12.3
         version: 3.12.3
       '@lucide/svelte':
-        specifier: ^1.28.0
+        specifier: ^1.7.0
         version: 1.28.0(svelte@5.56.9)
       '@observator/svelte':
         specifier: ^0.3.1
@@ -204,6 +204,9 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^7.3.0
         version: 7.3.0(svelte@5.56.9)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.97.3)(tsx@4.23.1))
+      '@tailwindcss/forms':
+        specifier: ^0.5.11
+        version: 0.5.11(tailwindcss@4.3.3)
       '@tailwindcss/typography':
         specifier: ^0.5.20
         version: 0.5.20(tailwindcss@4.3.3)
@@ -217,7 +220,7 @@ importers:
         specifier: ^4.1.2
         version: 4.1.10(bufferutil@4.1.0)(playwright@1.62.1)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.97.3)(tsx@4.23.1))(vitest@4.1.10)
       bits-ui:
-        specifier: ^2.18.1
+        specifier: ^2.16.4
         version: 2.18.1(@internationalized/date@3.12.3)(@sveltejs/kit@2.70.2(@sveltejs/vite-plugin-svelte@7.3.0(svelte@5.56.9)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.97.3)(tsx@4.23.1)))(svelte@5.56.9)(typescript@6.0.3)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.97.3)(tsx@4.23.1)))(svelte@5.56.9)
       clsx:
         specifier: ^2.1.1
@@ -229,8 +232,8 @@ importers:
         specifier: ^0.0.2
         version: 0.0.2
       ipfs-gateway-emulator:
-        specifier: ^5.0.0
-        version: 5.0.0
+        specifier: ^5.1.0
+        version: 5.1.0
       json-stable-stringify:
         specifier: ^1.3.0
         version: 1.3.0
@@ -1538,6 +1541,11 @@ packages:
   '@swc/helpers@0.5.18':
     resolution: {integrity: sha512-TXTnIcNJQEKwThMMqBXsZ4VGAza6bvN4pa41Rkqoio6QBKMvo+5lexeTMScGCIxtzgQJzElcvIltani+adC5PQ==}
 
+  '@tailwindcss/forms@0.5.11':
+    resolution: {integrity: sha512-h9wegbZDPurxG22xZSoWtdzc41/OlNEUQERNqI/0fOwa2aVlWGu7C35E/x6LDyD3lgtztFSSjKZyuVM0hxhbgA==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1 || >= 4.0.0-alpha.20 || >= 4.0.0-beta.1'
+
   '@tailwindcss/node@4.3.3':
     resolution: {integrity: sha512-/T8IKEsf9VTU6tLjgC7+sv2mOPtQxzE2jMw7u4Tt40Tx+QSZxpzh95/H6cMKoja9XuW7iMdLJYBB0o9G1CaAgg==}
 
@@ -2433,8 +2441,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  ipfs-gateway-emulator@5.0.0:
-    resolution: {integrity: sha512-A2N/DdVOQsTHyoOVpv6hBaSUTCIumyegglnXdSzGrphucmRPqxz16ooB5wzMgcXVwI4u/7l74qnuoah7tcpVhA==}
+  ipfs-gateway-emulator@5.1.0:
+    resolution: {integrity: sha512-aTEs8eWIGEGhiX3dXF+Alk9rtN8bD+l0b4SmiO1dd2f6B/FBsJ4JcD8S2GjgqXph2bVw1Yh/ik1v8rVLprynbA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -2863,6 +2871,10 @@ packages:
   mime-types@2.1.35:
     resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
     engines: {node: '>= 0.6'}
+
+  mini-svg-data-uri@1.4.4:
+    resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
+    hasBin: true
 
   minimalistic-assert@1.0.1:
     resolution: {integrity: sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A==}
@@ -5305,6 +5317,11 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@tailwindcss/forms@0.5.11(tailwindcss@4.3.3)':
+    dependencies:
+      mini-svg-data-uri: 1.4.4
+      tailwindcss: 4.3.3
+
   '@tailwindcss/node@4.3.3':
     dependencies:
       '@jridgewell/remapping': 2.3.5
@@ -6398,7 +6415,7 @@ snapshots:
       sade: 1.8.1
       varint: 6.0.0
 
-  ipfs-gateway-emulator@5.0.0:
+  ipfs-gateway-emulator@5.1.0:
     dependencies:
       '@hono/node-server': 2.0.12(hono@4.12.34)
       hono: 4.12.34
@@ -6831,6 +6848,8 @@ snapshots:
   mime-types@2.1.35:
     dependencies:
       mime-db: 1.52.0
+
+  mini-svg-data-uri@1.4.4: {}
 
   minimalistic-assert@1.0.1: {}
 
