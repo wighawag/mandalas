@@ -3,6 +3,8 @@
 	"title": "Mandalas",
 	"description": "Mandalas are unique procedurally generated bitmap NFTs on ethereum. The first to use tokenURI to remove the need for any client-code",
 	"canonicalURL": "https://mandalas.eth.limo",
+	"repoURL": "https://github.com/wighawag/mandalas",
+	"communityURL": "",
 	"ENSName": "mandalas.eth",
 	"themeColor": "#000000",
 	"appleStatusBarStyle": "black-translucent",

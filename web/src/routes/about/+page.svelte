@@ -1,6 +1,6 @@
 <script lang="ts">
 	import DefaultHead from '$lib/metadata/DefaultHead.svelte';
-	import {url} from '$lib/core/utils/web/path';
+	import {url} from '$lib/kit/paths';
 
 	const CONTRACT_ADDRESS = '0xDaCa87395f3b1Bbc46F3FA187e996E03a5dCc985';
 	const REPO_URL = 'https://github.com/wighawag/mandalas';

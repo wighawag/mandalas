@@ -3,7 +3,7 @@
 	import {generateBitmapDataURI, template19_bis} from 'mandalas-common';
 	import {getAppContext, route} from '$lib';
 	import {goto} from '$app/navigation';
-	import {url} from '$lib/core/utils/web/path';
+	import {url} from '$lib/kit/paths';
 	import {createCopyToClipboard} from '$lib/core/ui/clipboard/copy-to-clipboard';
 	import CurveBar from '$lib/ui/curve/CurveBar.svelte';
 	import Button from '$lib/shadcn/ui/button/button.svelte';
