@@ -50,7 +50,7 @@ export function createAppContext(core: CoreServices): AppContext {
 	const {initialPrice, linearCoefficient} =
 		deployments.get().contracts.MandalaToken.linkedData;
 	const config = {
-		batchSize: core.batchSize,
+		batchSize: core.appConfig.batchSize,
 		initialPrice: BigInt(initialPrice),
 		linearCoefficient: BigInt(linearCoefficient),
 	};
