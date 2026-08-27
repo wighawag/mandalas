@@ -2,7 +2,13 @@
 	import '../app.css';
 
 	import {version} from '$app/environment';
-	import {serviceWorker, notifications, params, route} from '$lib';
+	import {
+		serviceWorker,
+		notifications,
+		params,
+		route,
+		sendingIndicator,
+	} from '$lib';
 	import {
 		provideRoute,
 		provideENS,
@@ -17,15 +23,17 @@
 	import Context from '$lib/context/Context.svelte';
 	import InitError from '$lib/context/InitError.svelte';
 	import Navbar from '$lib/ui/navbar/navbar.svelte';
-	import RpcHealthBanner from '$lib/ui/rpc-health/RpcHealthBanner.svelte';
-	import NonceCacheBanner from '$lib/ui/nonce-cache/NonceCacheBanner.svelte';
-	import OfflineBanner from '$lib/ui/offline/OfflineBanner.svelte';
 	import PurchaseFlow from '$lib/ui/purchase/PurchaseFlow.svelte';
-	import SendingBanner from '$lib/ui/in-flight/SendingBanner.svelte';
+	// The four condition bars are no longer imported here: they are entries in
+	// `ui/chrome.ts` now, where this app's rpc-health gate lives too.
+	import SendingIndicator from '$lib/ui/in-flight/SendingIndicator.svelte';
+	import {sendingIndicatorSlot} from '$lib/ui/in-flight/sending';
 	import {createENSService} from '$lib/core/ens';
 	import {Toaster} from '$lib/shadcn/ui/sonner';
 	import AcrossPages from '$lib/context/AcrossPages.svelte';
 	import DefaultHead from '$lib/metadata/DefaultHead.svelte';
+	import AppShell from '$lib/core/ui/AppShell.svelte';
+	import {CHROME} from '$lib/ui/chrome';
 	import {LAYERS} from '$lib/core/ui/layers';
 	import KitNavigation from '$lib/kit/KitNavigation.svelte';
 	import {navigating, page} from '$app/state';
@@ -64,13 +72,9 @@
 	// does: the app shows ENS names wherever an address appears.
 	provideENS(createENSService());
 
-	// The RPC-health / no-RPC banner is relevant on pages that read onchain data.
-	// The standalone mandala renderer does not (it is pure client-side generation
-	// from the id in the hash), so it is excluded. `page.route.id` is base-path
-	// independent (works under IPFS/relative paths).
-	let showRpcBanner = $derived(
-		page.route.id !== '/mandala' && page.route.id !== '/about',
-	);
+	// The RPC-health gate that used to live here as `showRpcBanner` moved into
+	// `ui/chrome.ts`, with this app's routes, so adding or gating a bar is a line
+	// there rather than an edit to this file.
 </script>
 
 <DefaultHead />
@@ -86,19 +90,32 @@
 		     provides it as a capability. First, so anything below can rely on the
 		     app knowing where it is. Renders nothing. -->
 		<KitNavigation />
-		<!-- The framework's answers, handed to components that must not ask for
-		     themselves. Getters, so reading them inside those components tracks
-		     `page`/`navigating` as if they had. See src/lib/kit/README.md. -->
-		<Navbar {repoURL} {communityURL} currentPath={() => page.url.pathname} />
-		<SendingBanner />
-		<OfflineBanner />
-		<NonceCacheBanner />
-		{#if showRpcBanner}
-			<RpcHealthBanner />
-		{/if}
+		<!-- THE HEIGHT SHELL. What it guarantees, why the navbar is out of flow and
+		     what an app-shell scroller would cost are all in
+		     `core/ui/AppShell.svelte`, deliberately: this file is the most-edited in
+		     the template, so rationale parked here conflicts with every descendant
+		     that ever touched it.
 
-		{@render children()}
+		     WHICH bars exist is `ui/chrome.ts`, for the same reason. Adding one is a
+		     line there, not an edit here. -->
+		<AppShell chrome={CHROME} routeId={() => page.route.id}>
+			{#snippet navbar()}
+				<!-- The framework's answers, handed to components that must not ask for
+				     themselves. Getters, so reading them inside those components tracks
+				     `page`/`navigating` as if they had. See src/lib/kit/README.md. -->
+				<Navbar
+					{repoURL}
+					{communityURL}
+					currentPath={() => page.url.pathname}
+				/>
+			{/snippet}
 
+			{@render children()}
+		</AppShell>
+
+		<!-- Outside the shell: everything it renders is a portal or a fixed-position
+		     surface, so it has no business being a row in the column. PurchaseFlow is
+		     a Dialog, so it qualifies on the same grounds as AcrossPages. -->
 		<PurchaseFlow />
 		<AcrossPages />
 	</Context>
@@ -146,6 +163,22 @@
 
 {#snippet progressLayer()}
 	<NavigationProgress isNavigating={() => !!navigating.to} />
+	<!-- HERE RATHER THAN IN THE TOAST LAYER, which is where it started. A system
+	     modal (the wallet-action prompt) sits above the toast layer and dims what
+	     is under its backdrop, so the one sentence explaining what leaving the
+	     page would cost was greyed out exactly while the user was being held by a
+	     modal, which is when they are most likely to give up and reload. Both are
+	     views of the SAME fact, a dispatch being awaited, so neither can be said
+	     to interrupt the other. See the layer's `holds` in core/ui/layers.ts.
+
+	     The ledger is passed in because this is OUTSIDE `<Context>`: a layer
+	     container is a sibling of it, so there is no app context to ask here. -->
+	{#if sendingIndicatorSlot(sendingIndicator) === 'overlay'}
+		<SendingIndicator
+			inFlight={context.context.inFlight}
+			placement="floating"
+		/>
+	{/if}
 {/snippet}
 
 {#each LAYERS as layer (layer.id)}

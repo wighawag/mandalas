@@ -10,6 +10,7 @@
 	import Badge from '$lib/shadcn/ui/badge/badge.svelte';
 	import {formatBalance} from '$lib/core/utils/format/balance';
 	import {countPendingOperations} from '$lib/view/operation';
+	import {createSendingPulse} from '$lib/ui/in-flight/sending';
 	import {effectiveGasPrice} from '$lib/core/connection/gasFee';
 	import {FaucetButton, hasFaucet} from '$lib/core/ui/faucet/index.js';
 	import MenuIcon from '@lucide/svelte/icons/menu';
@@ -102,7 +103,16 @@
 		clock,
 		deployments,
 		overlays,
+		inFlight,
 	} = getAppContext();
+
+	// A transaction being handed over RIGHT NOW, which is the window before it
+	// becomes an operation the badge below can count. Wordless and immediate on
+	// purpose: see the two-surface note in $lib/ui/in-flight/sending.ts. This is
+	// the rung that is on screen whenever the unload guard is armed, so it must
+	// not be delayed AND must not be hidden by a connection step: it is rendered
+	// outside the connected/disconnected branch below for that reason.
+	const sending = createSendingPulse(inFlight);
 
 	// The drawer closes itself on any navigation, and the back gesture closes it,
 	// because it is a registered view overlay. Nav links below therefore carry no
@@ -181,7 +191,18 @@
 	></div>
 {/snippet}
 
-<header class="sticky top-0 left-0 z-50 w-full">
+<!-- `fixed`, NOT `sticky`, and the height shell in `+layout.svelte` is the
+     reason. A sticky element can only stay pinned while its containing block is
+     on screen, and the shell is exactly 100dvh tall, so a sticky header's travel
+     runs out after one region-height of scroll and the navigation leaves for
+     good. Out of flow, there is no containing block to run out of. Before the
+     shell arrived, `sticky` here was correct.
+
+     The shell reserves the space with `pt-[var(--navbar-height)]`, which is why
+     app.css points `--navbar-height` at `--header-height`: what has to be
+     reserved is this whole header, both colour rules included, not just the nav
+     row inside it. -->
+<header class="fixed top-0 left-0 z-50 w-full">
 	{@render colorStrip()}
 	<!--navbar padding handled by scrollbar-gutter on desktop, needs-gutter-padding class adds padding on touch devices, see app.css-->
 	<nav
@@ -379,14 +400,43 @@
 				{#if connection.isTargetStepReached($connection)}
 					<EthereumAvatar address={$connection.account.address} />
 					{#if transactionCount > 0}
+						<!-- Pulses while another dispatch is being handed over, so the count
+						     and the "one more on its way" are one mark rather than two
+						     competing ones. Class only: the element and its testid are
+						     unchanged, so anything waiting on the badge is unaffected. -->
 						<span
-							class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground"
+							class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground {$sending.sending
+								? 'animate-pulse ring-2 ring-primary/50'
+								: ''}"
 						>
 							{transactionCount > 99 ? '99+' : transactionCount}
 						</span>
 					{/if}
 				{:else}
 					<MenuIcon class="h-5 w-5" />
+				{/if}
+				{#if $sending.sending && transactionCount === 0}
+					<!-- The same corner as the badge, before there is anything to count.
+					     OUTSIDE the connected branch, deliberately: a dispatch can outlive
+					     the step that started it, and this is the rung sending.ts promises
+					     is up whenever the unload guard is armed. Rendered inside, that
+					     promise would quietly become "whenever the account button happens
+					     to be showing", and the browser would ask about leaving with
+					     nothing at all on screen.
+
+					     A SEPARATE testid from `pending-operations`, which means "tracking
+					     N operations" and is what the e2e suite waits on to mean settled.
+					     `aria-hidden` because the ordinary case is over in a few hundred
+					     milliseconds; the concession is spelled out in sending.ts. -->
+					<span
+						data-testid="sending-transaction"
+						aria-hidden="true"
+						class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center"
+					>
+						<span
+							class="h-2 w-2 animate-pulse rounded-full bg-primary ring-2 ring-primary/50"
+						></span>
+					</span>
 				{/if}
 			</button>
 		</div>
