@@ -89,9 +89,16 @@ echo -e "\n${GREEN}Deploying contracts and exporting to the web app${NC}"
 # Regenerates web/src/lib/deployments.ts (a generated, gitignored file) so the
 # app talks to the freshly deployed contract. `pnpm build <mode>` regenerates
 # it for that mode afterwards.
-( cd "$ROOT_DIR" && pnpm --filter ./contracts exec ldenv -d localhost pnpm :deploy+export @@ )
-( cd "$ROOT_DIR" && pnpm --filter ./contracts exec ldenv -d localhost \
-	pnpm rocketh-export -e @@MODE --ts ../web/src/lib/deployments.ts @@ )
+# `deploy` then `export`, the two PUBLIC scripts, rather than the internal
+# `:deploy:dev+export`. That one is the dev-loop's composition: it takes its
+# output path from whoever calls it (the zellij pane forwards `--ts`), so called
+# from here with no arguments `rocketh-export` has no output file and fails.
+# Upstream's e2e script does exactly this pair for the same reason.
+#
+# `--no-compile` because `deploy` otherwise recompiles with the production
+# profile, which this run has already done.
+( cd "$ROOT_DIR" && pnpm --filter ./contracts run deploy localhost --skip-prompts --no-compile )
+( cd "$ROOT_DIR" && pnpm --filter ./contracts run export localhost --ts ../web/src/lib/deployments.ts )
 
 echo -e "\n${GREEN}Building the web app for localhost${NC}"
 ( cd "$ROOT_DIR" && pnpm build localhost )
