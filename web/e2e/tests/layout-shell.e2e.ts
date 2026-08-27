@@ -1,11 +1,11 @@
 import type {Page} from '@playwright/test';
 // Plain Playwright, not the template's `fixtures/test`, which this app does not
 // carry. Nothing here needs it: every assertion below is geometry, and the
-// suite deliberately avoids depending on wallet or account state (see the note
-// on the probe further down).
+// suite deliberately avoids depending on wallet or account state.
 import {test, expect} from '@playwright/test';
 
 const {describe} = test;
+import {SMOKE_ROUTES} from '../routes';
 
 /**
  * The height contract `+layout.svelte` states, measured in a real browser
@@ -36,14 +36,26 @@ describe('The layout height shell', () => {
 			};
 			const doc = document.documentElement;
 			return {
-				// `header`, NOT `nav`, and the difference is this app's not the
-				// template's. Upstream the navbar IS the fixed chrome, so measuring
-				// `nav` was the same thing. Mandalas brackets its nav with a multicolor
-				// rule above AND below, all three inside one fixed `<header>`, so
-				// `nav.bottom` is 4px short of where the chrome actually ends and every
-				// assertion built on it would be off by the bottom rule. What the shell
-				// reserves is the header, which is what `--navbar-height` points at.
-				nav: rect('header'),
+				// `[data-app-navbar]`, never a tag. The element that IS the fixed
+				// chrome is the app's choice: `<nav>` here, a `<header>` bracketing the
+				// bar with rules in a descendant. Measuring `nav` there is short by the
+				// bottom rule and fails looking like a layout bug. The attribute is part
+				// of the shell's contract, see the `navbar` prop in AppShell.svelte.
+				nav: rect('[data-app-navbar]'),
+				// The space the shell RESERVES, read rather than restated, and read as
+				// the shell's computed `padding-top` rather than from `--navbar-height`
+				// directly. The variable's value is a LENGTH, `3rem`, so parsing it
+				// yields 3 and every comparison against a pixel measurement is wrong by
+				// a factor of the root font size. `padding-top` is the same declaration
+				// already resolved to px by the browser, and it is also the thing that
+				// actually has to match the chrome: if these two disagree the header
+				// overlaps the page, which is the bug being pinned.
+				chromeHeight: (() => {
+					const shell = document.querySelector('[data-app-shell]');
+					return shell
+						? parseFloat(getComputedStyle(shell).paddingTop)
+						: undefined;
+				})(),
 				content: rect('[data-app-content]'),
 				viewportHeight: window.innerHeight,
 				documentScrolls: doc.scrollHeight > doc.clientHeight,
@@ -319,10 +331,10 @@ describe('The layout height shell', () => {
 		// nothing is under pressure and the old assertion (`height >= 0`, which a
 		// DOMRect can never fail) passed on a case that never arose.
 		//
-		// 80 is below `56 + 37`, so the chrome cannot fit however the space is
-		// divided, and `[&>*]:shrink-0` is finally load-bearing. 56 rather than the
-		// template's 48: this app's chrome is the whole header, nav plus a rule
-		// above and below it.
+		// 80 is below the chrome plus a bar (about 37), so the chrome cannot fit
+		// however the space is divided, and `[&>*]:shrink-0` is finally
+		// load-bearing. The viewport is a literal because it is the INPUT being
+		// chosen; the chrome height it is compared against is read below.
 		await page.setViewportSize({width: 1280, height: 80});
 		await page.goto('/');
 		await page.context().setOffline(true);
@@ -335,10 +347,10 @@ describe('The layout height shell', () => {
 		// Something has to give, and it is the page rather than the chrome. A
 		// squashed navbar is a broken navbar and an unreadable bar reports nothing,
 		// while a region of zero is just a page that has to be scrolled to.
-		// 56 = --header-height (3rem nav + 2 * 0.25rem rules), which is what
-		// --navbar-height points at here. The template's 48 is its nav alone.
+		// Read, not restated: whatever this app reserves, the chrome still occupies
+		// it when the viewport cannot pay for it.
 		expect(Math.round(after.nav!.height), 'the navbar keeps its height').toBe(
-			56,
+			Math.round(after.chromeHeight!),
 		);
 		expect(barHeight, 'and so does the bar').toBeGreaterThan(30);
 		expect(
@@ -407,11 +419,7 @@ describe('The layout height shell', () => {
 		// there is a flake waiting for an empty wallet.
 		await page.setViewportSize({width: 1280, height: 600});
 
-		// `/mandala/` stands in for the template's `/demo/`, which this app does not
-		// have. Pointing an inherited suite at a missing route does not fail: it
-		// asserts against the 404 page and passes, which is the quietest way for a
-		// smoke test to stop testing anything.
-		for (const path of ['/', '/mandala/', '/transactions/', '/explorer/']) {
+		for (const path of SMOKE_ROUTES) {
 			await page.goto(path);
 			const {content, nav, viewportHeight} = await geometry(page);
 

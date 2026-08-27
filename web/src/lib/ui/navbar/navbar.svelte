@@ -202,7 +202,12 @@
      app.css points `--navbar-height` at `--header-height`: what has to be
      reserved is this whole header, both colour rules included, not just the nav
      row inside it. -->
-<header class="fixed top-0 left-0 z-50 w-full">
+<!-- `data-app-navbar` goes on the HEADER, not the nav inside it: it names the
+     element that IS the fixed chrome, and here that is the whole bracketed
+     header, both colour rules included. The template puts it on its <nav>
+     because there the two are the same element. See the `navbar` prop in
+     core/ui/AppShell.svelte. -->
+<header data-app-navbar class="fixed top-0 left-0 z-50 w-full">
 	{@render colorStrip()}
 	<!--navbar padding handled by scrollbar-gutter on desktop, needs-gutter-padding class adds padding on touch devices, see app.css-->
 	<nav
