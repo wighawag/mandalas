@@ -5,6 +5,31 @@ import type {Page} from '@playwright/test';
 import {test, expect} from '@playwright/test';
 
 const {describe} = test;
+
+/**
+ * Wait until the app is UP: hydrated, started, and done with the network work
+ * its boot needs.
+ *
+ * The template keeps this in `fixtures/test` as `waitForAppReady`; this app does
+ * not carry that file (see the note above), so the same wait is written here
+ * against the same signal: the navbar's disabled "Connect" spinner is what the
+ * server renders and what the app shows while the connection store is still
+ * loading, so its absence means client-side code has run AND settled.
+ *
+ * WHY IT MATTERS HERE, and it is not politeness: the offline tests below take
+ * the NETWORK away, and doing that inside the boot window kills a request the
+ * app is still waiting on. Nothing retries it, no store settles, no chrome bar
+ * can ever appear, and the test fails twenty seconds later on a missing banner
+ * that reads as a fault in the shell it was about to measure. It is a race, so
+ * it strikes the heavier app rather than the template.
+ */
+async function waitForAppReady(page: Page) {
+	await expect(
+		page.locator('button:disabled', {hasText: /connect/i}),
+		'the app should have finished starting (navbar still shows the loading ' +
+			'Connect button)',
+	).toHaveCount(0, {timeout: 30_000});
+}
 import {SMOKE_ROUTES} from '../routes';
 
 /**
@@ -150,6 +175,13 @@ describe('The layout height shell', () => {
 		page,
 	}) => {
 		await page.goto('/');
+		// EVERY offline test in this file waits for the app to be up FIRST, and it
+		// is not politeness. Cutting the network while the boot is still using it
+		// leaves the app permanently half-started, so no bar can ever appear and the
+		// assertion below fails as though the shell were broken. See
+		// waitForAppReady. This test happened to be safe by accident, because the
+		// `geometry` call below is a round trip; the accident is now a statement.
+		await waitForAppReady(page);
 		const before = await geometry(page);
 
 		// The offline bar is the honest trigger: `core/connection/offline.ts`
@@ -200,6 +232,7 @@ describe('The layout height shell', () => {
 		// again. `AppShell` pins the group instead.
 		await page.setViewportSize({width: 1280, height: 348});
 		await page.goto('/');
+		await waitForAppReady(page);
 
 		await page.context().setOffline(true);
 		const first = page.getByTestId('offline-banner');
@@ -279,6 +312,7 @@ describe('The layout height shell', () => {
 		// also the only place a user would meet it.
 		await page.setViewportSize({width: 1280, height: 348});
 		await page.goto('/');
+		await waitForAppReady(page);
 		await page.context().setOffline(true);
 		await expect(page.getByTestId('offline-banner')).toBeVisible();
 
@@ -337,6 +371,7 @@ describe('The layout height shell', () => {
 		// chosen; the chrome height it is compared against is read below.
 		await page.setViewportSize({width: 1280, height: 80});
 		await page.goto('/');
+		await waitForAppReady(page);
 		await page.context().setOffline(true);
 		const bar = page.getByTestId('offline-banner');
 		await expect(bar).toBeVisible();
