@@ -378,9 +378,23 @@
 			{/if}
 		</div>
 
+		<!-- `data-connected` is the single, authoritative connection signal for e2e,
+		     and this app had drifted off it. The template puts it on this same
+		     container; here the attributes were lost, so every inherited suite that
+		     waits for the app to have an OPINION about the connection waited for an
+		     element that does not exist and failed thirty seconds later saying only
+		     "element(s) not found".
+
+		     Tests used to infer it from the balance text, but the balance renders
+		     EMPTY while still loading, so an already-connected app looked disconnected
+		     and the fixture re-ran the whole connect flow mid-test. This attribute
+		     tracks the same predicate the branches below use, is always in the DOM,
+		     and does not depend on a breakpoint that hides the balance. -->
 		<div
 			bind:this={accountElement}
 			class="relative flex h-full shrink-0 items-center space-x-2"
+			data-testid="wallet-status"
+			data-connected={connection.isTargetStepReached($connection)}
 		>
 			<!-- Connect Button / Connected Address -->
 			{#if ($connection.step === 'Idle' && $connection.loading) || ($connection.step != 'Idle' && !connection.isTargetStepReached($connection))}
