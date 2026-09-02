@@ -2,4 +2,4 @@ export {formatBalance} from './balance';
 export {truncateHex, type TruncateHexOptions} from './hex';
 export {formatGas, formatGasPrice, formatValue} from './value';
 export {bigIntReplacer, toPlainJson} from './json';
-export {formatError} from './error';
+export {errorMessage, messageOf, formatError} from './error';
