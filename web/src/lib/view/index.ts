@@ -57,12 +57,14 @@ export type ViewStateStore = {
  * inclusion, so the handover is immediate.
  */
 function isInFlight(operation: {
-	transactionIntent: {state?: {status?: string; inclusion?: string}};
+	// Observer-owned, and no longer nested under a stored intent: the record
+	// keeps the observer's state directly and the intent is a projection.
+	state?: {outcome?: string; inclusion?: string};
 }): boolean {
-	const state = operation.transactionIntent.state;
+	const state = operation.state;
 	// No state yet: just broadcast, definitely not on chain.
 	if (!state) return true;
-	if (state.status === 'Failure') return false;
+	if (state.outcome === 'Failure') return false;
 	return (
 		state.inclusion !== 'Included' &&
 		state.inclusion !== 'NotFound' &&

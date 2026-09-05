@@ -32,11 +32,13 @@ function stubOperations(
 /** A functionCall operation in a given inclusion/status state. */
 function op(
 	functionName: string,
-	state?: {status?: string; inclusion?: string},
+	state?: {outcome?: string; inclusion?: string},
 ) {
 	return {
 		metadata: {type: 'functionCall', functionName},
-		transactionIntent: {state},
+		// The observer's state sits on the operation now: the intent it used to
+		// nest under is a projection and is no longer stored.
+		state,
 	};
 }
 
@@ -147,7 +149,7 @@ describe('createViewState (mandalas curve)', () => {
 				currentPrice: 1n * COEFFICIENT + INITIAL_PRICE,
 			}),
 			operations: stubOperations({
-				'1': op('mint', {inclusion: 'Included', status: 'Success'}),
+				'1': op('mint', {inclusion: 'Included', outcome: 'Success'}),
 			}),
 			config,
 		});
@@ -184,7 +186,7 @@ describe('createViewState (mandalas curve)', () => {
 				currentPrice: 4n * COEFFICIENT + INITIAL_PRICE,
 			}),
 			operations: stubOperations({
-				'1': op('mint', {status: 'Failure'}),
+				'1': op('mint', {outcome: 'Failure'}),
 				'2': op('mint', {inclusion: 'Dropped'}),
 				'3': op('mint', {inclusion: 'NotFound'}),
 			}),
