@@ -428,6 +428,12 @@ describe('Stopping waiting for the wallet', () => {
 		// The flow comes to rest showing NO wallet at all. That is the state the
 		// announcement used to disappear in, so it is asserted rather than assumed:
 		// without it this test would silently become a second copy of the one above.
+		//
+		// `Idle` HERE, where the template accepts one of its pickers, and for the
+		// same reason this test drives `cancel()` above: this app announces one
+		// wallet, so no picker ever opens and `cancel()` is its shortest route to a
+		// resting state that carries no wallet. Which step that is stays the app's
+		// business either way.
 		await expect
 			.poll(
 				() =>

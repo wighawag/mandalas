@@ -1,4 +1,4 @@
-import {expect, type Page} from '@playwright/test';
+import {expect, type Locator, type Page} from '@playwright/test';
 
 /**
  * A wallet that HOLDS a transaction request until the test lets it go.
@@ -499,11 +499,11 @@ export async function chooseStallingWallet(page: Page): Promise<void> {
 }
 
 /**
- * How long ONE attempt at the sign-in click may take before the loop stops
- * waiting on it and looks again.
+ * How long ONE attempt at the sign-in click may run before it is abandoned.
  *
- * Generous, because a click that is merely slow should still land: this exists
- * to bound a wait that would otherwise never end, not to hurry the app up.
+ * Generous, because it costs the caller nothing: the click does not block the
+ * poll (see {@link waitUntilHolding}), so this only bounds how long a doomed
+ * attempt lingers before another may be made.
  */
 const SIGN_IN_CLICK_TIMEOUT = 5_000;
 
@@ -530,44 +530,66 @@ async function waitUntilHolding(page: Page, timeout = 60_000): Promise<void> {
 		name: new RegExp(STALLING_WALLET_NAME, 'i'),
 	});
 	const deadline = Date.now() + timeout;
+	/** Which buttons have an attempt running, so they cannot pile up. */
+	const inFlightClicks = new Set<string>();
+
+	/**
+	 * Click it if it is there, without making the poll wait for the answer.
+	 *
+	 * One attempt per button at a time, bounded, and never awaited: see the note
+	 * on the sign-in click below for why each of those three matters.
+	 */
+	const startClick = async (name: string, button: Locator) => {
+		if (inFlightClicks.has(name)) return;
+		if (!(await button.isVisible().catch(() => false))) return;
+		inFlightClicks.add(name);
+		void button
+			.click({timeout: SIGN_IN_CLICK_TIMEOUT})
+			.catch(() => {})
+			.finally(() => {
+				inFlightClicks.delete(name);
+			});
+	};
 
 	while (Date.now() < deadline) {
 		// Asked FIRST on every pass, so the loop returns the instant the wallet has
 		// it and a caller's clock starts as close to the dispatch as it can.
 		if (await isHoldingTransaction(page).catch(() => false)) return;
-		// The picker, when this app shows one at all. Both clicks may lose a race
-		// with the app moving on, which is fine: the next pass looks again.
-		if (await walletEntry.isVisible().catch(() => false)) {
-			await walletEntry.click().catch(() => {});
-		}
-		if (await stallingWallet.isVisible().catch(() => false)) {
-			await stallingWallet.click().catch(() => {});
-		}
-		if (await signIn.isVisible().catch(() => false)) {
-			// BOUNDED, and that bound is the whole reason this loop terminates.
-			//
-			// Losing the race with the app moving on is NORMAL here, and this comment
-			// used to say exactly that - but an unbounded click does not lose a race,
-			// it WAITS for it. `isVisible` is a snapshot, and the modal closes the
-			// moment sign-in succeeds, so the button is routinely gone by the time the
-			// click resolves its locator. Playwright then auto-waits for a "Sign in"
-			// button to come back, and with no timeout that wait has no end: measured
-			// at `count=0, visible=false`, still waiting 117 seconds later. The
-			// `catch` never fired, because nothing ever rejected.
-			//
-			// The damage was not the lost click, which the next pass would have
-			// retried anyway. It is that the loop never got back to its own
-			// `deadline`, so the diagnostic below - the one thing that can tell a
-			// parked flow from a slow node - could never run, and the suite died on
-			// Playwright's own test timeout instead, naming `waitForTimeout` and
-			// explaining nothing. That is what made both suites that come through here
-			// look like node contention for as long as they did.
-			//
-			// It can only fire where the button exists at all, which is an app that
-			// SIGNS IN. This one never renders it, so the code is inert here and this
-			// is a descendant's fix kept in the file they share.
-			await signIn.click({timeout: SIGN_IN_CLICK_TIMEOUT}).catch(() => {});
-		}
+		// The picker, when this app shows one at all. Bounded and NOT awaited, for
+		// the same two reasons as the sign-in click below: a click that loses its
+		// race against the app moving on must fail rather than wait for the element
+		// to come back, and it must not hold up the poll above while it does.
+		await startClick('walletEntry', walletEntry);
+		await startClick('stallingWallet', stallingWallet);
+		// NOT AWAITED, AND BOUNDED, and it has to be both.
+		//
+		// BOUNDED, because an unbounded click does not lose a race, it WAITS for
+		// it. `isVisible` is a snapshot and the modal closes the moment sign-in
+		// succeeds, so the button is routinely gone by the time the click resolves
+		// its locator; Playwright then auto-waits for a "Sign in" button to come
+		// back, and with no timeout that wait has no end. Measured at `count=0,
+		// visible=false`, still waiting 117 seconds later, with the `catch` never
+		// firing because nothing ever rejected. The loop therefore never got back
+		// to its own `deadline`, the diagnostic below could never run, and the
+		// test died on Playwright's own timeout naming `waitForTimeout` and
+		// explaining nothing - which is what made both suites that come through
+		// here look like node contention for as long as they did.
+		//
+		// NOT AWAITED, because awaiting it spends the caller's clock. A bound
+		// alone fixed the hang and broke the sending indicator instead: the
+		// transaction is dispatched WHILE the doomed click is still timing out, so
+		// the loop noticed the wallet was holding several seconds late, by which
+		// time the notice under test had already appeared and the suite failed
+		// claiming it was up too early. That is the trap this file's header names
+		// ("NEITHER MAY COST TIME IT DOES NOT NEED"), reached from the other side.
+		// Left in flight, the poll above stays tight and returns on the very pass
+		// the wallet is handed the request.
+		//
+		// One at a time, so a button that never becomes clickable cannot pile up
+		// attempts. A click still running when this returns is harmless: nothing
+		// later in these suites renders a "Sign in" button, so it simply times out
+		// unobserved, and its rejection is already swallowed.
+		await startClick('signIn', signIn);
 		await page.waitForTimeout(100);
 	}
 
