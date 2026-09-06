@@ -20,3 +20,14 @@
 # it and becomes cargo cult.
 #
 # This template omits nothing - it is where the files come from.
+
+web/e2e/tests/sending-indicator.e2e.ts
+# The template's sending-indicator suite, deleted here long before this list
+# existed and re-decided by hand at every cascade since. It asserts the order
+# and floor of the two in-flight rungs, which this app does not present. The
+# escape-hatch suite, which shares the same fixture, IS carried here.
+
+web/e2e/tests/home.e2e.ts
+# The template's home-page suite. This repo has never carried it - it has its
+# own home page and does not assert on it - and the cascade offered it back
+# twice in one afternoon when the template changed how it reads the app name.
