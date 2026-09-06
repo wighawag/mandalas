@@ -13,6 +13,7 @@ import {
 	lockStallingWallet,
 	sendAndStall as stallARequest,
 	sentHashes,
+	STALLING_WALLET_NAME,
 	writeForm,
 } from '../fixtures/stalling-wallet';
 
@@ -309,9 +310,16 @@ describe('Stopping waiting for the wallet', () => {
 
 		// And wallet state is rebuilt under the request, which IS the transition.
 		//
-		// `unlock()`, because it is the ONE route into that rebuild that every app
-		// in this tree actually has. What is being pinned is the rebuild, not the
-		// call that causes it, so the call should be the one no app has to override.
+		// `unlock()`, because it is the ONE route through this transition that every
+		// app in this tree actually has.
+		//
+		// BE PRECISE ABOUT WHAT THIS DOES AND DOES NOT COVER. `unlock()` publishes
+		// through `onAccountChanged`, which spreads the existing wallet forward, so
+		// it exercises the announcement surviving a wallet-state CHANGE - not the
+		// from-scratch `wallet: {...}` construction that erased the list in 0.10.0.
+		// The next test drives that, by connecting a wallet again; this comment used to
+		// claim it happened here, which was wrong and is the sort of confident,
+		// specific, false sentence this file keeps having to apologise for.
 		//
 		// This used to be a bare `ensureConnected()`, and that only worked here by
 		// accident of configuration. `ensureConnected` promises the app's TARGET
@@ -326,19 +334,17 @@ describe('Stopping waiting for the wallet', () => {
 		//
 		// Naming a wallet mechanism instead (`ensureConnected('WalletConnected',
 		// {type: 'wallet', address})`) does force the reconnect, and is wrong for a
-		// different reason: from a signed-in state it routes through `connect()` and
-		// opens the WALLET PICKER, which nobody in this test is there to answer. The
-		// picker is the next test's subject, not this one's.
+		// different reason: it routes through `connect()`, which tears the wallet
+		// down and rebuilds it. Rebuilding from a wallet-less state is the next
+		// test's subject, not this one's.
 		//
 		// `unlock()` is what this app puts in front of the user in exactly this
 		// state (see `walletPromptCopy`: "Your wallet is locked ... Unlock it to see
-		// the request"), it rebuilds wallet state under the parked request, and it
-		// keeps the step, the account and the wallet where re-running the flow would
-		// rebuild all three. The next test still drives `connect()`, so the harsher
-		// rebuild - the one that lands on NO wallet at all - stays covered.
-		await page.evaluate(() =>
-			(globalThis as any).context.connection.unlock(),
-		);
+		// the request"), it moves wallet state under the parked request, and it keeps
+		// the step, the account and the wallet where re-running the flow would
+		// rebuild all three. The next test covers both harsher cases: a state with NO
+		// wallet at all, and the wallet being BUILT again underneath the request.
+		await page.evaluate(() => (globalThis as any).context.connection.unlock());
 		await expect
 			.poll(() => walletStatus(page), {timeout: 30_000})
 			.toBe('connected');
@@ -454,8 +460,44 @@ describe('Stopping waiting for the wallet', () => {
 		await expect(escapeHatch(page)).toBeVisible();
 		expect(await wouldBlockUnload(page)).toBe(true);
 
-		// And it still clears when the wallet answers, from a state that never got
-		// its wallet back.
+		// AND THROUGH THE REBUILD ON THE WAY BACK, which is the transition that
+		// actually regressed and the only place this suite still drives it.
+		//
+		// Everything above happens while wallet state is being TORN DOWN or spread
+		// forward. The 0.10.0 bug was in neither: it was in the nine places that
+		// BUILD a `wallet: {...}` from scratch, each of which asserted
+		// `pendingRequests: []` and so erased an outstanding request permanently.
+		// `unlock()` in the test above cannot catch that - upstream's own fix note
+		// says the event handlers "spread the existing wallet state and so preserve
+		// the list" - and neither can resting with no wallet. CONNECTING A WALLET
+		// AGAIN is what constructs one from scratch, under a request the user's
+		// wallet is still holding, which is exactly the shape that lost it.
+		//
+		// So the number below is the one that was 0. Reverting @etherplay/connect's
+		// central stamp turns this line, and only this line, back into
+		// `expected 1, received 0`.
+		//
+		// Driven with the wallet NAMED, which in the template is what the picker
+		// row's `onclick` does and here is simply the only way: this app announces
+		// one wallet and never opens a picker (see `cancel()` above), so there is no
+		// row to click even in principle. Same call either way
+		// (ConnectionFlow.svelte: `connect({type: 'wallet', name})`), reached past
+		// the UI exactly as `cancel()` above is.
+		await page.evaluate(
+			(name) =>
+				(globalThis as any).context.connection.connect({type: 'wallet', name}),
+			STALLING_WALLET_NAME,
+		);
+		await expect
+			.poll(() => walletStatus(page), {timeout: 30_000})
+			.toBe('connected');
+		await expect
+			.poll(() => pendingRequestCount(page), {timeout: 15_000})
+			.toBe(1);
+		expect(await isHoldingTransaction(page)).toBe(true);
+
+		// And it still clears when the wallet answers, having lost and regained its
+		// wallet in between.
 		await approveHeldTransaction(page);
 		await expect
 			.poll(() => pendingRequestCount(page), {timeout: 30_000})

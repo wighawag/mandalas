@@ -38,10 +38,17 @@ export default defineConfig({
 		// written to print can run, and the test dies on the 120s timeout above
 		// pointing at whatever line happened to be executing. That is what the
 		// sign-in click in e2e/fixtures/stalling-wallet.ts did upstream, and it cost
-		// an afternoon of blaming the node instead.
+		// an afternoon of blaming the hardhat node.
 		//
-		// Well above anything a working app needs, so it changes no passing test: it
-		// only converts a hang into a failure that names its own line.
+		// A BACKSTOP, NOT THE FIX. Every click in that loop is bounded at its own
+		// call site, because the right timeout there is a few seconds and this is
+		// thirty. What this buys is that the NEXT unbounded action fails at its own
+		// line instead of as an unexplained test timeout.
+		//
+		// Well above anything a working app needs, and it does not govern `expect`
+		// (which has its own timeout, and is where the long deliberate waits in this
+		// suite live). So it changes no passing test: it only converts a hang into a
+		// failure that names itself.
 		actionTimeout: 30_000,
 	},
 	projects: [{name: 'chromium', use: {...devices['Desktop Chrome']}}],
