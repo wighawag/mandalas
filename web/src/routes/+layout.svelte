@@ -23,6 +23,7 @@
 	import Context from '$lib/context/Context.svelte';
 	import InitError from '$lib/context/InitError.svelte';
 	import Navbar from '$lib/ui/navbar/navbar.svelte';
+	import SurfaceNavbar from '$lib/ui/navbar/SurfaceNavbar.svelte';
 	import PurchaseFlow from '$lib/ui/purchase/PurchaseFlow.svelte';
 	// The four condition bars are no longer imported here: they are entries in
 	// `ui/chrome.ts` now, where this app's rpc-health gate lives too.
@@ -33,7 +34,7 @@
 	import AcrossPages from '$lib/context/AcrossPages.svelte';
 	import DefaultHead from '$lib/metadata/DefaultHead.svelte';
 	import AppShell from '$lib/core/ui/AppShell.svelte';
-	import {CHROME} from '$lib/ui/chrome';
+	import {chromeFor} from '$lib/ui/chrome';
 	import {LAYERS} from '$lib/core/ui/layers';
 	import KitNavigation from '$lib/kit/KitNavigation.svelte';
 	import {navigating, page} from '$app/state';
@@ -52,6 +53,13 @@
 	// prerenders instead of waiting behind a splash. Readiness arrives through
 	// the stores. See ADR-0002 (`work` branch).
 	const context = createContext();
+
+	// WHICH CHROME THIS SURFACE GETS, which is the app's unless the page being
+	// shown declared its own. The decision is `chromeFor`'s and nothing is decided
+	// here: see `$lib/ui/chrome` for the test that settles it (whether the
+	// chrome's claims are still TRUE of what the player is looking at) and why a
+	// declaration lives on the route's page data rather than in this file.
+	const surface = $derived(chromeFor(page.data));
 
 	// Set when the app cannot run at all. Env-derived reasons are known at
 	// construction (so the error also prerenders); the `?burner=true` one is
@@ -98,16 +106,21 @@
 
 		     WHICH bars exist is `ui/chrome.ts`, for the same reason. Adding one is a
 		     line there, not an edit here. -->
-		<AppShell chrome={CHROME} routeId={() => page.route.id}>
+		<AppShell chrome={surface.bars} routeId={() => page.route.id}>
 			{#snippet navbar()}
-				<!-- The framework's answers, handed to components that must not ask for
-				     themselves. Getters, so reading them inside those components tracks
-				     `page`/`navigating` as if they had. See src/lib/kit/README.md. -->
-				<Navbar
-					{repoURL}
-					{communityURL}
-					currentPath={() => page.url.pathname}
-				/>
+				<SurfaceNavbar navbar={surface.navbar}>
+					{#snippet appNavbar()}
+						<!-- The framework's answers, handed to components that must not ask
+						     for themselves. Getters, so reading them inside those components
+						     tracks `page`/`navigating` as if they had. See
+						     src/lib/kit/README.md. -->
+						<Navbar
+							{repoURL}
+							{communityURL}
+							currentPath={() => page.url.pathname}
+						/>
+					{/snippet}
+				</SurfaceNavbar>
 			{/snippet}
 
 			{@render children()}
