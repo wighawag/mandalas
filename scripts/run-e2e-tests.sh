@@ -44,6 +44,11 @@ export ETH_NODE_URI_localhost="$RPC_URL"
 export PUBLIC_NODE_URL="$RPC_URL"
 
 STARTED_NODE=""
+# The node's PROCESS GROUP, which is what cleanup kills. `pnpm contracts:node:local`
+# is a chain of wrappers (pnpm -> pnpm -> ldenv -> hardhat), and killing the
+# first of them left hardhat itself running on the port. The next run then
+# found a node there and reused a chain full of this run's state.
+STARTED_PGID=""
 
 node_is_up() {
 	curl -sf -m 2 -X POST "$RPC_URL" \
@@ -54,7 +59,12 @@ node_is_up() {
 cleanup() {
 	# Only ever stop what this script started. Port 8545 may belong to a node
 	# the developer is using for something else, and killing it would be rude.
-	if [ -n "$STARTED_NODE" ]; then
+	if [ -n "$STARTED_PGID" ]; then
+		echo -e "\n${YELLOW}Stopping the hardhat node this run started (pgid $STARTED_PGID)${NC}"
+		kill -- "-$STARTED_PGID" 2>/dev/null || true
+		sleep 1
+		kill -9 -- "-$STARTED_PGID" 2>/dev/null || true
+	elif [ -n "$STARTED_NODE" ]; then
 		echo -e "\n${YELLOW}Stopping the hardhat node this run started (pid $STARTED_NODE)${NC}"
 		kill "$STARTED_NODE" 2>/dev/null || true
 		sleep 1
@@ -71,8 +81,22 @@ else
 	# --port must be passed through, otherwise the node always binds 8545 while
 	# everything else follows E2E_RPC_PORT, and the run dies on EADDRINUSE when
 	# 8545 belongs to something else.
-	( cd "$ROOT_DIR" && pnpm contracts:node:local --port "$RPC_PORT" >/tmp/mandalas-e2e-node.log 2>&1 ) &
+	#
+	# `setsid` puts the node in a group of its own, so cleanup can stop the whole
+	# chain without the group ever containing this script.
+	( cd "$ROOT_DIR" && exec setsid pnpm contracts:node:local --port "$RPC_PORT" >/tmp/mandalas-e2e-node.log 2>&1 ) &
 	STARTED_NODE=$!
+	# Wait for a group that is NOT ours: until the child has run `setsid` it is
+	# still in this script's group, and killing that would take the run down.
+	OWN_PGID="$(ps -o pgid= -p $$ 2>/dev/null | tr -d ' ')"
+	for _ in $(seq 1 25); do
+		STARTED_PGID="$(ps -o pgid= -p "$STARTED_NODE" 2>/dev/null | tr -d ' ')"
+		[ -n "$STARTED_PGID" ] && [ "$STARTED_PGID" != "$OWN_PGID" ] && break
+		sleep 0.2
+	done
+	if [ -z "$STARTED_PGID" ] || [ "$STARTED_PGID" = "$OWN_PGID" ]; then
+		STARTED_PGID=""
+	fi
 	for _ in $(seq 1 40); do
 		node_is_up && break
 		sleep 1
