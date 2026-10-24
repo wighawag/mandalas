@@ -8,7 +8,8 @@
  *   it down from upstream forever, so the less it differs the better.
  * - `./app.ts` is THIS app: Mandalas' chain reads, view model, browse grid and
  *   mint flow. It is the half a fork replaces, and the only one it should need
- *   to.
+ *   to. It is reached through the `$app-specific` alias (see svelte.config.js),
+ *   so a fork may keep its half anywhere and point the alias at it.
  *
  * The core builds the app rather than the other way round, because the order
  * matters: the app needs the connection and accountData, and core's refresh
@@ -16,7 +17,7 @@
  * point in `core.ts`.
  */
 import {createCoreContext, type ConnectionFactory} from './core.js';
-import {createAppContext} from './app.js';
+import {createAppContext} from '$app-specific';
 import type {Context} from './types.js';
 
 export type {

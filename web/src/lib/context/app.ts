@@ -1,9 +1,13 @@
-import {createOnchainState} from '$lib/onchain/state.js';
-import {createViewState} from '$lib/view/index.js';
-import {createPurchaseFlow} from '$lib/ui/purchase/purchase-flow.js';
+import {
+	createOnchainState,
+	type OnchainStateStore,
+} from '$lib/onchain/state.js';
+import {createViewState, type ViewStateStore} from '$lib/view/index.js';
+import {createPurchaseFlow, type PurchaseFlowStore} from '$lib/ui/purchase/purchase-flow.js';
 import {RandomTokenStore} from '$lib/stores/randomTokens.js';
 import {createNFTOfStore, type NFTOfStore} from '$lib/stores/nftsof.js';
-import type {CoreServices, AppContext} from './core.js';
+import type {TypedDeployments} from '$lib/deployments-store.js';
+import type {CoreServices} from './core.js';
 
 /**
  * THIS APP'S HALF OF THE CONTEXT. The part a fork replaces.
@@ -29,8 +33,14 @@ import type {CoreServices, AppContext} from './core.js';
  * refresh wiring and RPC health then need this half's `onchainState`. Two passes
  * in one direction, rather than a cycle. See the injection point in `core.ts`,
  * which also explains why the balance stores are hoisted above it here.
+ *
+ * REACHED THROUGH THE `$app-specific` ALIAS, never by path (see svelte.config.js).
+ * The framework imports `$app-specific`, so an app whose half lives elsewhere (a
+ * game keeps it beside its own code) points the alias there and no framework
+ * file is edited. What the alias must provide is what this module exports:
+ * `createAppContext`, `AppMembers` and `operationScope`.
  */
-export function createAppContext(core: CoreServices): AppContext {
+export function createAppContext(core: CoreServices): AppMembers {
 	const {
 		connection,
 		publicClient,
@@ -101,4 +111,40 @@ export function createAppContext(core: CoreServices): AppContext {
 	// `config` is not returned: it is this half's own construction detail, and
 	// core neither uses it nor puts it in the context.
 	return {onchainState, viewState, randomTokens, nftsOf, purchaseFlow};
+}
+
+/**
+ * What this app adds to the app context. `Context` (see `./types.ts`) is the
+ * framework's members plus these, read through `$app-specific`, so the framework
+ * names no type of this app's.
+ *
+ * Core reads `onchainState` for refreshes and RPC health, and states what it
+ * needs of it as `AppContext`; a store that falls short is a compile error
+ * where `./index.ts` hands this factory to core.
+ */
+export type AppMembers = {
+	onchainState: OnchainStateStore;
+	viewState: ViewStateStore;
+	/** Locally-generated candidate Mandalas for the browse grid. */
+	randomTokens: RandomTokenStore;
+	/** Mandalas owned by an address (undefined = the connected account). */
+	nftsOf: (owner?: string) => NFTOfStore;
+	/** The mint dialog's state machine (price quote -> confirm -> submit). */
+	purchaseFlow: PurchaseFlowStore;
+};
+
+/**
+ * The address that scopes local operation data: which of this app's contracts
+ * a browser's operation records belong to.
+ *
+ * A FUNCTION OF THE TYPED DEPLOYMENTS, not a contract name, so naming a
+ * contract the deployment does not have is a compile error here, in the app,
+ * rather than a lookup in the framework that answers `undefined`.
+ *
+ * The contract should be one whose address is stable for the deployment's
+ * lifetime (e.g. the main proxy), not its implementation, which changes on
+ * every hot contract replacement.
+ */
+export function operationScope(deployments: TypedDeployments): `0x${string}` {
+	return deployments.contracts.MandalaToken.address;
 }
