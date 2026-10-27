@@ -12,15 +12,6 @@
     "syncpack": "^15.3.3",
     "zellij-launcher": "^0.0.1"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ],
-    "overrides": {
-      "utf-8-validate": "-",
-      "cookie@<0.7.0": "^0.7.0"
-    }
-  },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepare": "node scripts/ensure-deployments.mjs",
