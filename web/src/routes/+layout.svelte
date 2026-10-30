@@ -37,6 +37,7 @@
 	import {chromeFor} from '$lib/ui/chrome';
 	import {LAYERS} from '$lib/core/ui/layers';
 	import KitNavigation from '$lib/kit/KitNavigation.svelte';
+	import {ModeWatcher} from 'mode-watcher';
 	import {navigating, page} from '$app/state';
 	// Identity, from the one file that holds it. Deliberately NOT written as
 	// literals here: this layout is the most-edited file in the template, so a
@@ -84,6 +85,9 @@
 	// `ui/chrome.ts`, with this app's routes, so adding or gating a bar is a line
 	// there rather than an edit to this file.
 </script>
+
+<!-- dark on <html>, and color-scheme with it: see the template's layout -->
+<ModeWatcher defaultMode="dark" />
 
 <DefaultHead />
 
