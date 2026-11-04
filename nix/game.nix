@@ -16,7 +16,7 @@
   # built the template, a descendant's stale hash quietly gets the TEMPLATE's
   # packages. Two lockfiles can also name the same packages, and so share a
   # hash.
-  pnpmDepsHash = "sha256-u0xELFbGJ3NawTADvsSPgmuX8uNc5EVLddWWEmNEh40=";
+  pnpmDepsHash = "sha256-bLkVxDcoO1KZIZjxm/LzBqw/lukRGXzdsg+gnM0k9zI=";
 
   # contracts/hardhat.config.ts compiles with 0.7.1.
   solc = {
