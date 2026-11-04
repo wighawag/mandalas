@@ -18,6 +18,9 @@
   # hash.
   pnpmDepsHash = "sha256-bLkVxDcoO1KZIZjxm/LzBqw/lukRGXzdsg+gnM0k9zI=";
 
+  # The shared library (common-lib), which the web app imports built.
+  preBuild = "pnpm --filter mandalas-common build";
+
   # contracts/hardhat.config.ts compiles with 0.7.1.
   solc = {
     version = "0.7.1+commit.f4a555be";
