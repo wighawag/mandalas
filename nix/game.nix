@@ -18,6 +18,12 @@
   # hash.
   pnpmDepsHash = "sha256-u0xELFbGJ3NawTADvsSPgmuX8uNc5EVLddWWEmNEh40=";
 
+  # contracts/hardhat.config.ts compiles with 0.7.1.
+  solc = {
+    version = "0.7.1+commit.f4a555be";
+    hash = "sha256-f8yYPFFJhApHuUb8UfwU8cIc2gfAHWUOSh+BQxnLFCM=";
+  };
+
   # Optional, shown with their defaults:
   #
   # name = <the root package.json's "name">;   the package is "<name>-lan"

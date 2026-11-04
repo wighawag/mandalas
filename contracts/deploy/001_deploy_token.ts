@@ -18,7 +18,14 @@ export default deployScript(
 				args: [deployer, initialPrice, creatorCutPer10000th, linearCoefficient],
 			},
 			{
-				proxyDisabled: env.name === 'localhost', // TODO tags ?
+				// No proxy on a LAN box either, and there it is deployed through the
+				// CREATE2 factory, as the LAN package needs (nix/lan.nix: every address
+				// must depend on the code alone). Not with a proxy: under CREATE2 the
+				// proxy's constructor is called by the factory, and `postUpgrade`'s
+				// `proxied` check wants the proxy's admin, so it reverts. Elsewhere,
+				// mainnet included, the deploy stays as it was.
+				proxyDisabled: env.name === 'localhost' || env.name === 'lan', // TODO tags ?
+				deterministic: env.name === 'lan',
 				execute: 'postUpgrade',
 				linkedData: {
 					initialPrice: initialPrice,
