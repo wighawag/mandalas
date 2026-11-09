@@ -15,12 +15,12 @@ importers:
       expand-vars:
         specifier: ^0.1.0
         version: 0.1.0
-      jolly-roger-contracts:
-        specifier: workspace:*
-        version: link:contracts
       ldenv:
         specifier: ^0.6.0
         version: 0.6.0
+      mandalas-contracts:
+        specifier: workspace:*
+        version: link:contracts
       pinnace:
         specifier: 0.17.0
         version: 0.17.0
