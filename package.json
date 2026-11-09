@@ -1,5 +1,13 @@
 {
   "name": "mandalas",
+  "lan": {
+    "pnpmDepsHash": "sha256-bLkVxDcoO1KZIZjxm/LzBqw/lukRGXzdsg+gnM0k9zI=",
+    "preBuild": "pnpm --filter mandalas-common build",
+    "solc": {
+      "version": "0.7.1+commit.f4a555be",
+      "hash": "sha256-f8yYPFFJhApHuUb8UfwU8cIc2gfAHWUOSh+BQxnLFCM="
+    }
+  },
   "version": "0.0.1",
   "description": "Mandalas",
   "private": true,
