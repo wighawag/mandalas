@@ -135,3 +135,16 @@ web/test/lib/view/pending-operations.test.ts
 # one nonce, which surfaces as an unrelated test failing on a transaction that
 # never appeared, and taking the file back is cheaper than diagnosing that.
 web/test/e2e-account-claims.test.ts
+
+# ---------------------------------------------------------------------------
+# THE LAN PACKAGE (`nix build .#lan`, ethereum-lan-node's lib.mkRockethGame).
+# The LAN box is for games played at tables, and mandalas is an NFT collection,
+# not a table game, so it does not go on one: these two files are what turns
+# the package on (they had been, since 98713778). What else it uses stays: the
+# two hooks (`SOLC_PATH` in hardhat.config.ts, `withGuardRecording` in
+# rocketh/deploy.ts) are inert unless the LAN build switches them on, and
+# deploy.ts is shared with the template. So does the "lan" field of
+# package.json, back at the template's values: it is inert without the flake,
+# and its `pnpmDepsHash` needs no recomputing here any more.
+flake.nix
+flake.lock
