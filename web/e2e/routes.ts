@@ -1,15 +1,47 @@
 /**
- * The routes a smoke test walks. See the template's copy for why this is data
- * rather than literals in a suite.
+ * THE APP'S MAIN PAGE, as the suites that visit it name it: its route, the
+ * heading that page renders, the label of the home page's link to it, and its
+ * contract (as /contracts lists it). Here it is the greetings demo. The app
+ * names the same page in `MAIN_PAGE` of its `$app-specific` module
+ * (`src/lib/context/app.ts` here); a descendant changes both.
+ */
+export const MAIN_PAGE = {
+	// Mandalas' page for one mandala, `/mandala/`, stands in for the template's
+	// `/demo/`: pointing an inherited suite at a missing route does not fail, it
+	// asserts against the 404 page and passes. The home page opens it from a
+	// mandala's card, not from a named link, and the suites that read a
+	// `heading` and a `homeLink` (home, hydration) are omitted here, so this
+	// names neither.
+	route: '/mandala/',
+	contract: 'MandalaToken',
+} as const;
+
+/**
+ * The routes a smoke test walks, in ONE place so a descendant overrides a list
+ * rather than editing a suite.
  *
- * MANDALAS' LIST: `/mandala/` stands in for the template's `/demo/`, which this
- * app does not have. Pointing an inherited suite at a missing route does not
- * fail, it asserts against the 404 page and passes, which is the quietest way
- * for a smoke test to stop testing anything.
+ * WHY THIS FILE EXISTS. Inherited suites used to carry route literals, and a
+ * descendant that replaced the demo route inherited a test pointing at a path
+ * it does not have. That does not fail: SvelteKit answers with the 404 page,
+ * the assertions about the shell still hold on it, and the test PASSES while
+ * testing nothing. It is the quietest possible regression, it has bitten this
+ * tree at least twice (see `bleeps@4d09f4a1`, "ONE TEST WAS PASSING ON A 404"),
+ * and both times it was found by accident.
+ *
+ * So the list is data, and it is short enough to keep honest.
+ *
+ * WHAT BELONGS HERE: routes every page-level guarantee should hold on, which in
+ * practice means one route per kind of page the app has. Not every route. A
+ * smoke pass that walks thirty pages is a slow way to learn the same fact.
+ *
+ * WHAT A DESCENDANT DOES: replaces the entries it does not have. Its main page
+ * is `MAIN_PAGE.route`, so an app with no `/demo/` changes `MAIN_PAGE` above
+ * and leaves this list alone. Keep `/` first: it is the only entry every
+ * descendant is guaranteed to share.
  */
 export const SMOKE_ROUTES = [
 	'/',
-	'/mandala/',
+	MAIN_PAGE.route,
 	'/transactions/',
 	'/explorer/',
 ] as const;

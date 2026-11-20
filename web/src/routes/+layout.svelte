@@ -8,10 +8,12 @@
 		params,
 		route,
 		sendingIndicator,
+		blockExplorer,
 	} from '$lib';
 	import {
 		provideRoute,
 		provideENS,
+		provideBlockExplorer,
 		provideDocumentLocation,
 	} from '$lib/core/capabilities';
 	import NotificationOverlay from '$lib/core/notifications/NotificationOverlay.svelte';
@@ -80,6 +82,7 @@
 	// unconditionally rather than gated on PUBLIC_ENS_NODE_URL as the template
 	// does: the app shows ENS names wherever an address appears.
 	provideENS(createENSService());
+	provideBlockExplorer(blockExplorer);
 
 	// The RPC-health gate that used to live here as `showRpcBanner` moved into
 	// `ui/chrome.ts`, with this app's routes, so adding or gating a bar is a line
