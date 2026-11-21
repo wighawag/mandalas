@@ -9,14 +9,15 @@
 		route,
 		sendingIndicator,
 		blockExplorer,
+		faucet,
 	} from '$lib';
 	import {
 		provideRoute,
 		provideENS,
 		provideBlockExplorer,
+		provideFaucet,
 		provideDocumentLocation,
 	} from '$lib/core/capabilities';
-	import NotificationOverlay from '$lib/core/notifications/NotificationOverlay.svelte';
 	import Notifications from '$lib/core/notifications/Notifications.svelte';
 	import VersionAndInstallNotfications from '$lib/core/service-worker/VersionAndInstallNotfications.svelte';
 	import NavigationProgress from '$lib/components/NavigationProgress.svelte';
@@ -83,6 +84,7 @@
 	// does: the app shows ENS names wherever an address appears.
 	provideENS(createENSService());
 	provideBlockExplorer(blockExplorer);
+	provideFaucet(faucet);
 
 	// The RPC-health gate that used to live here as `showRpcBanner` moved into
 	// `ui/chrome.ts`, with this app's routes, so adding or gating a bar is a line
@@ -173,16 +175,15 @@
 	<VersionAndInstallNotfications
 		{serviceWorker}
 		classes={{
-			root: 'bg-background bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,var(--color-muted)_10px,var(--color-muted)_20px)]',
+			region:
+				'bg-background bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,var(--color-muted)_10px,var(--color-muted)_20px)]',
 		}}
 	/>
 {/snippet}
 
 {#snippet toastLayer()}
 	<Toaster position="bottom-right" richColors closeButton />
-	<NotificationOverlay>
-		<Notifications {notifications} />
-	</NotificationOverlay>
+	<Notifications {notifications} />
 {/snippet}
 
 {#snippet progressLayer()}
