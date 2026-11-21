@@ -9,6 +9,7 @@ layout {
 		pane name="svelte-check" command="pnpm"  {
 			args "web:check:watch"
 		}
+		
 	}
 
 	pane split_direction="vertical" {

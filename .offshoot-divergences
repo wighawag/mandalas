@@ -1,13 +1,13 @@
 # The stem's files this node carries MODIFIED, each with the reason it differs.
 #
 # WHAT THIS IS FOR. `.offshoot-omissions` lists what this repo does not carry
-# from its stem; this lists what it carries and changes. Everything else is the
-# stem's byte for byte or this repo's own, so a diff against the stem reads as:
-# the additions, the omissions (listed there) and these. A modified file is a
-# conflict on every cascade that touches it, so each one here is a cost paid on
-# purpose, and the reason says what it buys. A cascade reviewer meeting one of
-# these files knows the node's side is a decision; meeting any other modified
-# file, it is drift.
+# from its stem (jolly-roger `main`); this lists what it carries and changes.
+# Everything else is the stem's byte for byte or this repo's own, so a diff
+# against the stem reads as: the additions, the omissions (listed there) and
+# these. A modified file is a conflict on every cascade that touches it, so
+# each one here is a cost paid on purpose, and the reason says what it buys. A
+# cascade reviewer meeting one of these files knows the node's side is a
+# decision; meeting any other modified file, it is drift.
 #
 # AND IT IS CHECKED, by `scripts/check-divergences.mjs` (the tree's one copy,
 # from template-svelte), run by `web/test/offshoot-divergences.test.ts` and by
@@ -30,40 +30,58 @@
 # writes one it carries this file unchanged and the check says it has none.
 
 # The repo's identity, documents and workspace
-README.md                                              jolly-roger's README: the wallet-connected template with its contracts, the LAN package and how a descendant builds on it
-AGENTS.md                                              the repo's rules for agents: Svelte conventions plus the contracts' deploy rules and the LAN package's
-package.json                                           the monorepo of web and contracts: their scripts, the dev stack, the e2e and LAN settings ("lan", "e2e")
-pnpm-lock.yaml                                         the lockfile of this workspace's own dependencies (contracts, viem, @etherplay/connect, ...)
-pnpm-workspace.yaml                                    the contracts package in the workspace, and the cookie override for SvelteKit's vulnerable range
-.gitignore                                             the contracts', the LAN build's and the e2e's generated files
-.offshoot-omissions                                    jolly-roger's own omissions from template-svelte-shadcn (Head.svelte moved, the svg icon, the dev layouts)
+#
+# THIS REPO'S LIST IS ITS OWN. Its stem repo keeps a list too, and a cascade
+# that changes it conflicts here: keep this side, always (the stem's entries
+# describe the stem, not this repo), as `.offshoot-omissions` says of omissions.
+#
+# ONE SECTION, with no marker: this repo has one branch, `main`, fed from
+# jolly-roger `main`.
 
-# The web package's configuration
-web/package.json                                       the web app's dependencies (viem, @etherplay/connect, the account-data stack) and its scripts
-web/.env                                               the chain's public variables: the node URL, the URL handed to wallets, ENS, the explorer's block index
-web/.gitignore                                         the generated deployments module, yalc, and the e2e outputs as this app's playwright writes them
-web/.prettierignore                                    the vendored shadcn components are not reformatted
-web/README.md                                          the web app's README: the wallet-connected app, what already exists, how to switch the logs on
-web/svelte.config.js                                   the `$app-specific` alias, the slot an app on this template is composed through
-web/vite.config.ts                                     the two vitest projects (server and browser) run one after the other, workers capped, the dev host
-web/playwright.config.ts                               the e2e runs a local chain, deploys the contracts and drives a wallet, so its config starts them
-web/src/web-config.json                                the brand: Jolly Roger's name, description, URLs and identity links
-web/src/app.html                                       dark mode by default, and the named-logs console script that reads ?debug, documented where it is inlined
-web/src/app.d.ts                                       PageData's optional surfaceChrome and the shallow-routing overlay state, typed for the layout that reads them
-web/src/app.css                                        the stable scrollbar gutter, sonner's toast style and the navbar's height, beside the stem's layers with jolly-roger's notes on them (its debug surfaces, ADR-0004, the modal tests)
-web/static/_redirects                                  the explorer's dynamic routes rewritten for unique-origin IPFS gateways, before the 404 fallback
+# The repo's identity, documents and workspace
+README.md                                       Mandalas' README: the project, its bonding curve and how to run it
+.gitignore                                      a scratch `tmp` folder
+.offshoot-omissions                             this app's own omissions: the greetings demo and its contract, the template's browser suites it replaced, the LAN package
+package.json                                    Mandalas' name, version and workspace scripts (the common library)
+pnpm-lock.yaml                                  the lockfile of Mandalas' own packages and dependencies
+pnpm-workspace.yaml                             the common library in the workspace, an optional native addon removed
+scripts/run-e2e-tests.sh                        Mandalas' own e2e script: its chain, its deploy and its mint and burn suites
 
-# The app shell and its composition
-web/src/lib/index.ts                                   where this app is composed: the wallet connection, the account stores, the logs, the dispatch indicator
-web/src/lib/kit/README.md                              the adapter's scope as it stands here, its claims narrowed to what is true
-web/src/routes/+layout.svelte                          the shell: the chrome as a list a descendant extends, the app's context, a surface's own chrome, and sonner, the striped update banner and the sending notice in the stem's layers
-web/src/routes/+layout.ts                              the version logged at start and the named-logs init logger, beside the stem's service-worker toggle
-web/src/routes/+page.svelte                            jolly-roger's home page, its button to the app's main page (`MAIN_PAGE` of `$app-specific`), through the kit's paths and the shadcn button
-web/src/routes/+error.svelte                           the error page in the shadcn style and clamped to the viewport like the rest of the app
-web/test/framework-boundary.test.ts                    the boundary rule stated as inherited from template-svelte, with this repo's ADR-0004 and its own leak list
+# The contracts: MandalaToken as deployed
+contracts/.env                                  the dev faucet's claim covers a mint's price and its buffer
+contracts/hardhat.config.ts                     solc 0.7.1, MandalaToken's compiler, and no external artifacts
+contracts/package.json                          Mandalas' names, OpenZeppelin 3.4.2 as deployed, the common library and the contract test suite
+contracts/rocketh/config.ts                     the expected worst gas price, and the local chain mining every deploy at once
+contracts/test/js/utils/index.ts                the fixtures deploy MandalaToken with its bonding curve
 
-# The root's format helpers, widened
-web/src/lib/core/utils/format/index.ts                 the web3 formatters (balance, gas, value, on viem) beside the root's hex, json and error ones
+# The web package
+web/.env                                        the ENS node Mandalas reads names from
+web/.env.localhost                              the local chain in the notation the app resolves, as this app's dev stack runs it
+web/package.json                                Mandalas' name, the common library, tsx, and its serve port
+web/playwright.config.ts                        Mandalas' own e2e config: its mint and burn suites, its port
+web/src/web-config.json                         the brand: Mandalas' name, description, URLs and identity links
+web/static/icon.svg                             Mandalas' mark
+web/static/preview.png                          Mandalas' social preview
+web/src/app.html                                dark only: the colour scheme pinned
+web/src/app.css                                 the full-bleed colour rules (no scrollbar gutter), the header's heights with the navbar's pointed at them, Mandalas' identity
+web/src/lib/context/app.ts                      THIS app: Mandalas' chain reads, view model, browse grid and mint flow
+web/src/lib/context/config.ts                   the browse grid's batch size instead of a message limit
+web/src/lib/context/index.ts                    the context's doc names Mandalas as the app half
+web/src/lib/core/utils/format/error.ts          `formatError`, the reading this app's UI already calls, over the root's two
+web/src/lib/core/utils/format/index.ts          `formatError` exported beside the root's two
+web/src/lib/onchain/state.ts                    the bonding curve as read from the chain, instead of the greetings
+web/src/lib/view/index.ts                       Mandalas' view model over the curve
+web/src/lib/ui/chrome.ts                        the rpc-health bar gated off the standalone renderer, which reads no chain
+web/src/lib/ui/navbar/navbar.svelte             Mandalas' header: its colour rules, its navigation links and menus
+web/src/routes/+layout.svelte                   the purchase flow, the default head, ENS always provided, the condition bars as entries of ui/chrome.ts
+web/src/routes/+page.svelte                     Mandalas' home page: the browse grid and the mint
 
-# The e2e
-web/e2e/tests/service-worker-gateway.e2e.ts            the gateway navigation retried: it races the worker's clients.claim(), which Chromium can abort
+# The e2e and the unit tests
+web/e2e/routes.ts                               `MAIN_PAGE` is /mandala/ and its contract MandalaToken, its write setApprovalForAll (a bool the fixture cannot fill)
+web/e2e/fixtures/stalling-wallet.ts             the stalled send is setApprovalForAll through /contracts, its bool chosen in its <select>
+web/e2e/tests/escape-hatch.e2e.ts               plain Playwright with this app's stalling send, one address per test
+web/e2e/tests/layout-shell.e2e.ts               plain Playwright: every assertion is geometry, no wallet state
+web/e2e/tests/overlays.e2e.ts                   plain Playwright over this app's wallet fixture and its pages
+web/test/lib/context/config.test.ts             the batch size instead of the message limit
+web/test/lib/onchain/state.test.ts              the bonding curve's reads instead of the greetings'
+web/test/lib/ui/chrome.test.ts                  Mandalas' rpc-health gate, not the template's
