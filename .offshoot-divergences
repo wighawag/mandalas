@@ -77,9 +77,9 @@ web/src/routes/+layout.svelte                   the purchase flow, the default h
 web/src/routes/+page.svelte                     Mandalas' home page: the browse grid and the mint
 
 # The e2e and the unit tests
-web/e2e/routes.ts                               `MAIN_PAGE` is /mandala/ and its contract MandalaToken, its write setApprovalForAll (a bool the fixture cannot fill)
-web/e2e/fixtures/stalling-wallet.ts             the stalled send is setApprovalForAll through /contracts, its bool chosen in its <select>
-web/e2e/tests/escape-hatch.e2e.ts               plain Playwright with this app's stalling send, one address per test
+web/e2e/routes.ts                               `MAIN_PAGE` is /mandala/ and its contract MandalaToken, its write setApprovalForAll with an address made from the label
+web/e2e/fixtures/stalling-wallet.ts             the wallet picker raced, not awaited: this app announces one wallet, so it connects with no picker
+web/e2e/tests/escape-hatch.e2e.ts               plain Playwright, not the template's `fixtures/test`, which needs the burner accounts this app's e2e does not offer
 web/e2e/tests/layout-shell.e2e.ts               plain Playwright: every assertion is geometry, no wallet state
 web/e2e/tests/overlays.e2e.ts                   plain Playwright over this app's wallet fixture and its pages
 web/test/lib/context/config.test.ts             the batch size instead of the message limit

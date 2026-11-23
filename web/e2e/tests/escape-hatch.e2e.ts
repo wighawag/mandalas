@@ -7,15 +7,14 @@
 import {test, expect, type Page} from '@playwright/test';
 import {
 	approveHeldTransaction,
-	executeButton,
 	installStallingWallet,
 	isHoldingTransaction,
 	lockStallingWallet,
 	sendAndStall as stallARequest,
 	sentHashes,
 	STALLING_WALLET_NAME,
-	writeForm,
 } from '../fixtures/stalling-wallet';
+import {executeButton, writeArgs, writeInput} from '../fixtures/contracts-page';
 
 const {describe} = test;
 
@@ -86,18 +85,20 @@ describe('Stopping waiting for the wallet', () => {
 		page.locator('#--layer-system [role="dialog"]', {hasText});
 
 	/**
-	 * One distinctive address per test, so each proves its OWN input survived.
-	 * They are never sent anywhere: every call here is held by a wallet that does
-	 * not answer, so these are only ever bytes in a form.
+	 * One distinctive label per test, so each proves its OWN input survived. A
+	 * label, not an address: the stem's walk turns it into the write's arguments
+	 * (`MAIN_PAGE.write.args`, an operator address made from it). They are never
+	 * sent anywhere: every call here is held by a wallet that does not answer, so
+	 * these are only ever bytes in a form.
 	 */
-	const ADDRESSES = {
-		copy: '0x0000000000000000000000000000000000000011',
-		reconnect: '0x0000000000000000000000000000000000000015',
-		noWallet: '0x0000000000000000000000000000000000000016',
-		locked: '0x0000000000000000000000000000000000000017',
-		staysConnected: '0x0000000000000000000000000000000000000012',
-		released: '0x0000000000000000000000000000000000000013',
-		approvedLater: '0x0000000000000000000000000000000000000014',
+	const LABELS = {
+		copy: 'escape hatch copy',
+		reconnect: 'escape hatch reconnect',
+		noWallet: 'escape hatch no wallet',
+		locked: 'escape hatch locked',
+		staysConnected: 'escape hatch stays connected',
+		released: 'escape hatch released',
+		approvedLater: 'escape hatch approved later',
 	} as const;
 
 	/**
@@ -191,7 +192,7 @@ describe('Stopping waiting for the wallet', () => {
 	}
 
 	test('tells the truth, and never offers to cancel', async ({page}) => {
-		await sendAndStall(page, ADDRESSES.copy);
+		await sendAndStall(page, LABELS.copy);
 
 		await waitingModal(page)
 			.getByRole('button', {name: 'Stop waiting'})
@@ -214,7 +215,7 @@ describe('Stopping waiting for the wallet', () => {
 	test('releases the modal WITHOUT disconnecting the account', async ({
 		page,
 	}) => {
-		await sendAndStall(page, ADDRESSES.staysConnected);
+		await sendAndStall(page, LABELS.staysConnected);
 		// Captured rather than named, for the same reason as the locked test below:
 		// which step a connected app rests on is its TARGET step. The claim here is
 		// that stopping waiting moves NOTHING, and comparing against what it was
@@ -250,7 +251,7 @@ describe('Stopping waiting for the wallet', () => {
 		// obligation to settle, so no amount of waiting would have fixed it.
 		// A distinctive but harmless amount, so the assertion below that it is
 		// still there is actually about this test's input.
-		const player = ADDRESSES.released;
+		const player = LABELS.released;
 		await sendAndStall(page, player);
 
 		// The label, not the `disabled` attribute: this control stays clickable on
@@ -265,9 +266,7 @@ describe('Stopping waiting for the wallet', () => {
 		await expect(execute).toHaveText(/^execute$/i, {timeout: 15_000});
 		// And what they typed is still there. They have not been told anything
 		// happened, so taking their text away would be the app deciding it did.
-		await expect(writeForm(page).getByPlaceholder('0x...').first()).toHaveValue(
-			player,
-		);
+		await expect(writeInput(page, 0)).toHaveValue(writeArgs(player)[0]);
 		// Released without withdrawing anything: the wallet still has the request.
 		expect(await isHoldingTransaction(page)).toBe(true);
 	});
@@ -295,7 +294,7 @@ describe('Stopping waiting for the wallet', () => {
 		// which would hold all three up on its own and hide an upstream regression
 		// completely. So the library's list is read directly too: that number is the
 		// one that was 0.
-		await sendAndStall(page, ADDRESSES.reconnect);
+		await sendAndStall(page, LABELS.reconnect);
 
 		expect(await pendingRequestCount(page)).toBe(1);
 		await expect(escapeHatch(page)).toBeVisible();
@@ -421,7 +420,7 @@ describe('Stopping waiting for the wallet', () => {
 		// to call `cancel()` while a transaction is outstanding precisely because it
 		// throws away account data; driving it directly here asserts that even THAT
 		// state keeps announcing what the user's wallet is still holding.
-		await sendAndStall(page, ADDRESSES.noWallet);
+		await sendAndStall(page, LABELS.noWallet);
 		expect(await pendingRequestCount(page)).toBe(1);
 
 		await lockStallingWallet(page);
@@ -520,7 +519,7 @@ describe('Stopping waiting for the wallet', () => {
 		// `step: 'WalletConnected'`, so every `isTargetStepReached` branch rendered a
 		// wallet that was refusing everything as a working one, and the app's only
 		// suggestion was to give up.
-		await sendAndStall(page, ADDRESSES.locked);
+		await sendAndStall(page, LABELS.locked);
 		// Captured rather than named. The claim is that `unlock()` KEEPS the step
 		// where re-running the flow would rebuild it, and which step that is depends
 		// on the app's target: `SignedIn` here, `WalletConnected` in the template.
@@ -603,7 +602,7 @@ describe('Stopping waiting for the wallet', () => {
 	}) => {
 		// The promise the escape hatch makes, kept: "if you approve it later, it
 		// will still be sent". The app has to still be there to notice.
-		await sendAndStall(page, ADDRESSES.approvedLater);
+		await sendAndStall(page, LABELS.approvedLater);
 		await stopWaiting(page);
 
 		await approveHeldTransaction(page);

@@ -55,9 +55,10 @@ export const MAIN_PAGE = {
 	// revert is `setApprovalForAll(address operator, bool approved)`, revoking
 	// (`false`), so the label becomes the operator's address (its hash in the
 	// low bytes, one for a hash of zero). Its `bool` is a <select>, which the
-	// fixture's `fillWrite` does not fill, so this app's own
-	// `fixtures/stalling-wallet.ts` sends it, and the suites that would read
-	// this through the fixture (contracts, pending-operation) are omitted here.
+	// fixture's `fillWrite` selects. `fixtures/stalling-wallet.ts` sends it
+	// through the fixture; the suites that would read it through the template's
+	// `fixtures/test` (contracts, pending-operation) are omitted here, since this
+	// app's e2e offers no burner accounts for that fixture to list.
 	write: {
 		function: 'setApprovalForAll',
 		args: (label: string) => [labelAsAddress(label), 'false'],
