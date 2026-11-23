@@ -6,7 +6,7 @@ import {generatePrivateKey, privateKeyToAccount} from 'viem/accounts';
 import {encodePacked, keccak256, hexToBytes} from 'viem';
 import {generateTokenURI, template19_bis} from 'mandalas-common';
 
-const {provider, networkHelpers} = await network.connect();
+const {provider, networkHelpers} = await network.create();
 const {deployAll} = setupFixtures(provider);
 
 async function randomMintSignature(

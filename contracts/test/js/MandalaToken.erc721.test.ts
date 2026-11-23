@@ -6,7 +6,7 @@ import {network} from 'hardhat';
 import {setupFixtures} from './utils/index.js';
 import {describe, it} from 'node:test';
 
-const {provider, networkHelpers} = await network.connect();
+const {provider, networkHelpers} = await network.create();
 const {deployAll} = setupFixtures(provider);
 async function randomMintSignature(
 	to: `0x${string}`,
