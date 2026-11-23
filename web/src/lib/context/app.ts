@@ -3,7 +3,10 @@ import {
 	type OnchainStateStore,
 } from '$lib/onchain/state.js';
 import {createViewState, type ViewStateStore} from '$lib/view/index.js';
-import {createPurchaseFlow, type PurchaseFlowStore} from '$lib/ui/purchase/purchase-flow.js';
+import {
+	createPurchaseFlow,
+	type PurchaseFlowStore,
+} from '$lib/ui/purchase/purchase-flow.js';
 import {RandomTokenStore} from '$lib/stores/randomTokens.js';
 import {createNFTOfStore, type NFTOfStore} from '$lib/stores/nftsof.js';
 import type {TypedDeployments} from '$lib/deployments-store.js';
