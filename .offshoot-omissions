@@ -102,8 +102,11 @@ contracts/deployments/sepolia
 # keeps the inherited suites that are about the APP SHELL rather than the demo
 # (escape-hatch, layout-shell, overlays, service-worker-gateway).
 #
-# REPLACED: `demo.e2e.ts` and `pending-operation.e2e.ts` both reach their subject
-# by posting a greeting, and this repo mints instead.
+# REPLACED: `demo.e2e.ts` reaches its subject by posting a greeting, and this
+# repo mints instead. `pending-operation.e2e.ts` sends through `/contracts` since
+# K3c, but from the template's `fixtures/test` (its `connectedPage` and burner
+# account claims), which needs the burner-impersonation list below and this
+# repo's e2e does not offer one.
 # `impersonate-addresses.json` is the template's burner-impersonation list, and
 # this repo's wallet fixture does not read one.
 #
