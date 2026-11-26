@@ -134,9 +134,14 @@
 		</div>
 	{:else if currentAddress && !isWalletOwner}
 		<div class="mx-auto flex h-full w-full justify-between">
-			<a href={`#/`.concat(currentAddress)} class="m-2">
-				<Button variant="outline" size="sm">Show My Mandalas</Button>
-			</a>
+			<!-- The Button IS the link (it renders an <a> given href): a button inside
+			     a link is invalid HTML (test/no-nested-interactive.test.ts). -->
+			<Button
+				href={`#/`.concat(currentAddress)}
+				class="m-2"
+				variant="outline"
+				size="sm">Show My Mandalas</Button
+			>
 		</div>
 	{/if}
 
